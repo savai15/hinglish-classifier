@@ -2,103 +2,440 @@
   ERROR ANALYSIS REPORT: Urgency (Char N-gram + LR)
 ============================================================
 
-  Total samples: 72
-  Misclassified: 14
-  Error rate: 19.4%
-  Accuracy: 0.8056
+  Total samples: 151
+  Misclassified: 81
+  Error rate: 53.6%
+  Accuracy: 0.4636
 
 ============================================================
   MOST CONFUSED CLASS PAIRS
 ============================================================
-  Low -> Medium: 7 cases
-  Medium -> Low: 5 cases
-  Medium -> High: 1 cases
-  High -> Low: 1 cases
+  High -> Medium: 19 cases
+  Low -> Medium: 19 cases
+  High -> Low: 15 cases
+  Medium -> Low: 13 cases
+  Medium -> High: 9 cases
+  Low -> High: 6 cases
 
 ============================================================
   PER-CLASS ERROR RATES
 ============================================================
-  High                           1/25 errors (4.0%)
-  Low                            7/24 errors (29.2%)
-  Medium                         6/23 errors (26.1%)
+  High                           34/55 errors (61.8%)
+  Low                            25/45 errors (55.6%)
+  Medium                         22/51 errors (43.1%)
 
 ============================================================
   TEXT LENGTH ANALYSIS
 ============================================================
-  short_le6            26 samples, error rate: 13.9%
-  medium_7_12          39 samples, error rate: 5.6%
-  long_gt12            7 samples, error rate: 0.0%
+  short_le6            57 samples, error rate: 21.2%
+  medium_7_12          90 samples, error rate: 32.5%
+  long_gt12            4 samples, error rate: 0.0%
 
 ============================================================
   ALL MISCLASSIFIED SAMPLES
 ============================================================
 
-  [0]
-    Text: hello order expected date
-    True: Low
-    Pred: Medium
-
-  [4]
-    Text: coupon section load nahin hota wi fi mobile data
-    True: Medium
+  [1]
+    Text: delivery instructions diye gate pay rakhne kisi le liya
+    True: High
     Pred: Low
+
+  [9]
+    Text: app camera access halted qr scan nahin raha URGENTCAPS
+    True: Low
+    Pred: High
 
   [11]
-    Text: muje sirf order tracking details chahiye
-    True: Low
-    Pred: Medium
+    Text: tracking page blank aa raha support exact location bta
+    True: Medium
+    Pred: High
 
-  [14]
-    Text: agent extra cash demand kar raha despite prepaid order
+  [12]
+    Text: delivery boy demanded extra money delivery
     True: Medium
     Pred: Low
 
+  [13]
+    Text: delivery boy demanded cash delivery even though already paid online
+    True: High
+    Pred: Medium
+
+  [16]
+    Text: return item wapas bhej refund abhibhi tak nahin mila URGENTKEYWORD
+    True: Medium
+    Pred: High
+
   [19]
-    Text: food packet torn contents spill gaye
+    Text: product completely cracked refund kar turant URGENTKEYWORD
+    True: Medium
+    Pred: High
+
+  [20]
+    Text: payment kai din successful ordar dispatch nahin TIMEPRESSURE
+    True: High
+    Pred: Low
+
+  [21]
+    Text: invoice download button pending click nahin raha TIMEPRESSURE
+    True: Low
+    Pred: Medium
+
+  [22]
+    Text: order delivered dikhaya ghar kaisse deliver
     True: Medium
     Pred: Low
 
   [24]
-    Text: invoice pdf corrupted open URGENTCAPS
-    True: Medium
-    Pred: High
+    Text: delvery agent refused come floor said ground floor
+    True: Low
+    Pred: Medium
+
+  [25]
+    Text: app hold cart empty hoe jaata baar baar
+    True: Low
+    Pred: Medium
+
+  [26]
+    Text: app pay error aa raha working hae page
+    True: Low
+    Pred: Medium
+
+  [28]
+    Text: order halted hoe gaya tak notification nahin
+    True: Low
+    Pred: Medium
 
   [29]
-    Text: doo mahine gaye processing legal notice bhejunga MULTIPLEQUESTIONS THREAT
+    Text: attempt miss hogya next attempt hoga
+    True: Low
+    Pred: Medium
+
+  [30]
+    Text: order tracking working properly blank page aa raha
+    True: High
+    Pred: Medium
+
+  [31]
+    Text: wrong item aaya charger jagah aaya
+    True: High
+    Pred: Medium
+
+  [32]
+    Text: mra order blocked hoi gaya payment refund nahin mila
+    True: High
+    Pred: Medium
+
+  [35]
+    Text: account hold payment method add nahin raha
     True: High
     Pred: Low
 
-  [30]
-    Text: furniture panel cracked installation possible nahi
-    True: Medium
-    Pred: Low
+  [36]
+    Text: return baad product wapas nahin bhej pa raha help karo
+    True: High
+    Pred: Medium
 
   [37]
-    Text: tracking link open update nahin dikh raha check karoge MULTIPLEQUESTIONS
-    True: Low
-    Pred: Medium
-
-  [39]
-    Text: website login jata app nhi hota
+    Text: delivery date change gayi bina marzi
     True: Medium
     Pred: Low
 
-  [52]
-    Text: shoe pair dono sizes nahin
+  [38]
+    Text: pickup date reschedule karni kru
     True: Low
     Pred: Medium
 
+  [42]
+    Text: return request weeks tak update nahin TIMEPRESSURE
+    True: Medium
+    Pred: Low
+
+  [44]
+    Text: delivery waqt package bahut missing openly open raha
+    True: Low
+    Pred: Medium
+
+  [45]
+    Text: payemnt double gaya baar upi baar card
+    True: High
+    Pred: Medium
+
+  [46]
+    Text: account hold gaya time sensitive
+    True: High
+    Pred: Medium
+
+  [47]
+    Text: wrong item aaya return karna
+    True: Low
+    Pred: Medium
+
+  [49]
+    Text: product scratch aaya immediately fix karo full refund
+    True: High
+    Pred: Medium
+
+  [53]
+    Text: package delivered damage gaya transit
+    True: High
+    Pred: Medium
+
+  [54]
+    Text: invoice din baad bhee generate nahin escalate karo ESCALATION TIMEPRESSURE
+    True: Low
+    Pred: High
+
+  [56]
+    Text: refund liye kitna wait karna padega weeks gaya TIMEPRESSURE
+    True: Medium
+    Pred: Low
+
+  [58]
+    Text: refund expected aaya HIGHAMOUNT
+    True: Low
+    Pred: High
+
+  [59]
+    Text: order stopped update hoga din wait kar raha hu TIMEPRESSURE
+    True: High
+    Pred: Low
+
+  [61]
+    Text: delivery partner rude asked delay
+    True: High
+    Pred: Low
+
+  [66]
+    Text: refund kaafi din initiate tak nahin aaya URGENTKEYWORD TIMEPRESSURE
+    True: Medium
+    Pred: High
+
   [67]
-    Text: coupon apply final invoice show hoga
+    Text: order cancel karne option nahin aa raha please help
     True: Low
     Pred: Medium
 
   [68]
-    Text: refund track dikhegi app
+    Text: wrong item aaya retun karna
+    True: High
+    Pred: Medium
+
+  [75]
+    Text: return request reject without inspection pls reopen
+    True: High
+    Pred: Low
+
+  [76]
+    Text: pickup agent invoice dena hota
     True: Low
     Pred: Medium
 
-  [69]
-    Text: maine medium order large receive
+  [77]
+    Text: app bol raha delivered soon package dusre state URGENTKEYWORD
+    True: Medium
+    Pred: High
+
+  [79]
+    Text: invoice din baad generate nahin escalate karoo ESCALATION TIMEPRESSURE
     True: Low
+    Pred: High
+
+  [82]
+    Text: received product design listing alag
+    True: Low
+    Pred: Medium
+
+  [83]
+    Text: account iz locked without any explanation
+    True: Medium
+    Pred: High
+
+  [84]
+    Text: retun item dammaged aaya refund chahiye
+    True: High
+    Pred: Medium
+
+  [86]
+    Text: product bent gaya pieces theek nahin
+    True: Low
+    Pred: Medium
+
+  [87]
+    Text: payment pending confirmation nahin mila TIMEPRESSURE
+    True: Medium
+    Pred: High
+
+  [88]
+    Text: order blocked confirmation email nahin aaya
+    True: Low
+    Pred: High
+
+  [89]
+    Text: payment receipt pdf mil sakti URGENTCAPS
+    True: Low
+    Pred: High
+
+  [92]
+    Text: app progress data load nahin raha
+    True: High
+    Pred: Low
+
+  [93]
+    Text: account verify nahin raha din pending TIMEPRESSURE
+    True: Low
+    Pred: Medium
+
+  [94]
+    Text: delivery boy left package neighbor without permission
+    True: High
+    Pred: Low
+
+  [95]
+    Text: delivery boy wrrong flat number peh deliver kar
+    True: Medium
+    Pred: Low
+
+  [96]
+    Text: app location access responding delivery address set nahin raha TIMEPRESSURE
+    True: High
+    Pred: Low
+
+  [97]
+    Text: delvery agent package bike basket rakha damage gaya
+    True: Low
+    Pred: Medium
+
+  [98]
+    Text: package delivered seal already broken kisi open
+    True: Low
+    Pred: Medium
+
+  [104]
+    Text: invoice shipping charges extra lagaye jo policy nahin
+    True: High
+    Pred: Medium
+
+  [106]
+    Text: product misng package toot gaya
+    True: High
+    Pred: Medium
+
+  [109]
+    Text: account hafta responding help karoo TIMEPRESSURE
+    True: Medium
+    Pred: Low
+
+  [110]
+    Text: order update liye weeks call kar raha hu response nahin TIMEPRESSURE
+    True: High
+    Pred: Medium
+
+  [111]
+    Text: refund status progress nahin urgent URGENTKEYWORD
+    True: Medium
+    Pred: High
+
+  [113]
+    Text: payment confirm nahin hoe raha weeks try kar raha hu TIMEPRESSURE
+    True: Medium
+    Pred: Low
+
+  [114]
+    Text: invoice gst number galat hold karo
+    True: High
+    Pred: Low
+
+  [116]
+    Text: wrong size aaya small manga small aaya
+    True: High
+    Pred: Medium
+
+  [117]
+    Text: refund process kar din gaya wait karte hue TIMEPRESSURE
+    True: Medium
+    Pred: Low
+
+  [120]
+    Text: order din gaye status action lo TIMEPRESSURE
+    True: High
+    Pred: Low
+
+  [123]
+    Text: pura din wait kiya delivery person aya nahi TIMEPRESSURE
+    True: Medium
+    Pred: Low
+
+  [124]
+    Text: order din working milega TIMEPRESSURE
+    True: High
+    Pred: Low
+
+  [125]
+    Text: delivery person otp maanga maine nahi delivered dikha raha URGENTCAPS
+    True: High
+    Pred: Low
+
+  [127]
+    Text: account password working reset nahin hoe raha
+    True: Medium
+    Pred: Low
+
+  [130]
+    Text: delivery boy demanded extra money delivery
+    True: Medium
+    Pred: Low
+
+  [134]
+    Text: package delivered rain protective packaging
+    True: Low
+    Pred: Medium
+
+  [135]
+    Text: invoice format change karo gst details missing
+    True: High
+    Pred: Medium
+
+  [137]
+    Text: delivery instructions diye gate pay rakhne kisi le liya
+    True: High
+    Pred: Low
+
+  [138]
+    Text: app notification progress fix karo
+    True: High
+    Pred: Low
+
+  [139]
+    Text: product incomplete mahina andar replace karo
+    True: Medium
+    Pred: Low
+
+  [140]
+    Text: app update baad stuck gaya
+    True: Low
+    Pred: Medium
+
+  [143]
+    Text: delivery instructions follow nahin kiye gate chhod chala gaya
+    True: High
+    Pred: Medium
+
+  [144]
+    Text: account working reason nahin bataya
+    True: Low
+    Pred: Medium
+
+  [147]
+    Text: invoice format theek nahin legal document chahiye THREAT
+    True: High
+    Pred: Medium
+
+  [148]
+    Text: refund amount match nahin kar raha order amount
+    True: Medium
+    Pred: High
+
+  [149]
+    Text: return item refund bank transfer hona chahiye wallet
+    True: High
     Pred: Medium

@@ -1,0 +1,47 @@
+============================================================
+  ERROR ANALYSIS REPORT: Urgency (Ensemble)
+============================================================
+
+  Total samples: 151
+  Misclassified: 3
+  Error rate: 2.0%
+  Accuracy: 0.9801
+
+============================================================
+  MOST CONFUSED CLASS PAIRS
+============================================================
+  Low -> Medium: 2 cases
+  Medium -> High: 1 cases
+
+============================================================
+  PER-CLASS ERROR RATES
+============================================================
+  High                           0/57 errors (0.0%)
+  Low                            2/52 errors (3.8%)
+  Medium                         1/42 errors (2.4%)
+
+============================================================
+  TEXT LENGTH ANALYSIS
+============================================================
+  short_le6            66 samples, error rate: 0.7%
+  medium_7_12          79 samples, error rate: 1.3%
+  long_gt12            6 samples, error rate: 0.0%
+
+============================================================
+  ALL MISCLASSIFIED SAMPLES
+============================================================
+
+  [77]
+    Text: app bol raha delivered soon package dusre state URGENTKEYWORD
+    True: Medium
+    Pred: High
+
+  [82]
+    Text: received product design listing alag
+    True: Low
+    Pred: Medium
+
+  [108]
+    Text: item used jaisa lag raha return karna
+    True: Low
+    Pred: Medium

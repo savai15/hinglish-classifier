@@ -1,95 +1,92 @@
 ======================================================================
-  HINGLISH E-COMMERCE COMPLAINT CLASSIFIER - FINAL REPORT (Enhanced v2)
+  HINGLISH E-COMMERCE COMPLAINT CLASSIFIER - FINAL REPORT (Enhanced v3)
 ======================================================================
 
-  Dataset: 360 samples
+  Dataset: 1002 samples (360 original + 642 augmented)
   Categories: 6
   Urgency levels: 3
 
-  Train: 288 | Test: 72
+  Train: 851 | Test: 151
   CV Folds: 5
-  Enhancement: Urgency cues + Hyperparameter tuning + Error analysis
+  Enhancements: Augmentation + Urgency cues + Tuning + Ensemble + Error analysis
 
 ======================================================================
-  CATEGORY CLASSIFICATION RESULTS (Tuned Models)
-======================================================================
-
-  TF-IDF + LR:
-    Accuracy:         0.7917
-    F1 (macro):       0.7934
-    F1 (weighted):    0.7934
-    CV F1 (mean):     0.7477
-    Train time:       0.07s
-
-  Char N-gram + LR:
-    Accuracy:         0.6944
-    F1 (macro):       0.6925
-    F1 (weighted):    0.6925
-    CV F1 (mean):     0.7348
-    Train time:       0.66s
-
-  Combined (Word+Char):
-    Accuracy:         0.6944
-    F1 (macro):       0.6904
-    F1 (weighted):    0.6904
-    CV F1 (mean):     0.7386
-    Train time:       0.65s
-
-  TF-IDF + SVM:
-    Accuracy:         0.7917
-    F1 (macro):       0.7924
-    F1 (weighted):    0.7924
-    CV F1 (mean):     0.7511
-    Train time:       0.27s
-
-======================================================================
-  URGENCY CLASSIFICATION RESULTS (Tuned Models)
+  CATEGORY CLASSIFICATION RESULTS
 ======================================================================
 
   TF-IDF + LR:
-    Accuracy:         0.7500
-    F1 (macro):       0.7502
-    F1 (weighted):    0.7539
-    CV F1 (mean):     0.7513
-    Train time:       0.05s
+    Accuracy:       0.9272
+    F1 (macro):     0.9265
+    F1 (weighted):  0.9266
 
   Char N-gram + LR:
-    Accuracy:         0.8056
-    F1 (macro):       0.8023
-    F1 (weighted):    0.8056
-    CV F1 (mean):     0.7745
-    Train time:       0.52s
+    Accuracy:       0.9139
+    F1 (macro):     0.9134
+    F1 (weighted):  0.9137
 
   Combined (Word+Char):
-    Accuracy:         0.7639
-    F1 (macro):       0.7602
-    F1 (weighted):    0.7639
-    CV F1 (mean):     0.7684
-    Train time:       0.58s
+    Accuracy:       0.9073
+    F1 (macro):     0.9065
+    F1 (weighted):  0.9068
 
   TF-IDF + SVM:
-    Accuracy:         0.7639
-    F1 (macro):       0.7602
-    F1 (weighted):    0.7639
-    CV F1 (mean):     0.7575
-    Train time:       0.14s
+    Accuracy:       0.9338
+    F1 (macro):     0.9332
+    F1 (weighted):  0.9333
+
+  Ensemble:
+    Accuracy:       0.9272
+    F1 (macro):     0.9263
+    F1 (weighted):  0.9264
+
+======================================================================
+  URGENCY CLASSIFICATION RESULTS
+======================================================================
+
+  TF-IDF + LR:
+    Accuracy:       0.9603
+    F1 (macro):     0.9580
+    F1 (weighted):  0.9606
+
+  Char N-gram + LR:
+    Accuracy:       0.9603
+    F1 (macro):     0.9582
+    F1 (weighted):  0.9605
+
+  Combined (Word+Char):
+    Accuracy:       0.9536
+    F1 (macro):     0.9513
+    F1 (weighted):  0.9541
+
+  TF-IDF + SVM:
+    Accuracy:       0.9669
+    F1 (macro):     0.9652
+    F1 (weighted):  0.9670
+
+  Ensemble:
+    Accuracy:       0.9801
+    F1 (macro):     0.9788
+    F1 (weighted):  0.9801
 
 ======================================================================
   BEST MODELS
 ======================================================================
 
-  Best Category Model: TF-IDF + LR (F1=0.7934, CV=0.7477)
-  Best Urgency Model:  Char N-gram + LR (F1=0.8023, CV=0.7745)
+  Best Category Model: TF-IDF + SVM (F1=0.9332)
+  Best Urgency Model:  Ensemble (F1=0.9788)
+
+  Ensemble Category F1: 0.9263
+  Ensemble Urgency F1:  0.9788
 
 ======================================================================
-  ENHANCEMENT IMPACT
+  V2 -> V3 IMPROVEMENT
 ======================================================================
+  v2 Category Best F1: 0.7934 (TF-IDF + LR)
+  v3 Category Best F1: 0.9332 (TF-IDF + SVM)
+  Improvement: 0.1398 (+17.6%)
 
-  v2 Enhancements applied:
-  1. Urgency cue detection (CAPS, threats, escalation, high amounts)
-  2. Repeated letter normalization (urgenttt -> urgent)
-  3. 5-fold cross-validation for reliable evaluation
-  4. Hyperparameter tuning with RandomizedSearchCV
-  5. Comprehensive error analysis
+  v2 Urgency Best F1: 0.8023 (Char N-gram + LR)
+  v3 Urgency Best F1: 0.9788 (Ensemble)
+  Improvement: 0.1765 (+22.0%)
 
 ======================================================================

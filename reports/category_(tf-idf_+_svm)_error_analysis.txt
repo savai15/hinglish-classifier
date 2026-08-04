@@ -1,0 +1,92 @@
+============================================================
+  ERROR ANALYSIS REPORT: Category (TF-IDF + SVM)
+============================================================
+
+  Total samples: 151
+  Misclassified: 10
+  Error rate: 6.6%
+  Accuracy: 0.9338
+
+============================================================
+  MOST CONFUSED CLASS PAIRS
+============================================================
+  Order_Status -> Account_Technical: 2 cases
+  Returns_Refunds -> Order_Status: 1 cases
+  Delivery_Issue -> Wrong_Damaged_Product: 1 cases
+  Payment_Invoice -> Order_Status: 1 cases
+  Delivery_Issue -> Account_Technical: 1 cases
+  Returns_Refunds -> Payment_Invoice: 1 cases
+  Delivery_Issue -> Order_Status: 1 cases
+  Order_Status -> Payment_Invoice: 1 cases
+  Order_Status -> Delivery_Issue: 1 cases
+
+============================================================
+  PER-CLASS ERROR RATES
+============================================================
+  Account_Technical              0/25 errors (0.0%)
+  Delivery_Issue                 3/25 errors (12.0%)
+  Order_Status                   4/25 errors (16.0%)
+  Payment_Invoice                1/26 errors (3.8%)
+  Returns_Refunds                2/25 errors (8.0%)
+  Wrong_Damaged_Product          0/25 errors (0.0%)
+
+============================================================
+  TEXT LENGTH ANALYSIS
+============================================================
+  short_le6            66 samples, error rate: 2.0%
+  medium_7_12          79 samples, error rate: 4.0%
+  long_gt12            6 samples, error rate: 0.7%
+
+============================================================
+  ALL MISCLASSIFIED SAMPLES
+============================================================
+
+  [18]
+    Text: expected date app new date show nahin rahi
+    True: Order_Status
+    Pred: Account_Technical
+
+  [23]
+    Text: exchange item dispatch hoga MULTIPLEQUESTIONS
+    True: Returns_Refunds
+    Pred: Order_Status
+
+  [29]
+    Text: attempt miss hogya next attempt hoga
+    True: Delivery_Issue
+    Pred: Wrong_Damaged_Product
+
+  [50]
+    Text: billing address edit kar sakta hu order baad
+    True: Payment_Invoice
+    Pred: Order_Status
+
+  [71]
+    Text: agent address nahin mil raha bol raha jabki address bilkul correct
+    True: Delivery_Issue
+    Pred: Account_Technical
+
+  [76]
+    Text: pickup agent invoice dena hota
+    True: Returns_Refunds
+    Pred: Payment_Invoice
+
+  [77]
+    Text: app bol raha delivered soon package dusre state URGENTKEYWORD
+    True: Order_Status
+    Pred: Account_Technical
+
+  [97]
+    Text: delivery date hafta tak nahin aayi escalate karo URGENTCAPS EXCLAMATION ESCALATION URGENTKEYWORD
+    True: Delivery_Issue
+    Pred: Order_Status
+
+  [102]
+    Text: teen baar contact kiya exact stats nahin mila foran senior team bhejo URGENTCAPS ESCALATION
+    True: Order_Status
+    Pred: Payment_Invoice
+
+  [146]
+    Text: prepaid package missing loss horha escalate immediatly ESCALATION MEDIUMAMOUNT
+    True: Order_Status
+    Pred: Delivery_Issue

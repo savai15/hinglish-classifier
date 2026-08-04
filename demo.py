@@ -4,8 +4,32 @@ Hinglish E-Commerce Complaint Classifier - Live Demo (Enhanced v3)
 Run this script to test the trained models with custom Hinglish complaints.
 Now with ensemble models, confidence scores, and thresholding.
 """
-import os
+import subprocess
 import sys
+
+# Auto-install missing dependencies
+REQUIRED_PACKAGES = {
+    'numpy': 'numpy>=1.24.0',
+    'pandas': 'pandas>=2.0.0',
+    'sklearn': 'scikit-learn>=1.3.0',
+    'scipy': 'scipy>=1.10.0',
+}
+
+def install_missing():
+    missing = []
+    for mod, pkg in REQUIRED_PACKAGES.items():
+        try:
+            __import__(mod)
+        except ImportError:
+            missing.append(pkg)
+    if missing:
+        print(f"Installing missing packages: {', '.join(missing)}...")
+        subprocess.check_call([sys.executable, '-m', 'pip', 'install', '--quiet'] + missing)
+        print("Done!\n")
+
+install_missing()
+
+import os
 import numpy as np
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))

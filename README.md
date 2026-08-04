@@ -116,6 +116,16 @@ project/
 
 ## Installation
 
+**No manual setup needed!** All scripts auto-install missing dependencies.
+
+Just clone and run:
+```bash
+git clone https://github.com/savai15/test.git
+cd test
+streamlit run app.py
+```
+
+If you prefer manual installation:
 ```bash
 pip install -r requirements.txt
 ```

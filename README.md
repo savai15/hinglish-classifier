@@ -110,6 +110,7 @@ project/
 │   └── augment.py                        # Data augmentation generator
 ├── main.py                               # End-to-end training pipeline (v3)
 ├── demo.py                               # Live demo with confidence scores
+├── app.py                                # Streamlit web app (beautiful UI)
 └── requirements.txt                      # Python dependencies
 ```
 
@@ -137,7 +138,20 @@ This will:
 7. Generate error analysis reports
 8. Save all models and visualizations
 
-### Run Live Demo
+### Run Streamlit Web App (Recommended)
+```bash
+cd project
+streamlit run app.py
+```
+Opens a beautiful web interface at **http://localhost:8501** with:
+- Dark gradient UI with glassmorphism design
+- Real-time classification with confidence bars
+- 8 clickable sample complaints
+- Detailed probability tables
+- Low-confidence warnings
+- Sidebar with model info
+
+### Run CLI Demo
 ```bash
 python demo.py
 ```

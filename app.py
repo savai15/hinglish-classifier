@@ -11,7 +11,6 @@ import sys
 # AUTO-INSTALL MISSING DEPENDENCIES
 # ============================================================================
 REQUIRED_PACKAGES = {
-    'streamlit': 'streamlit>=1.30.0',
     'numpy': 'numpy>=1.24.0',
     'pandas': 'pandas>=2.0.0',
     'matplotlib': 'matplotlib>=3.7.0',
@@ -31,21 +30,13 @@ def install_missing_packages():
             missing.append(package_name)
 
     if missing:
-        print(f"Installing missing packages: {', '.join(missing)}")
+        print(f"Installing missing packages: {', '.join(missing)}...")
         subprocess.check_call(
             [sys.executable, '-m', 'pip', 'install', '--quiet'] + missing,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
         )
         print("Done! Starting app...")
-        # Re-import after installation
-        import importlib
-        for module_name in REQUIRED_PACKAGES:
-            try:
-                mod = __import__(module_name)
-                importlib.reload(mod)
-            except ImportError:
-                pass
 
 install_missing_packages()
 

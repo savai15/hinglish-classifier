@@ -38,7 +38,7 @@ def install_missing():
     if missing:
         print(f"Installing missing packages: {', '.join(missing)}...")
         subprocess.check_call([sys.executable, '-m', 'pip', 'install', '--quiet'] + missing)
-        print("Done!\n")
+        print("Done!")
 
 install_missing()
 

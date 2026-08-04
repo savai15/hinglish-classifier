@@ -38,6 +38,8 @@ from src.models import (
     train_model,
     predict,
     save_model,
+    EnsembleClassifier,
+    build_ensemble,
 )
 from src.evaluation import (
     evaluate_classifier,
@@ -51,36 +53,6 @@ from src.evaluation import (
     print_cv_table,
 )
 from src.error_analysis import analyze_errors, compare_error_rates
-
-
-class EnsembleClassifier:
-    """Soft-voting ensemble of multiple classifiers."""
-
-    def __init__(self, models_dict):
-        self.models = models_dict
-        self.classes_ = None
-
-    def fit(self, X, y):
-        for name, model in self.models.items():
-            model.fit(X, y)
-        self.classes_ = self.models[list(self.models.keys())[0]].classes_
-        return self
-
-    def predict(self, X):
-        probas = self.predict_proba(X)
-        return self.classes_[np.argmax(probas, axis=1)]
-
-    def predict_proba(self, X):
-        all_probas = []
-        for name, model in self.models.items():
-            proba = model.predict_proba(X)
-            all_probas.append(proba)
-        return np.mean(all_probas, axis=0)
-
-
-def build_ensemble(models_dict):
-    """Build an ensemble from a dictionary of trained pipelines."""
-    return EnsembleClassifier(models_dict)
 
 
 def main():

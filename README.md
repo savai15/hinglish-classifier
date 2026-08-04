@@ -11,53 +11,105 @@ This project builds a dual classification system that predicts:
 - **Category**: Which type of complaint (Order Status, Delivery Issue, Wrong/Damaged Product, Returns & Refunds, Payment/Invoice, Account/Technical)
 - **Urgency**: How urgent the complaint is (Low, Medium, High)
 
-## Dataset
-- **360 labeled Hinglish complaints** with real-world spelling variants
-- **6 categories**: Account_Technical, Delivery_Issue, Order_Status, Payment_Invoice, Returns_Refunds, Wrong_Damaged_Product
-- **3 urgency levels**: Low, Medium, High
-- complaints exhibit natural code-mixing of Hindi and English in Roman script
+## Results
 
-## Approaches Compared
+### Final Performance (v3 - Enhanced)
 
 | Model | Category F1 | Urgency F1 |
 |-------|-------------|------------|
-| TF-IDF + Logistic Regression (Baseline) | 0.6607 | 0.6647 |
-| Character N-gram + Logistic Regression | 0.6494 | **0.7230** |
-| Combined Word + Char N-gram | **0.6916** | 0.6822 |
-| TF-IDF + Linear SVM | 0.6856 | 0.6300 |
+| TF-IDF + Logistic Regression | 0.9265 | 0.9580 |
+| Character N-gram + Logistic Regression | 0.9134 | 0.9582 |
+| Combined Word + Char N-gram | 0.9065 | 0.9513 |
+| TF-IDF + Linear SVM | **0.9332** | 0.9652 |
+| **Ensemble (Top 3)** | 0.9263 | **0.9788** |
 
-### Best Models
-- **Category**: Combined Word + Char N-gram (F1 = 0.6916)
-- **Urgency**: Character N-gram + LR (F1 = 0.7230)
+### Evolution Across Versions
 
-### Key Finding
-Character n-gram approach (mimicking FastText's subword method) outperforms word-level TF-IDF on Hinglish text because it naturally handles:
-- Spelling variants (nahi/nai/nahee share character n-grams)
-- Out-of-vocabulary words
-- Code-mixed Hindi-English text
+| Version | Category F1 | Urgency F1 | Key Changes |
+|---------|------------|------------|-------------|
+| v1 (baseline) | 0.6916 | 0.7230 | 360 samples, no CV, no tuning |
+| v2 (+CV, +tuning) | 0.7934 | 0.8023 | 5-fold CV, hyperparameter tuning, urgency cues |
+| **v3 (+augmentation, +ensemble)** | **0.9332** | **0.9788** | 1002 samples, ensemble, confidence thresholding |
+
+**Total improvement: Category +34.9% | Urgency +35.4%**
+
+## Dataset
+- **1002 labeled Hinglish complaints** (360 original + 642 synthetic via augmentation)
+- **6 categories**: Account_Technical, Delivery_Issue, Order_Status, Payment_Invoice, Returns_Refunds, Wrong_Damaged_Product
+- **3 urgency levels**: Low, Medium, High
+- Complaints exhibit natural code-mixing of Hindi and English in Roman script
+
+### Data Augmentation
+- Generated 642 synthetic complaints using 180 urgency-specific templates
+- Templates categorized by urgency level (HIGH/MEDIUM/LOW) with appropriate tone:
+  - **HIGH**: Threats, escalation words, exclamation marks ("Consumer court jaunga!", "URGENT hai!")
+  - **MEDIUM**: Firm complaints, issue descriptions ("Update do", "Please check karo")
+  - **LOW**: Questions, general inquiries ("Usually kitne din leta h?", "Kaise karu?")
+- Spelling variations applied to mimic real Hinglish writing patterns
+
+## Enhancements (v1 -> v3)
+
+### v2 Enhancements
+1. **5-Fold Cross-Validation** - Reliable evaluation with mean +/- std reporting
+2. **Enhanced Preprocessing** - Urgency cue detection (CAPS, threats, escalation, exclamation marks)
+3. **Repeated Letter Normalization** - `urgenttt` -> `urgent`
+4. **Hyperparameter Tuning** - RandomizedSearchCV with 25 iterations per model
+5. **Error Analysis Module** - Confused pairs, per-class error rates, text length analysis
+
+### v3 Enhancements
+1. **Data Augmentation** - 360 -> 1002 samples with urgency-appropriate templates
+2. **Ensemble Model** - Soft-voting of top 3 models per task
+3. **Confidence Thresholding** - 40% threshold, flags low-confidence predictions for human review
+4. **Updated Demo** - Shows confidence scores and [NEEDS REVIEW] flags
 
 ## Project Structure
 ```
 project/
 ├── data/
-│   ├── raw/                              # Original CSV dataset
+│   ├── raw/
+│   │   ├── hinglish_ecommerce_complaints_360_spelling_variants.csv   # Original 360 samples
+│   │   └── hinglish_complaints_augmented.csv                         # Augmented 1002 samples
 │   └── processed/                        # Preprocessed data
-├── models/                               # Trained models (.pkl files)
-├── reports/                              # Visualizations and results
-│   ├── category_cm_*.png                 # Confusion matrices
+├── models/
+│   ├── preprocessor.pkl                  # Hinglish text preprocessor
+│   ├── category_ensemble.pkl             # Best category model (ensemble)
+│   ├── category_tf-idf__svm.pkl          # Category TF-IDF + SVM
+│   ├── category_tf-idf__lr.pkl           # Category TF-IDF + LR
+│   ├── category_char_n-gram__lr.pkl      # Category Char N-gram + LR
+│   ├── category_combined_wordchar.pkl    # Category Combined model
+│   ├── urgency_ensemble.pkl              # Best urgency model (ensemble)
+│   ├── urgency_tf-idf__svm.pkl           # Urgency TF-IDF + SVM
+│   ├── urgency_tf-idf__lr.pkl            # Urgency TF-IDF + LR
+│   ├── urgency_char_n-gram__lr.pkl       # Urgency Char N-gram + LR
+│   └── urgency_combined_wordchar.pkl     # Urgency Combined model
+├── reports/
+│   ├── results.txt                       # Full text report
+│   ├── category_cm_best.png              # Best category confusion matrix
+│   ├── category_cm_norm_best.png         # Normalized confusion matrix
 │   ├── category_model_comparison.png     # Model comparison chart
 │   ├── category_per_class_f1.png         # Per-class F1 scores
-│   ├── urgency_cm_*.png                  # Confusion matrices
+│   ├── category_cv_comparison.png        # Cross-validation comparison
+│   ├── category_error_rates.png          # Error rate comparison
+│   ├── category_*_error_analysis.txt     # Detailed error analysis
+│   ├── category_*_confused_pairs.png     # Confused class pairs
+│   ├── category_*_per_class_accuracy.png # Per-class accuracy
+│   ├── urgency_cm_best.png               # Best urgency confusion matrix
+│   ├── urgency_cm_norm_best.png          # Normalized confusion matrix
 │   ├── urgency_model_comparison.png      # Model comparison chart
-│   └── results.txt                       # Full text report
+│   ├── urgency_per_class_f1.png          # Per-class F1 scores
+│   ├── urgency_cv_comparison.png         # Cross-validation comparison
+│   ├── urgency_error_rates.png           # Error rate comparison
+│   └── urgency_*_error_analysis.txt      # Detailed error analysis
 ├── src/
 │   ├── __init__.py
-│   ├── preprocessor.py                   # Hinglish text preprocessing
-│   ├── data_loader.py                    # Data loading and splitting
-│   ├── models.py                         # Model definitions
-│   └── evaluation.py                     # Evaluation and visualization
-├── main.py                               # End-to-end training pipeline
-├── demo.py                               # Live demo with interactive input
+│   ├── preprocessor.py                   # Hinglish text preprocessing (with urgency cues)
+│   ├── data_loader.py                    # Data loading, splitting, CV splits
+│   ├── models.py                         # Model definitions + ensemble + tuning
+│   ├── evaluation.py                     # Evaluation, CV, visualizations
+│   ├── error_analysis.py                 # Error analysis module
+│   └── augment.py                        # Data augmentation generator
+├── main.py                               # End-to-end training pipeline (v3)
+├── demo.py                               # Live demo with confidence scores
 └── requirements.txt                      # Python dependencies
 ```
 
@@ -65,7 +117,6 @@ project/
 
 ```bash
 pip install -r requirements.txt
-python -c "import nltk; nltk.download('stopwords', quiet=True)"
 ```
 
 ## Usage
@@ -76,9 +127,31 @@ cd project
 python main.py
 ```
 
+This will:
+1. Load the augmented dataset (1002 samples)
+2. Preprocess with urgency cue detection
+3. Run 5-fold cross-validation on all models
+4. Tune hyperparameters with RandomizedSearchCV
+5. Build ensemble models
+6. Evaluate on test set
+7. Generate error analysis reports
+8. Save all models and visualizations
+
 ### Run Live Demo
 ```bash
 python demo.py
+```
+
+Example output:
+```
+Complaint: Mera order abhi tak nahi aaya, bahut urgent hai!
+-> Category: Order_Status (78%) | Urgency: High (96%)
+
+Complaint: Profile name edit kar sakta hu??
+-> Category: Account_Technical (79%) | Urgency: Low (93%)
+
+Complaint: Consumer court me complaint karunga agar refund nahi mila!
+-> Category: Returns_Refunds (60%) | Urgency: High (96%)
 ```
 
 ### Use in Your Code
@@ -86,43 +159,93 @@ python demo.py
 from src.preprocessor import HinglishPreprocessor
 from src.models import load_model
 
-# Load
+# Load ensemble models
 preprocessor = HinglishPreprocessor.load("models/preprocessor.pkl")
-cat_model = load_model("models/category_combined_wordchar.pkl")
-urg_model = load_model("models/urgency_char_n-gram__lr.pkl")
+cat_model = load_model("models/category_ensemble.pkl")
+urg_model = load_model("models/urgency_ensemble.pkl")
 
-# Predict
+# Predict with confidence
+import numpy as np
+
 complaint = "Mera order nahi aaya, refund do!"
 cleaned = preprocessor.preprocess(complaint)
-category = cat_model.predict([cleaned])[0]   # -> 'Order_Status'
-urgency = urg_model.predict([cleaned])[0]    # -> 'High'
+
+category = cat_model.predict([cleaned])[0]
+urgency = urg_model.predict([cleaned])[0]
+
+# Get confidence scores
+cat_proba = cat_model.predict_proba([cleaned])[0]
+urg_proba = urg_model.predict_proba([cleaned])[0]
+cat_confidence = np.max(cat_proba)
+urg_confidence = np.max(urg_proba)
+
+# Flag low confidence predictions
+THRESHOLD = 0.4
+if cat_confidence < THRESHOLD:
+    print("Category prediction needs human review")
+if urg_confidence < THRESHOLD:
+    print("Urgency prediction needs human review")
+```
+
+### Generate Augmented Data
+```bash
+python src/augment.py
 ```
 
 ## Technical Details
 
-### Preprocessing Pipeline
+### Preprocessing Pipeline (Enhanced v2)
 1. Lowercase conversion
-2. Hinglish spelling normalization (nahi/nai/nahee -> nahin)
-3. URL/email/phone/amount token replacement
-4. Special character removal
-5. Hindi + English stopword removal
-6. Short word filtering
+2. Repeated letter normalization (`urgenttt` -> `urgent`)
+3. Hinglish spelling normalization (`nahi/nai/nahee` -> `nahin`)
+4. **Urgency cue detection** (before cleaning):
+   - ALL CAPS words -> `URGENTCAPS` token
+   - Exclamation marks -> `EXCLAMATION` / `EXCLAMATIONHIGH` tokens
+   - Threat words ("consumer court", "legal") -> `THREAT` token
+   - Escalation words ("manager", "senior") -> `ESCALATION` token
+   - High-value amounts (>=5000) -> `HIGHAMOUNT` token
+   - Urgency keywords ("urgent", "jaldi") -> `URGENTKEYWORD` token
+   - Time pressure words -> `TIMEPRESSURE` token
+5. URL/email/phone/amount token replacement
+6. Special character removal
+7. Hindi + English stopword removal
+8. Short word filtering
+9. Urgency tokens appended to text
 
 ### Feature Extraction
-- **Word-level TF-IDF**: Unigrams + bigrams, max 15K features
-- **Character n-gram TF-IDF**: Character 2-5 grams, max 30K features (mimics FastText subword)
+- **Word-level TF-IDF**: Unigrams + bigrams, tuned max features
+- **Character n-gram TF-IDF**: Character 2-6 grams, tuned max features (mimics FastText subword)
 - **Combined**: Concatenated word + character features
 
 ### Classifiers
-- Logistic Regression (with balanced class weights)
-- Linear SVM (with calibration for probability estimates)
+- Logistic Regression (with balanced class weights, tuned C)
+- Linear SVM (with calibration for probability estimates, tuned C)
+- **Ensemble**: Soft-voting of top 3 models per task
 
-## Results Summary
-- 360 labeled Hinglish complaints
-- 4 model architectures compared
-- Character n-gram approach shows advantage for code-mixed text
-- Full pipeline trains in under 1 second
-- All models, preprocessor, and visualizations saved to disk
+### Hyperparameter Tuning
+- RandomizedSearchCV with 25 iterations, 3-fold CV
+- Tuned parameters: `max_features`, `ngram_range`, `min_df`, `max_df`, `C`
+
+### Cross-Validation
+- 5-fold stratified cross-validation
+- Reports mean F1 with standard deviation
+
+### Confidence Thresholding
+- 40% confidence threshold
+- Predictions below threshold flagged as `[NEEDS REVIEW]`
+
+## Error Analysis
+
+### Category Classification
+- **Account_Technical** and **Wrong_Damaged_Product**: 0% error rate (perfect)
+- **Order_Status**: 16% error rate (most confused with Account_Technical)
+- Most common confused pairs: Order_Status <-> Account_Technical
+
+### Urgency Classification
+- **High urgency**: 0% error rate (perfect)
+- **Low urgency**: 3.8% error rate
+- **Medium urgency**: 2.4% error rate
+- Most common confused pairs: Low <-> Medium
 
 ## License
 Educational project use only.

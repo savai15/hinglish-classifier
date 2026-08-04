@@ -1,0 +1,118 @@
+============================================================
+  ERROR ANALYSIS REPORT: Category (TF-IDF + LR)
+============================================================
+
+  Total samples: 72
+  Misclassified: 15
+  Error rate: 20.8%
+  Accuracy: 0.7917
+
+============================================================
+  MOST CONFUSED CLASS PAIRS
+============================================================
+  Account_Technical -> Payment_Invoice: 3 cases
+  Payment_Invoice -> Account_Technical: 3 cases
+  Returns_Refunds -> Wrong_Damaged_Product: 1 cases
+  Delivery_Issue -> Payment_Invoice: 1 cases
+  Order_Status -> Delivery_Issue: 1 cases
+  Wrong_Damaged_Product -> Returns_Refunds: 1 cases
+  Returns_Refunds -> Delivery_Issue: 1 cases
+  Returns_Refunds -> Payment_Invoice: 1 cases
+  Wrong_Damaged_Product -> Order_Status: 1 cases
+  Account_Technical -> Wrong_Damaged_Product: 1 cases
+
+============================================================
+  PER-CLASS ERROR RATES
+============================================================
+  Account_Technical              4/12 errors (33.3%)
+  Delivery_Issue                 2/12 errors (16.7%)
+  Order_Status                   1/12 errors (8.3%)
+  Payment_Invoice                3/12 errors (25.0%)
+  Returns_Refunds                3/12 errors (25.0%)
+  Wrong_Damaged_Product          2/12 errors (16.7%)
+
+============================================================
+  TEXT LENGTH ANALYSIS
+============================================================
+  short_le6            26 samples, error rate: 2.8%
+  medium_7_12          39 samples, error rate: 13.9%
+  long_gt12            7 samples, error rate: 4.2%
+
+============================================================
+  ALL MISCLASSIFIED SAMPLES
+============================================================
+
+  [8]
+    Text: exchange item dispatch hoga MULTIPLEQUESTIONS
+    True: Returns_Refunds
+    Pred: Wrong_Damaged_Product
+
+  [13]
+    Text: app update baad payment page load nahin raha
+    True: Account_Technical
+    Pred: Payment_Invoice
+
+  [14]
+    Text: agent extra cash demand kar raha despite prepaid order
+    True: Delivery_Issue
+    Pred: Payment_Invoice
+
+  [16]
+    Text: package wrong route ja raha address km door jaldii correct karo EXCLAMATION URGENTKEYWORD
+    True: Order_Status
+    Pred: Delivery_Issue
+
+  [18]
+    Text: item completely fake refund immediately warna legal action lunga URGENTCAPS EXCLAMATIONHIGH THREAT URGENTKEYWORD
+    True: Wrong_Damaged_Product
+    Pred: Returns_Refunds
+
+  [20]
+    Text: app crash kii wajah payment twice submit technical team escalate karo EXCLAMATIONHIGH ESCALATION
+    True: Account_Technical
+    Pred: Payment_Invoice
+
+  [21]
+    Text: payment screen freeze amount deducted technical finance team involve karo URGENTKEYWORD
+    True: Account_Technical
+    Pred: Payment_Invoice
+
+  [26]
+    Text: atke hue har support agent fake timeline deta EXCLAMATIONHIGH HIGHAMOUNT
+    True: Returns_Refunds
+    Pred: Delivery_Issue
+
+  [29]
+    Text: doo mahine gaye processing legal notice bhejunga MULTIPLEQUESTIONS THREAT
+    True: Returns_Refunds
+    Pred: Payment_Invoice
+
+  [38]
+    Text: amount debit message teen baar aaya bank account almost empty hogya EXCLAMATIONHIGH
+    True: Payment_Invoice
+    Pred: Account_Technical
+
+  [44]
+    Text: package khola pura oil leak furniture kharab hogya compensation chahiye EXCLAMATION
+    True: Wrong_Damaged_Product
+    Pred: Order_Status
+
+  [45]
+    Text: wallet balance card combine kar sakte MULTIPLEQUESTIONS
+    True: Payment_Invoice
+    Pred: Account_Technical
+
+  [46]
+    Text: phone number verify nhi raha invalid bol raha
+    True: Account_Technical
+    Pred: Wrong_Damaged_Product
+
+  [59]
+    Text: agent address nahin mil raha bol raha jabki address bilkul correct
+    True: Delivery_Issue
+    Pred: Account_Technical
+
+  [64]
+    Text: gst number save karne option
+    True: Payment_Invoice
+    Pred: Account_Technical

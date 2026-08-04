@@ -1,0 +1,104 @@
+============================================================
+  ERROR ANALYSIS REPORT: Urgency (Char N-gram + LR)
+============================================================
+
+  Total samples: 72
+  Misclassified: 14
+  Error rate: 19.4%
+  Accuracy: 0.8056
+
+============================================================
+  MOST CONFUSED CLASS PAIRS
+============================================================
+  Low -> Medium: 7 cases
+  Medium -> Low: 5 cases
+  Medium -> High: 1 cases
+  High -> Low: 1 cases
+
+============================================================
+  PER-CLASS ERROR RATES
+============================================================
+  High                           1/25 errors (4.0%)
+  Low                            7/24 errors (29.2%)
+  Medium                         6/23 errors (26.1%)
+
+============================================================
+  TEXT LENGTH ANALYSIS
+============================================================
+  short_le6            26 samples, error rate: 13.9%
+  medium_7_12          39 samples, error rate: 5.6%
+  long_gt12            7 samples, error rate: 0.0%
+
+============================================================
+  ALL MISCLASSIFIED SAMPLES
+============================================================
+
+  [0]
+    Text: hello order expected date
+    True: Low
+    Pred: Medium
+
+  [4]
+    Text: coupon section load nahin hota wi fi mobile data
+    True: Medium
+    Pred: Low
+
+  [11]
+    Text: muje sirf order tracking details chahiye
+    True: Low
+    Pred: Medium
+
+  [14]
+    Text: agent extra cash demand kar raha despite prepaid order
+    True: Medium
+    Pred: Low
+
+  [19]
+    Text: food packet torn contents spill gaye
+    True: Medium
+    Pred: Low
+
+  [24]
+    Text: invoice pdf corrupted open URGENTCAPS
+    True: Medium
+    Pred: High
+
+  [29]
+    Text: doo mahine gaye processing legal notice bhejunga MULTIPLEQUESTIONS THREAT
+    True: High
+    Pred: Low
+
+  [30]
+    Text: furniture panel cracked installation possible nahi
+    True: Medium
+    Pred: Low
+
+  [37]
+    Text: tracking link open update nahin dikh raha check karoge MULTIPLEQUESTIONS
+    True: Low
+    Pred: Medium
+
+  [39]
+    Text: website login jata app nhi hota
+    True: Medium
+    Pred: Low
+
+  [52]
+    Text: shoe pair dono sizes nahin
+    True: Low
+    Pred: Medium
+
+  [67]
+    Text: coupon apply final invoice show hoga
+    True: Low
+    Pred: Medium
+
+  [68]
+    Text: refund track dikhegi app
+    True: Low
+    Pred: Medium
+
+  [69]
+    Text: maine medium order large receive
+    True: Low
+    Pred: Medium

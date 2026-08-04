@@ -1,10 +1,11 @@
 """
-Data Loader for Hinglish E-Commerce Complaints
-Loads, validates, and splits the complaint dataset.
+Data Loader for Hinglish E-Commerce Complaints (Enhanced v2)
+Loads, validates, splits, and provides cross-validation for the complaint dataset.
 """
 import os
+import numpy as np
 import pandas as pd
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, StratifiedKFold
 
 
 def load_data(csv_path):
@@ -72,9 +73,9 @@ def get_data_stats(df):
     return stats
 
 
-def split_data(df, test_size=0.2, val_size=0.1, random_state=42):
+def split_data(df, test_size=0.2, random_state=42):
     """
-    Split data into train, validation, and test sets with stratification.
+    Split data into train and test sets with stratification.
 
     Parameters
     ----------
@@ -82,33 +83,86 @@ def split_data(df, test_size=0.2, val_size=0.1, random_state=42):
         Full dataset
     test_size : float
         Fraction for test set
-    val_size : float
-        Fraction for validation set (taken from train after test split)
     random_state : int
         Random seed for reproducibility
 
     Returns
     -------
     tuple
-        (df_train, df_val, df_test) - three DataFrames
+        (df_train, df_test) - two DataFrames
     """
-    # First split: train+val vs test
-    df_trainval, df_test = train_test_split(
+    df_train, df_test = train_test_split(
         df,
         test_size=test_size,
         random_state=random_state,
         stratify=df['category']
     )
 
-    # Second split: train vs val (adjust val_size relative to trainval)
-    adjusted_val_size = val_size / (1 - test_size)
-    df_train, df_val = train_test_split(
-        df_trainval,
-        test_size=adjusted_val_size,
-        random_state=random_state,
-        stratify=df_trainval['category']
+    print(f"  Train: {len(df_train)} | Test: {len(df_test)}")
+
+    return df_train.reset_index(drop=True), df_test.reset_index(drop=True)
+
+
+def get_cv_splits(df, n_splits=5, random_state=42, label_column='category'):
+    """
+    Generate stratified k-fold cross-validation splits.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Full dataset
+    n_splits : int
+        Number of CV folds
+    random_state : int
+        Random seed for reproducibility
+    label_column : str
+        Column to stratify on
+
+    Yields
+    ------
+    tuple
+        (train_idx, val_idx) for each fold
+    """
+    skf = StratifiedKFold(
+        n_splits=n_splits,
+        shuffle=True,
+        random_state=random_state
     )
 
-    print(f"  Train: {len(df_train)} | Val: {len(df_val)} | Test: {len(df_test)}")
+    X = df['clean_text'].values
+    y = df[label_column].values
 
-    return df_train.reset_index(drop=True), df_val.reset_index(drop=True), df_test.reset_index(drop=True)
+    for fold_idx, (train_idx, val_idx) in enumerate(skf.split(X, y)):
+        yield fold_idx, train_idx, val_idx
+
+
+def get_cv_splits_multi(df, n_splits=5, random_state=42):
+    """
+    Generate CV splits that work for both category and urgency tasks.
+    Uses category for stratification (primary task).
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Full dataset with 'clean_text', 'category', 'urgency' columns
+    n_splits : int
+        Number of CV folds
+    random_state : int
+        Random seed
+
+    Yields
+    ------
+    tuple
+        (fold_idx, train_idx, val_idx) for each fold
+    """
+    skf = StratifiedKFold(
+        n_splits=n_splits,
+        shuffle=True,
+        random_state=random_state
+    )
+
+    X = df['clean_text'].values
+    y = df['category'].values  # Stratify on category
+
+    for fold_idx, (train_idx, val_idx) in enumerate(skf.split(X, y)):
+        yield fold_idx, train_idx, val_idx

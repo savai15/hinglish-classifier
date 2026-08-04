@@ -1,83 +1,95 @@
 ======================================================================
-  HINGLISH E-COMMERCE COMPLAINT CLASSIFIER - FINAL REPORT
+  HINGLISH E-COMMERCE COMPLAINT CLASSIFIER - FINAL REPORT (Enhanced v2)
 ======================================================================
 
   Dataset: 360 samples
   Categories: 6
   Urgency levels: 3
 
-  Train: 252 | Test: 72
+  Train: 288 | Test: 72
+  CV Folds: 5
+  Enhancement: Urgency cues + Hyperparameter tuning + Error analysis
 
 ======================================================================
-  CATEGORY CLASSIFICATION RESULTS
-======================================================================
-
-  TF-IDF + LR:
-    Accuracy:    0.6667
-    F1 (macro):  0.6607
-    F1 (weighted):0.6607
-    Train time:  0.01s
-
-  Char N-gram + LR:
-    Accuracy:    0.6528
-    F1 (macro):  0.6494
-    F1 (weighted):0.6494
-    Train time:  0.05s
-
-  Combined (Word+Char):
-    Accuracy:    0.6944
-    F1 (macro):  0.6916
-    F1 (weighted):0.6916
-    Train time:  0.07s
-
-  TF-IDF + SVM:
-    Accuracy:    0.6944
-    F1 (macro):  0.6856
-    F1 (weighted):0.6856
-    Train time:  0.02s
-
-======================================================================
-  URGENCY CLASSIFICATION RESULTS
+  CATEGORY CLASSIFICATION RESULTS (Tuned Models)
 ======================================================================
 
   TF-IDF + LR:
-    Accuracy:    0.6667
-    F1 (macro):  0.6647
-    F1 (weighted):0.6676
-    Train time:  0.01s
+    Accuracy:         0.7917
+    F1 (macro):       0.7934
+    F1 (weighted):    0.7934
+    CV F1 (mean):     0.7477
+    Train time:       0.07s
 
   Char N-gram + LR:
-    Accuracy:    0.7222
-    F1 (macro):  0.7230
-    F1 (weighted):0.7257
-    Train time:  0.06s
+    Accuracy:         0.6944
+    F1 (macro):       0.6925
+    F1 (weighted):    0.6925
+    CV F1 (mean):     0.7348
+    Train time:       0.66s
 
   Combined (Word+Char):
-    Accuracy:    0.6806
-    F1 (macro):  0.6822
-    F1 (weighted):0.6850
-    Train time:  0.06s
+    Accuracy:         0.6944
+    F1 (macro):       0.6904
+    F1 (weighted):    0.6904
+    CV F1 (mean):     0.7386
+    Train time:       0.65s
 
   TF-IDF + SVM:
-    Accuracy:    0.6389
-    F1 (macro):  0.6300
-    F1 (weighted):0.6342
-    Train time:  0.02s
+    Accuracy:         0.7917
+    F1 (macro):       0.7924
+    F1 (weighted):    0.7924
+    CV F1 (mean):     0.7511
+    Train time:       0.27s
+
+======================================================================
+  URGENCY CLASSIFICATION RESULTS (Tuned Models)
+======================================================================
+
+  TF-IDF + LR:
+    Accuracy:         0.7500
+    F1 (macro):       0.7502
+    F1 (weighted):    0.7539
+    CV F1 (mean):     0.7513
+    Train time:       0.05s
+
+  Char N-gram + LR:
+    Accuracy:         0.8056
+    F1 (macro):       0.8023
+    F1 (weighted):    0.8056
+    CV F1 (mean):     0.7745
+    Train time:       0.52s
+
+  Combined (Word+Char):
+    Accuracy:         0.7639
+    F1 (macro):       0.7602
+    F1 (weighted):    0.7639
+    CV F1 (mean):     0.7684
+    Train time:       0.58s
+
+  TF-IDF + SVM:
+    Accuracy:         0.7639
+    F1 (macro):       0.7602
+    F1 (weighted):    0.7639
+    CV F1 (mean):     0.7575
+    Train time:       0.14s
 
 ======================================================================
   BEST MODELS
 ======================================================================
 
-  Best Category Model: Combined (Word+Char) (F1=0.6916)
-  Best Urgency Model:  Char N-gram + LR (F1=0.7230)
+  Best Category Model: TF-IDF + LR (F1=0.7934, CV=0.7477)
+  Best Urgency Model:  Char N-gram + LR (F1=0.8023, CV=0.7745)
 
 ======================================================================
-  KEY FINDING
+  ENHANCEMENT IMPACT
 ======================================================================
 
-  Character n-gram approach (mimicking FastText's subword method)
-  outperforms word-level TF-IDF on Hinglish text because it
-  naturally handles spelling variants (nahi/nai/nahee),
-  out-of-vocabulary words, and code-mixed Hindi-English text.
+  v2 Enhancements applied:
+  1. Urgency cue detection (CAPS, threats, escalation, high amounts)
+  2. Repeated letter normalization (urgenttt -> urgent)
+  3. 5-fold cross-validation for reliable evaluation
+  4. Hyperparameter tuning with RandomizedSearchCV
+  5. Comprehensive error analysis
 
 ======================================================================

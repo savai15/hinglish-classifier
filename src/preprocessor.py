@@ -1,6 +1,7 @@
 """
-Hinglish Text Preprocessor
+Hinglish Text Preprocessor (Enhanced v2)
 Handles cleaning, normalization, and preprocessing of Hinglish (Hindi-English code-mixed) text.
+Now includes urgency cue detection for better urgency classification.
 """
 import re
 import string
@@ -17,6 +18,8 @@ class HinglishPreprocessor:
     - Spelling variant normalization (nahi/nai/nahee -> nahin)
     - URL, email, phone number replacement with tokens
     - Currency amount replacement with tokens
+    - Urgency cue detection (CAPS, exclamation, threats, escalation)
+    - Repeated letter normalization (urgenttt -> urgent)
     - Special character removal
     - Hindi + English stopword removal
     - Short word removal (single characters)
@@ -125,6 +128,100 @@ class HinglishPreprocessor:
             'agent': 'agent', 'aggent': 'agent',
         }
 
+        # Urgency cue patterns
+        self.threat_words = {
+            'consumer court', 'legal', 'police', 'court', 'lawyer', 'advocate',
+            'cyber crime', 'fraud', 'cheating', 'scam', 'file case', 'sue',
+            'consumer forum', 'legal action', 'legal notice',
+        }
+
+        self.escalation_words = {
+            'manager', 'senior', 'escalate', 'escalation', 'higher authority',
+            'supervisor', 'nodal officer', 'grievance', 'ombudsman',
+        }
+
+        self.high_value_pattern = re.compile(r'(?:rs\.?|₹)\s*(\d[\d,]*)', re.IGNORECASE)
+
+    def detect_urgency_cues(self, text):
+        """
+        Detect urgency cues in text and return tokens to add.
+
+        Returns a string of urgency tokens to append to the preprocessed text.
+        """
+        cues = []
+        original_text = text  # Keep original for detection
+
+        # 1. ALL CAPS words (at least 2 chars, not common words)
+        caps_words = re.findall(r'\b([A-Z]{2,})\b', original_text)
+        meaningful_caps = [w for w in caps_words if len(w) >= 2 and w not in {'OK', 'GST', 'URL', 'SMS', 'UPI'}]
+        if meaningful_caps:
+            cues.append('URGENTCAPS')
+
+        # 2. Exclamation marks intensity
+        excl_count = original_text.count('!')
+        if excl_count >= 3:
+            cues.append('EXCLAMATIONHIGH')
+        elif excl_count >= 1:
+            cues.append('EXCLAMATION')
+
+        # 3. Question marks (frustration indicator)
+        quest_count = original_text.count('?')
+        if quest_count >= 2:
+            cues.append('MULTIPLEQUESTIONS')
+
+        # 4. Threat words
+        text_lower = original_text.lower()
+        for threat in self.threat_words:
+            if threat in text_lower:
+                cues.append('THREAT')
+                break
+
+        # 5. Escalation words
+        for esc in self.escalation_words:
+            if esc in text_lower:
+                cues.append('ESCALATION')
+                break
+
+        # 6. High-value amounts (₹5000+, ₹10000+)
+        amount_matches = self.high_value_pattern.findall(original_text)
+        for amt_str in amount_matches:
+            try:
+                amt = int(amt_str.replace(',', ''))
+                if amt >= 10000:
+                    cues.append('HIGHAMOUNT')
+                    break
+                elif amt >= 5000:
+                    cues.append('MEDIUMAMOUNT')
+                    break
+            except ValueError:
+                pass
+
+        # 7. Urgency words in Hindi/English
+        urgency_keywords = [
+            'urgent', 'jaldi', 'turant', 'abhi', 'fauran', 'tatkal',
+            'immediately', 'asap', 'emergency', 'critical',
+        ]
+        for kw in urgency_keywords:
+            if kw in text_lower:
+                cues.append('URGENTKEYWORD')
+                break
+
+        # 8. Time pressure words
+        time_pressure = [
+            'din', 'days', 'weeks', 'months', 'wait', 'intezaar', 'intejar',
+            'pending', 'lambe', 'bahut din',
+        ]
+        for tp in time_pressure:
+            if tp in text_lower:
+                cues.append('TIMEPRESSURE')
+                break
+
+        return ' '.join(cues) if cues else ''
+
+    def normalize_repeated_letters(self, text):
+        """Normalize repeated letters: urgenttt -> urgent, plssss -> plss."""
+        return re.sub(r'(.)\1{2,}', r'\1\1', text)
+
     def normalize_spelling(self, text):
         """Normalize Hinglish spelling variants to canonical forms."""
         words = text.lower().split()
@@ -134,9 +231,13 @@ class HinglishPreprocessor:
     def clean_text(self, text):
         """Clean raw text: remove noise and replace special tokens."""
         if not isinstance(text, str):
-            return ""
+            return "", ""
+
+        # Detect urgency cues BEFORE cleaning
+        urgency_tokens = self.detect_urgency_cues(text)
 
         text = text.lower()
+        text = self.normalize_repeated_letters(text)
         text = self.normalize_spelling(text)
 
         # Replace URLs
@@ -156,7 +257,7 @@ class HinglishPreprocessor:
         # Remove extra whitespace
         text = re.sub(r'\s+', ' ', text).strip()
 
-        return text
+        return text, urgency_tokens
 
     def remove_stopwords(self, text):
         """Remove Hindi and English stopwords."""
@@ -167,15 +268,26 @@ class HinglishPreprocessor:
     def preprocess(self, text):
         """
         Full preprocessing pipeline:
-        1. Clean text (lowercase, normalize spelling, replace tokens, remove special chars)
-        2. Remove stopwords
-        3. Filter short words
+        1. Detect urgency cues (before cleaning)
+        2. Clean text (lowercase, normalize spelling, replace tokens, remove special chars)
+        3. Remove stopwords
+        4. Filter short words
+        5. Append urgency tokens
 
-        Returns: cleaned string
+        Returns: cleaned string with urgency tokens
         """
-        text = self.clean_text(text)
+        text, urgency_tokens = self.clean_text(text)
         text = self.remove_stopwords(text)
+
+        # Append urgency tokens to the end of the text
+        if urgency_tokens:
+            text = f"{text} {urgency_tokens}"
+
         return text
+
+    def preprocess_batch(self, texts):
+        """Preprocess a batch of texts. Returns list of cleaned texts."""
+        return [self.preprocess(t) for t in texts]
 
     def save(self, filepath):
         """Save preprocessor to disk."""

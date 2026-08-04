@@ -1,8 +1,8 @@
 """
-Evaluation Module for Hinglish Complaint Classification
+Evaluation Module for Hinglish Complaint Classification (Enhanced v2)
 
 Provides comprehensive evaluation metrics, confusion matrices,
-and comparison visualizations.
+comparison visualizations, and cross-validation evaluation.
 """
 import os
 import numpy as np
@@ -18,24 +18,13 @@ from sklearn.metrics import (
     f1_score,
     classification_report,
     confusion_matrix,
-    ConfusionMatrixDisplay
 )
+from sklearn.model_selection import cross_val_score
 
 
 def evaluate_classifier(y_true, y_pred, class_names=None, task_name="Classification"):
     """
     Comprehensive evaluation of a classifier.
-
-    Parameters
-    ----------
-    y_true : array-like
-        True labels
-    y_pred : array-like
-        Predicted labels
-    class_names : list, optional
-        List of class names for display
-    task_name : str
-        Name of the task (for display)
 
     Returns
     -------
@@ -67,6 +56,52 @@ def evaluate_classifier(y_true, y_pred, class_names=None, task_name="Classificat
     print(f"\n  Classification Report:")
     print(classification_report(y_true, y_pred, target_names=class_names, zero_division=0))
     print(f"{'='*60}\n")
+
+    return results
+
+
+def evaluate_cv(pipeline, X, y, cv=5, scoring='f1_macro', task_name="CV Evaluation"):
+    """
+    Evaluate a pipeline using stratified k-fold cross-validation.
+
+    Parameters
+    ----------
+    pipeline : sklearn.pipeline.Pipeline
+        The model pipeline
+    X : array-like
+        Feature data
+    y : array-like
+        Labels
+    cv : int
+        Number of CV folds
+    scoring : str
+        Scoring metric
+    task_name : str
+        Task name for display
+
+    Returns
+    -------
+    dict
+        CV results with mean, std, and per-fold scores
+    """
+    from sklearn.model_selection import StratifiedKFold
+
+    skf = StratifiedKFold(n_splits=cv, shuffle=True, random_state=42)
+
+    scores = cross_val_score(pipeline, X, y, cv=skf, scoring=scoring, n_jobs=-1)
+
+    results = {
+        'mean': float(scores.mean()),
+        'std': float(scores.std()),
+        'scores': scores.tolist(),
+        'min': float(scores.min()),
+        'max': float(scores.max()),
+    }
+
+    print(f"\n  {task_name} ({cv}-fold CV):")
+    print(f"    F1 (macro): {results['mean']:.4f} ± {results['std']:.4f}")
+    print(f"    Range: [{results['min']:.4f}, {results['max']:.4f}]")
+    print(f"    Per-fold: {[f'{s:.4f}' for s in scores]}")
 
     return results
 
@@ -136,11 +171,6 @@ def plot_normalized_confusion_matrix(y_true, y_pred, class_names=None,
 def compare_models(results_dict, task_name="Model Comparison", save_path=None, figsize=(12, 6)):
     """
     Compare multiple models using bar charts.
-
-    Parameters
-    ----------
-    results_dict : dict
-        Dictionary mapping model names to their evaluation results
     """
     models = list(results_dict.keys())
     metrics = ['accuracy', 'f1_macro', 'precision_macro', 'recall_macro']
@@ -241,6 +271,44 @@ def plot_per_class_f1(results_dict, class_names, task_name="Per-Class F1 Scores"
     plt.close()
 
 
+def plot_cv_comparison(cv_results_dict, task_name="CV Comparison", save_path=None, figsize=(10, 6)):
+    """
+    Plot cross-validation results with error bars.
+
+    Parameters
+    ----------
+    cv_results_dict : dict
+        Dictionary mapping model names to CV results (with 'mean' and 'std')
+    """
+    models = list(cv_results_dict.keys())
+    means = [cv_results_dict[m]['mean'] for m in models]
+    stds = [cv_results_dict[m]['std'] for m in models]
+
+    fig, ax = plt.subplots(figsize=figsize)
+    x = np.arange(len(models))
+    bars = ax.bar(x, means, yerr=stds, capsize=5, color='#2196F3', alpha=0.8, error_kw={'linewidth': 1.5})
+
+    ax.set_ylabel('F1 (macro)', fontsize=12)
+    ax.set_title(f'{task_name} - {len(cv_results_dict)}-Fold CV Results (mean ± std)', fontsize=14)
+    ax.set_xticks(x)
+    ax.set_xticklabels(models, fontsize=10)
+    ax.set_ylim(0, 1.05)
+    ax.grid(axis='y', alpha=0.3)
+
+    for bar, mean, std in zip(bars, means, stds):
+        ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + std + 0.02,
+                f'{mean:.3f}', ha='center', fontsize=10)
+
+    plt.tight_layout()
+
+    if save_path:
+        os.makedirs(os.path.dirname(save_path), exist_ok=True)
+        plt.savefig(save_path, dpi=150, bbox_inches='tight')
+        print(f"  CV comparison chart saved to {save_path}")
+
+    plt.close()
+
+
 def print_comparison_table(results_dict, task_name="Model Comparison"):
     """
     Print a formatted comparison table of model results.
@@ -262,3 +330,22 @@ def print_comparison_table(results_dict, task_name="Model Comparison"):
         print(row)
 
     print(f"{'='*70}\n")
+
+
+def print_cv_table(cv_results_dict, task_name="CV Results"):
+    """
+    Print a formatted table of cross-validation results.
+    """
+    models = list(cv_results_dict.keys())
+
+    header = f"\n{'='*60}\n  {task_name} (5-Fold Cross-Validation)\n{'='*60}"
+    print(header)
+    print(f"  {'Model':<25} {'F1 (mean)':>12} {'F1 (std)':>10} {'Range':>20}")
+    print(f"  {'-'*65}")
+
+    for model_name in models:
+        r = cv_results_dict[model_name]
+        row = f"  {model_name:<25} {r['mean']:>12.4f} {r['std']:>10.4f} [{r['min']:.4f}, {r['max']:.4f}]"
+        print(row)
+
+    print(f"{'='*60}\n")

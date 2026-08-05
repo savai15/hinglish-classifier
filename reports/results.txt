@@ -15,78 +15,78 @@
 ======================================================================
 
   TF-IDF + LR:
-    Accuracy:       0.9272
-    F1 (macro):     0.9265
-    F1 (weighted):  0.9266
+    Accuracy:       0.9073
+    F1 (macro):     0.9058
+    F1 (weighted):  0.9061
 
   Char N-gram + LR:
-    Accuracy:       0.9139
-    F1 (macro):     0.9134
-    F1 (weighted):  0.9137
+    Accuracy:       0.9073
+    F1 (macro):     0.9062
+    F1 (weighted):  0.9065
 
   Combined (Word+Char):
     Accuracy:       0.9073
-    F1 (macro):     0.9065
+    F1 (macro):     0.9064
     F1 (weighted):  0.9068
 
   TF-IDF + SVM:
-    Accuracy:       0.9338
-    F1 (macro):     0.9332
-    F1 (weighted):  0.9333
+    Accuracy:       0.9205
+    F1 (macro):     0.9196
+    F1 (weighted):  0.9197
 
   Ensemble:
-    Accuracy:       0.9272
-    F1 (macro):     0.9263
-    F1 (weighted):  0.9264
+    Accuracy:       0.9139
+    F1 (macro):     0.9128
+    F1 (weighted):  0.9130
 
 ======================================================================
   URGENCY CLASSIFICATION RESULTS
 ======================================================================
 
   TF-IDF + LR:
-    Accuracy:       0.9603
-    F1 (macro):     0.9580
-    F1 (weighted):  0.9606
+    Accuracy:       0.9470
+    F1 (macro):     0.9476
+    F1 (weighted):  0.9472
 
   Char N-gram + LR:
-    Accuracy:       0.9603
-    F1 (macro):     0.9582
-    F1 (weighted):  0.9605
+    Accuracy:       0.9735
+    F1 (macro):     0.9738
+    F1 (weighted):  0.9737
 
   Combined (Word+Char):
-    Accuracy:       0.9536
-    F1 (macro):     0.9513
-    F1 (weighted):  0.9541
-
-  TF-IDF + SVM:
     Accuracy:       0.9669
-    F1 (macro):     0.9652
+    F1 (macro):     0.9656
     F1 (weighted):  0.9670
 
+  TF-IDF + SVM:
+    Accuracy:       0.9536
+    F1 (macro):     0.9530
+    F1 (weighted):  0.9538
+
   Ensemble:
-    Accuracy:       0.9801
-    F1 (macro):     0.9788
-    F1 (weighted):  0.9801
+    Accuracy:       0.9669
+    F1 (macro):     0.9665
+    F1 (weighted):  0.9670
 
 ======================================================================
   BEST MODELS
 ======================================================================
 
-  Best Category Model: TF-IDF + SVM (F1=0.9332)
-  Best Urgency Model:  Ensemble (F1=0.9788)
+  Best Category Model: TF-IDF + SVM (F1=0.9196)
+  Best Urgency Model:  Char N-gram + LR (F1=0.9738)
 
-  Ensemble Category F1: 0.9263
-  Ensemble Urgency F1:  0.9788
+  Ensemble Category F1: 0.9128
+  Ensemble Urgency F1:  0.9665
 
 ======================================================================
   V2 -> V3 IMPROVEMENT
 ======================================================================
   v2 Category Best F1: 0.7934 (TF-IDF + LR)
-  v3 Category Best F1: 0.9332 (TF-IDF + SVM)
-  Improvement: 0.1398 (+17.6%)
+  v3 Category Best F1: 0.9196 (TF-IDF + SVM)
+  Improvement: 0.1262 (+15.9%)
 
   v2 Urgency Best F1: 0.8023 (Char N-gram + LR)
-  v3 Urgency Best F1: 0.9788 (Ensemble)
-  Improvement: 0.1765 (+22.0%)
+  v3 Urgency Best F1: 0.9738 (Char N-gram + LR)
+  Improvement: 0.1715 (+21.4%)
 
 ======================================================================

@@ -129,8 +129,8 @@ def get_cv_splits(df, n_splits=5, random_state=42, label_column='category'):
         random_state=random_state
     )
 
-    X = df['clean_text'].values
-    y = df[label_column].values
+    X = df['clean_text'].to_numpy()
+    y = df[label_column].to_numpy()
 
     for fold_idx, (train_idx, val_idx) in enumerate(skf.split(X, y)):
         yield fold_idx, train_idx, val_idx
@@ -161,8 +161,8 @@ def get_cv_splits_multi(df, n_splits=5, random_state=42):
         random_state=random_state
     )
 
-    X = df['clean_text'].values
-    y = df['category'].values  # Stratify on category
+    X = df['clean_text'].to_numpy()
+    y = df['category'].to_numpy()  # Stratify on category
 
     for fold_idx, (train_idx, val_idx) in enumerate(skf.split(X, y)):
         yield fold_idx, train_idx, val_idx

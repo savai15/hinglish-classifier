@@ -137,13 +137,13 @@ def main():
     print("\n[3/9] Splitting data into train/test...")
     df_train, df_test = split_data(df, test_size=0.15)
 
-    X_train = df_train['clean_text'].values
-    y_train_cat = df_train['category'].values
-    y_train_urg = df_train['urgency'].values
+    X_train = df_train['clean_text'].to_numpy()
+    y_train_cat = df_train['category'].to_numpy()
+    y_train_urg = df_train['urgency'].to_numpy()
 
-    X_test = df_test['clean_text'].values
-    y_test_cat = df_test['category'].values
-    y_test_urg = df_test['urgency'].values
+    X_test = df_test['clean_text'].to_numpy()
+    y_test_cat = df_test['category'].to_numpy()
+    y_test_urg = df_test['urgency'].to_numpy()
 
     category_names = sorted(df['category'].unique().tolist())
     urgency_names = sorted(df['urgency'].unique().tolist())

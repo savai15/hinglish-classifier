@@ -3,20 +3,21 @@
 ============================================================
 
   Total samples: 151
-  Misclassified: 10
-  Error rate: 6.6%
-  Accuracy: 0.9338
+  Misclassified: 12
+  Error rate: 7.9%
+  Accuracy: 0.9205
 
 ============================================================
   MOST CONFUSED CLASS PAIRS
 ============================================================
   Order_Status -> Account_Technical: 2 cases
+  Delivery_Issue -> Wrong_Damaged_Product: 2 cases
   Returns_Refunds -> Order_Status: 1 cases
-  Delivery_Issue -> Wrong_Damaged_Product: 1 cases
+  Delivery_Issue -> Order_Status: 1 cases
   Payment_Invoice -> Order_Status: 1 cases
   Delivery_Issue -> Account_Technical: 1 cases
   Returns_Refunds -> Payment_Invoice: 1 cases
-  Delivery_Issue -> Order_Status: 1 cases
+  Wrong_Damaged_Product -> Returns_Refunds: 1 cases
   Order_Status -> Payment_Invoice: 1 cases
   Order_Status -> Delivery_Issue: 1 cases
 
@@ -24,17 +25,17 @@
   PER-CLASS ERROR RATES
 ============================================================
   Account_Technical              0/25 errors (0.0%)
-  Delivery_Issue                 3/25 errors (12.0%)
+  Delivery_Issue                 4/25 errors (16.0%)
   Order_Status                   4/25 errors (16.0%)
   Payment_Invoice                1/26 errors (3.8%)
   Returns_Refunds                2/25 errors (8.0%)
-  Wrong_Damaged_Product          0/25 errors (0.0%)
+  Wrong_Damaged_Product          1/25 errors (4.0%)
 
 ============================================================
   TEXT LENGTH ANALYSIS
 ============================================================
-  short_le6            66 samples, error rate: 2.0%
-  medium_7_12          79 samples, error rate: 4.0%
+  short_le6            75 samples, error rate: 3.3%
+  medium_7_12          70 samples, error rate: 4.0%
   long_gt12            6 samples, error rate: 0.7%
 
 ============================================================
@@ -56,6 +57,16 @@
     True: Delivery_Issue
     Pred: Wrong_Damaged_Product
 
+  [37]
+    Text: package scratch aaya immediately refund karo URGENTCAPS EXCLAMATION URGENTKEYWORD
+    True: Delivery_Issue
+    Pred: Wrong_Damaged_Product
+
+  [44]
+    Text: delivery halted expected date cross gayi
+    True: Delivery_Issue
+    Pred: Order_Status
+
   [50]
     Text: billing address edit kar sakta hu order baad
     True: Payment_Invoice
@@ -76,10 +87,10 @@
     True: Order_Status
     Pred: Account_Technical
 
-  [97]
-    Text: delivery date hafta tak nahin aayi escalate karo URGENTCAPS EXCLAMATION ESCALATION URGENTKEYWORD
-    True: Delivery_Issue
-    Pred: Order_Status
+  [80]
+    Text: refund liye documents chahiye
+    True: Wrong_Damaged_Product
+    Pred: Returns_Refunds
 
   [102]
     Text: teen baar contact kiya exact stats nahin mila foran senior team bhejo URGENTCAPS ESCALATION

@@ -1,139 +1,139 @@
 text,category,urgency,is_synthetic
-Delivery agent ne wrong person ko de diya! FRAUD! asap!,Delivery_Issue,High,True
-"payement fail ho gaya but paisa kat gaya, please chek",Payment_Invoice,Medium,True
-Profile kaise dekhu?,Account_Technical,Low,True
-Return item ek mahina se return karne ki koshish kar raha hu,Returns_Refunds,Medium,True
-prduct scratch aaya hai hai! right now! Legal action lunga!,Wrong_Damaged_Product,High,True
-refound status check kaise karu? Koi option nahi! asap!,Returns_Refunds,High,True
-Refund 11 din sey pending hai! BAHUT URGENT!,Returns_Refunds,High,True
-Delivery boy demanded extra money for delivery,Delivery_Issue,Medium,True
-paymnt 8000 kiya but 7500 kat gaya! critical hai!,Payment_Invoice,High,True
+Delivery 2 din se delay hai! bahot URGENT!,Delivery_Issue,High,True
+Invoice 7 din se generate nahi ho raha! URGENT!,Payment_Invoice,High,True
+App bohot din se not responding hai! BAHUT URGENT!,Account_Technical,High,True
+"Refund amount galat aaya hai, ₹3000 instead of ₹1800",Returns_Refunds,Medium,True
+Product toot gaya hai! Completely unusable hai! URGENT!,Wrong_Damaged_Product,High,True
+Return reject kar diya bina reason ke,Returns_Refunds,Medium,True
+"Return ke baad product wapas nahee bhej pa raha, help karo",Returns_Refunds,Medium,True
+Delivery ke baad product check kaise karu?,Delivery_Issue,Low,True
+Payment gateway pe amount stuck hai! very urgent!,Payment_Invoice,High,True
 "Electrical wire exposed h, shock lag sakta tha. Sell karna band karo and escalate immediately.",Wrong_Damaged_Product,High,False
-App update ke baad sab stuck ho gaya! turant resolve karo!,Account_Technical,High,True
+Login credentials halted dikha raha hai,Account_Technical,Medium,True
 App cache clear karne sey orders delete to nahi honge?,Account_Technical,Low,False
-Refund process kaise hota hai?,Returns_Refunds,Low,True
-OTP stuck hai but verify nahee ho raha,Account_Technical,Medium,True
-Order 17 baar pending ho raha hai! Fix karo ya paisa wapas karo!,Order_Status,High,True
-Order ka tracking number kahan milega?,Order_Status,Low,True
+Refund status check kaise karu? Koi option nahi! turant resolve karo!,Returns_Refunds,High,True
+acconut me kya kya update kar sakte hai?,Account_Technical,Low,True
+Order confirm hone ke baad delivry date change ho gayi,Order_Status,Medium,True
+Order status me kya dikha raha hai?,Order_Status,Low,True
 App ka latest version kaunsa h?,Account_Technical,Low,False
-"Password reset link not working hai, naya password set nahi ho raha",Account_Technical,Medium,True
-Delivery boy rude tha! MANAGER sey BAAT KARO! immediately!,Delivery_Issue,High,True
+"Account showing error hai, KYC verify nahin ho raha",Account_Technical,Medium,True
+"Delivery ke baad product missing hai, empty box aaya",Delivery_Issue,Medium,True
 Exchange item kab dispatch hoga??,Returns_Refunds,Low,False
-Delivery boy ne package fek ke diya! right now!,Delivery_Issue,High,True
+"delievery ek mahina ho rahi hai, pehle parson sey hoti thi",Delivery_Issue,Medium,True
 Baby product damaged aur unsafe condition me aya!!! Immediate pickup arrange karo.,Wrong_Damaged_Product,High,False
-"Product duplicate lag raha hai, original nahi hai",Wrong_Damaged_Product,Medium,True
-"Delivery instructions follow nai kiye, gate pay chhod ke chala gaya",Delivery_Issue,Medium,True
+Product bent ho gaya hai! emergency hai! Immediate action lo!,Wrong_Damaged_Product,High,True
+"Delivery 2 din ho rahi hai, pehle pehle se hoti thi",Delivery_Issue,Medium,True
 Product ka outer box dented h but item working hai.,Wrong_Damaged_Product,Low,False
 "Invoice value manipulated lag rahi hai, ₹4,500 extra tax add hai. Urgent audit kro.",Payment_Invoice,High,False
 "Ordered item se different model aaya h, next step bata do.",Wrong_Damaged_Product,Low,False
-Order not responding hai but delivr date cross ho gayi,Order_Status,Medium,True
-Order 8 items ka tha but sirf 5 aaye,Order_Status,Medium,True
-"App halted ho gaya hai after update, fix karo",Account_Technical,Medium,True
+Order place karne ke baad phone number change ho sakta hai kya?,Order_Status,Low,True
+"Order status stuck hai, bahut der ho gayi! Mera paisa wapas karo!",Order_Status,High,True
+"Account halted hai, KYC verify nahi ho raha",Account_Technical,Medium,True
 "Stats me processing aa raha hai, normally kitna time lagta hai?",Order_Status,Low,False
 Received prodct ka design listing se alag hai.,Wrong_Damaged_Product,Low,False
-"Invoice me address galat hai, update karo",Payment_Invoice,Medium,True
-"Delivery ke baad product missing hai, empty box aaya",Delivery_Issue,Medium,True
-Product dent pada hai hai! bahot urgent hai! Replace ya refund do!,Wrong_Damaged_Product,High,True
+Invoice amount galat hai! critical hai! Recalculate karo!,Payment_Invoice,High,True
+Delivery instructions diye the but follow nahi hue,Delivery_Issue,Low,True
+"Mera order incomplete hai, kiya karu?",Wrong_Damaged_Product,Low,True
 Agent extra cash demand kar raha tha despite prepaid order..,Delivery_Issue,Medium,False
-"Refund amount ₹8000 hona chahiye, check karo",Returns_Refunds,Medium,True
-refnd status kaise check karu?,Returns_Refunds,Low,True
-"App showing error ho raha hai, ek mahina sey use nai ho raha",Account_Technical,Medium,True
+retrn request approve karo! Item cracked he hai! TURANT!,Returns_Refunds,High,True
+Return item ka refund nahi mil raha! abhi karo!,Returns_Refunds,High,True
+Login halted hai! Password sahi hai! emergency hai!,Account_Technical,High,True
 Bank ne confirm kiya refund initiate hi nai hua. Aaj resolve kro!,Returns_Refunds,High,False
 Promised date nikal gayi but parcel abi tak deliver nhi hua.,Delivery_Issue,Medium,False
 Trackng number kaha milega? Mje status dekhna hai.,Order_Status,Low,False
 Agent ne item le liya aur status cancelled kar diya!!! Police complaint karunga..,Returns_Refunds,High,False
-Order 26 din se not responding hai! Bahut urgent hai! asap!,Order_Status,High,True
+"Mera order 5 din se stuck hai! URGENT hai, turant resolve karo!",Order_Status,High,True
 Headphones ka left side kaam nhi kar raha from first use..,Wrong_Damaged_Product,Medium,False
 "Medicine ka wrong dosage bheja hai, dangerous hai. Turantt correct item bhejo.",Wrong_Damaged_Product,High,False
-Order failed hai but delivery date cross ho gayi! right now!,Order_Status,High,True
-Refund usually kitne working days leta h?,Returns_Refunds,Low,True
-Product return karne ka option kahan hai?,Wrong_Damaged_Product,Low,True
-Account kaise banau?,Account_Technical,Low,True
-Invoice galat hai! bahut der ho gayi! Correct karo!,Payment_Invoice,High,True
-Account 7 din se not working hai! Help karo!,Account_Technical,High,True
+"ordr tracking not responding hai, koi batao kya ho raha hai",Order_Status,Medium,True
+Refund ke liye koi charge he kya?,Returns_Refunds,Low,True
+Wrong item ka kya karu?,Wrong_Damaged_Product,Low,True
+"acount verify nahi ho raha, 5 din se pending hai",Account_Technical,Medium,True
+"Invoice not responding hai, correct invoice bhejo",Payment_Invoice,Medium,True
+"Password reset link not working hai, naya password set nahi ho raha",Account_Technical,Medium,True
 Payment screen freeze hui n amount deducted. Technical + finance team ko abhi involve karo.,Account_Technical,High,False
-Refund status kaise check karu?,Returns_Refunds,Low,True
+"Return ke baad product vapas nahin bhej pa raha, help karo",Returns_Refunds,Medium,True
 Return window app issue ki wajah se expire ho gayi..,Returns_Refunds,Medium,False
 OTP share nahi kiya phir bhi order place ho gaya. Acount block karo!,Account_Technical,High,False
-Profile name kaise change karu?,Account_Technical,Low,True
+App 7 din se stuck hai! BAHUT URGENT!,Account_Technical,High,True
 Agent ne OTP maanga but parcel handover nai kiya.,Delivery_Issue,Medium,False
 ITEM COMPLETELY FAKE h!!! Refund immediately warna legal action lunga.,Wrong_Damaged_Product,High,False
-"App stuck ho gaya he after update, fix karo",Account_Technical,Medium,True
+Account me kya kya options hai?,Account_Technical,Low,True
 Tracking number fake aa raha hai!!! Refund ya real status abi do.,Order_Status,High,False
 Order late hai aur new expected date bhi clear nhi hai.,Delivery_Issue,Medium,False
-Delivery wrong adress pe ho gayi! right now!,Delivery_Issue,High,True
+Delivery boy rude tha! MANAGER SE BAAT KARO! fatafat!,Delivery_Issue,High,True
 Gift ordr retrn kru to sender ko notification jayega?,Returns_Refunds,Low,False
-Return request approve hone me kitna time lagta hai?,Returns_Refunds,Low,True
-Refund ke liye kitna wait karna padega? 2 din ho gaya,Returns_Refunds,Medium,True
-Return request 7 din pay ki thi! turant resolve karo! Koi response nahi!,Returns_Refunds,High,True
-Login halted hai! Password sahi hai! emergency hai!,Account_Technical,High,True
+Return request kaafi din pe ki thi! please jaldi! Koi response nahi!,Returns_Refunds,High,True
+Return item ko kaise pack karu?,Returns_Refunds,Low,True
+Return item ko kaise pack karu?,Returns_Refunds,Low,True
+acconut me kya kya update kar sakte hai?,Account_Technical,Low,True
 Cash on delivery me exact cash chaiye?,Payment_Invoice,Low,False
-delivry ke baad product return ho sakta hai kya?,Delivery_Issue,Low,True
+Delivery ke liye koi extra charge he kya?,Delivery_Issue,Low,True
 "Courier tracking invalid bata raha h, correct number bhejo.",Order_Status,Medium,False
-delievery slot book kaise karu?,Delivery_Issue,Low,True
-"Account stopped hai, customer care bhi help nai kar raha! ESCALATE KARO!",Account_Technical,High,True
-Invoice 7 din se generate nahi ho raha! URGENT!,Payment_Invoice,High,True
+Delivery ke baad product ka status kaise check karu?,Delivery_Issue,Low,True
+App not responding hai! Data load nahi ho raha! URGENT!,Account_Technical,High,True
+payement usually kitne din me confirm hota hai?,Payment_Invoice,Low,True
 Return pickup ke time box zaroori hai kyaa?,Returns_Refunds,Low,False
 "Item pasand nahi aaya, retrn ka process bata do.",Returns_Refunds,Low,False
-"Account not updating hai, koi explanation nahi diya",Account_Technical,Medium,True
+Profile name kaise change karu?,Account_Technical,Low,True
 Seller threatening mein to cancel complaint. Full refund NOW.,Returns_Refunds,High,False
-Return item ka refund nahi mil raha! asap!,Returns_Refunds,High,True
+"Return request reject without inspection, please reopen",Returns_Refunds,Medium,True
 Wrong GST invoice ki wajah se company filing ruk gayi hai. corect it TODAY.,Payment_Invoice,High,False
-"App blocked hai, payment process nahi ho raha",Account_Technical,Medium,True
+OTP stuck hai but verify nahee ho raha,Account_Technical,Medium,True
 The prodct has water damage and does not turn on.,Wrong_Damaged_Product,Medium,False
 "My order is marked delivered and ₹9,999 is at risk. Resolve this immediatly.",Delivery_Issue,High,False
 Kia parcel lost hai? Kaafi time se koi scan update nahi hua.,Order_Status,Medium,False
 Paise le liye aur order trace nahi horha. Aaj resolve nahi hua to complaint raise karunga.,Order_Status,High,False
-"Wrong address pe deliver ho gaya, mera address toh Whitefield, Bangalore hai",Delivery_Issue,Medium,True
-"Order status stopped hai, immediately! Mera paisa wapas karo!",Order_Status,High,True
-"Invoice me customer name galat hai, fix karo",Payment_Invoice,Medium,True
-Payment 10 din pay kiya but order confirm nahi hua! jaldi karo!,Payment_Invoice,High,True
+"Package dent pada hai hai, abbi karo! TURANT REPLACE KARO!",Delivery_Issue,High,True
+Order cancel karne ka option nahi aa raha,Order_Status,Medium,True
+Invoice me extra charges lagaye hai! fatafat! Remove karo!,Payment_Invoice,High,True
+Payment 3 din sey pending hai! fatafat!,Payment_Invoice,High,True
 Password reset link attacker ke email pe ja raha h. This is serious fraud.,Account_Technical,High,False
-Product crushed hai! Completely unusable hai! URGENT!,Wrong_Damaged_Product,High,True
-Product missing hai hai! Fire hazard hai! jaldee karo!,Wrong_Damaged_Product,High,True
-delievery slot book kaise karu?,Delivery_Issue,Low,True
+"Order me wrong product aaya hai, plss check karo",Wrong_Damaged_Product,Medium,True
+"Order delivered wrng item, exchange karo please",Wrong_Damaged_Product,Medium,True
+Delivery 3 din se pending hai! Koi action nahi le raha!,Delivery_Issue,High,True
 "Lift nhi hai, pkg door tak la denge kyaa?",Delivery_Issue,Low,False
-App update ke baad sab pending ho gaya! emergency hai!,Account_Technical,High,True
-"Product scratch aaya hai hai, bohot din ke andar replace kro",Wrong_Damaged_Product,Medium,True
-"Password reset link not updating hai, naya password set nahi ho raha",Account_Technical,Medium,True
+Login kaise karu?,Account_Technical,Low,True
+"Mera order missing items hai, refund kaise lunga?",Wrong_Damaged_Product,Low,True
+OTP kaise resend karu?,Account_Technical,Low,True
 "Parcl kis city me hai abhi, pata chal sakta hai?",Order_Status,Low,False
 I WILL REPORT THIS DATA BREACH if my account iz not secured right now.,Account_Technical,High,False
-Account not updating hai! Koi explanation nahee diya! fatafat!,Account_Technical,High,True
-Payment double charge hua hai! asap! Refund karo!,Payment_Invoice,High,True
+"Account security issu hai, someone else is logging in",Account_Technical,Medium,True
+Payment showing error hai but confirmation nai mila! URGENT!,Payment_Invoice,High,True
 "Unknown device se access alert mla, logout all sessions right now!",Account_Technical,High,False
-Return item ka packaging kaise karu?,Returns_Refunds,Low,True
+Return request bahut din pe ki thi but ab tak koi upadte nahi,Returns_Refunds,Medium,True
 Ek phone number sey two accounts use ho sakte hain?,Account_Technical,Low,False
-paymnt fail ho gaya toh kya karu?,Payment_Invoice,Low,True
-"Order not responding hai, bht din sey pareshan hu! TURANT KARO!",Order_Status,High,True
-Package scratch aaya hai hai! IMMEDIATELY refnd karo!,Delivery_Issue,High,True
-"Order me kya kya aayega, list bhejo",Order_Status,Low,True
+Invoice ke liye koi charge hai kya?,Payment_Invoice,Low,True
+Order place kiya tha but abhi tak failed,Order_Status,Medium,True
+Delivery person ne OTP maanga but maine diya nahi,Delivery_Issue,Medium,True
+Order delivered dikh raha he but mujhe kuch nahin mila,Order_Status,Medium,True
 Item pickup ho chuka hai but refund abi initiate nai hua.,Returns_Refunds,Medium,False
-"App disabled ho raha hai, 10 din se use nahi ho raha",Account_Technical,Medium,True
-delivr instructions diye the but follow nahi hue,Delivery_Issue,Low,True
-Payment 3 din se pending hai! immediately!,Payment_Invoice,High,True
-oder confirm hone ke baad delivery date change ho gayi,Order_Status,Medium,True
-Order dispatch hone ke baad address change ho sakta hai kya?,Order_Status,Low,True
+"App crash ho raha hai, 3 din sey bar bar ho raha hai",Account_Technical,Medium,True
+Delivery ke liye kya kya kar sakta hu?,Delivery_Issue,Low,True
+Payment methods kyaa kya hai?,Payment_Invoice,Low,True
+"Order tracking stopped hai, IMMEDIATELY fix kro warna consumer forum me complaint karunga!",Order_Status,High,True
+Order cancel karne ka option nahee aa raha,Order_Status,Medium,True
 Return window kitne din ka hota h?,Returns_Refunds,Low,False
-Product return karne ka option kahan hai?,Wrong_Damaged_Product,Low,True
+refound ke liye kya kya steps hai?,Wrong_Damaged_Product,Low,True
 Muje sirf ordr tracking details chahiye..,Order_Status,Low,False
-"Order confirm ho gaya hai, ab kya hoga?",Order_Status,Low,True
-Delivery boy demanded cash on delivery! Already paid tha! FRAUD!,Delivery_Issue,High,True
+"Order confirm nahee ho raha, ek mahina se try kar raha hu! ESCALATE KARO!",Order_Status,High,True
+Delivery ke baad product ka status kaise check karu?,Delivery_Issue,Low,True
 Ordr history suddenly empty dikha rahi hai.,Account_Technical,Medium,False
-"Order showing error hai, bahut der ho gayi! Legal action lunga!",Order_Status,High,True
-wrng item aaya hai! please jaldi! ESCALATE KARO!,Wrong_Damaged_Product,High,True
-Invoice 7 din se generate nahi ho raha,Payment_Invoice,Medium,True
+Order failed hai but koi response nahi! jldi karo!,Order_Status,High,True
+Product return karne ka option kahan hai?,Wrong_Damaged_Product,Low,True
+payement 10 din pay ki thi but abhi tak order confirm nahee hua,Payment_Invoice,Medium,True
 Maine medium order kiya tha but large receive hua..,Wrong_Damaged_Product,Low,False
 Delivery slot repeatedly change ho raha h without asking me.,Delivery_Issue,Medium,False
-Delivery 28 din se delay hai! bahot URGENT!,Delivery_Issue,High,True
-Return item dent pada hai tha! Full refund do! abhi karo!,Returns_Refunds,High,True
-"Wrong prduct bheja hai, charger ki jagah kuch aur aaya",Wrong_Damaged_Product,Medium,True
-Account not working hai but maine kuch nahi kiya! please jaldi!,Account_Technical,High,True
-Login nahi ho raha! jaldi karo! 7 baar try kiya!,Account_Technical,High,True
-"Return item deliver ho chuka hai, refund process start kro",Returns_Refunds,Medium,True
-Account settings kahan hai?,Account_Technical,Low,True
+delievery 2 din sey pending hai! Koi action nahi le raha!,Delivery_Issue,High,True
+"retrn item deliver ho chuka hai, refound process start karoo",Returns_Refunds,Medium,True
+Product retrn karne ke baad kya hota hai?,Wrong_Damaged_Product,Low,True
+"App disabled ho raha hai, 10 din se use nahi ho raha",Account_Technical,Medium,True
+"Account verify nahi ho raha, kaafi din se pending hai",Account_Technical,Medium,True
+retrn item vapas bhej diya! Refund kab aayega? URGENT!,Returns_Refunds,High,True
+"Profile update nai ho raha, failed hai form",Account_Technical,Medium,True
 "App retrn eligible bolta hai, request submit karte waqt error aata hai.",Returns_Refunds,Medium,False
-"ordr stuck hai, kya problem hai?",Order_Status,Medium,True
-Package delivered but outer box completely crushed tha,Delivery_Issue,Medium,True
+"Order status stopped hai, immediately! Mera paisa wapas karo!",Order_Status,High,True
+Delivery address change kar sakte hai kya?,Delivery_Issue,Low,True
 "Hello, order expected date kia hai?",Order_Status,Low,False
 Account automaticaly logout ho jata hai every few minutes.,Account_Technical,Medium,False
 App me language setting kaha change hoti h?,Account_Technical,Low,False
@@ -141,863 +141,863 @@ App me language setting kaha change hoti h?,Account_Technical,Low,False
 Coupon section load nai hota on both Wi-Fi and mobile data.,Account_Technical,Medium,False
 Dmgd product pickup nahi kar rahe aur retrn window close ho rahi. URGENTTT.,Returns_Refunds,High,False
 "Tax invoice seller ke naam se nahin, kisi aur entity ke naam se hai.",Payment_Invoice,Medium,False
-Invoice change ho sakta hae kya?,Payment_Invoice,Low,True
+paymnt not responding hai but confirmation nahi mila! URGENT!,Payment_Invoice,High,True
 This refnd delay is causing money loss. Senior manger call me today.,Returns_Refunds,High,False
-"Order status pending hai, customer care bhi help nahi kar raha! MANAGER KO BULAO!",Order_Status,High,True
-"Order 16 din se transit mein hai, kab milega?",Order_Status,Medium,True
-Account security issue hai! Someone else login kar raha! right now!,Account_Technical,High,True
+"ordr 18 items ka hai, sab ek saath aayenge kya?",Order_Status,Low,True
+"ordr tracking halted hai, koi batao kya ho raha hai",Order_Status,Medium,True
+OTP disabled hai but verify nahi ho raha! right now!,Account_Technical,High,True
 "PAYMENT PROOF SHARE KAR CHUKA HU, FIR BHI ORDER HOLD PE KYU h???",Payment_Invoice,High,False
-refnd completed bol rahe ho but paisa nahee aaya! FRAUD hai!,Returns_Refunds,High,True
+Refund status kaise chck karu?,Returns_Refunds,Low,True
 ACOUNT DELETED DIKHA RAHA HAI aur active orders missing hain. Restore now.,Account_Technical,High,False
-"Password reset link blocked hai, naya password set nahi ho raha",Account_Technical,Medium,True
+App not updating hai! Data load nahi ho raha! URGENT!,Account_Technical,High,True
 Rider ne abusive language use kii. This needs urgent disciplinary action.,Delivery_Issue,High,False
-Order status kaise check karu?,Order_Status,Low,True
-"Wrong color aaya hai, maine green oder kiya tha",Wrong_Damaged_Product,Medium,True
-Order confirm hone ke baad delivry date change ho gayi,Order_Status,Medium,True
-Wrong item ka status kaise check karu?,Wrong_Damaged_Product,Low,True
+ordr cancel karne ka option kahan hai?,Order_Status,Low,True
+"prduct bent ho gaya hai, pura bent ho gaya ho gaya hai",Wrong_Damaged_Product,Medium,True
+ordr showing error hai but delivery date cross ho gayi,Order_Status,Medium,True
+"ordr delivered wrong item, exchange karo please",Wrong_Damaged_Product,Medium,True
 Retrn reason edit kar sakte hain?,Returns_Refunds,Low,False
-oder 13 din sey showing error hai! Bahut urgnt hai! bahut urgent hai!,Order_Status,High,True
+"Order confirm nahi ho raha, ek mahina se try kar raha hu! ESCALATE KARO!",Order_Status,High,True
 "Mera original order costly tha, cheap duplicate bhej diya. Refund TODAY..",Wrong_Damaged_Product,High,False
-"Invoice me service charge extra lagaya hai, remove karo",Payment_Invoice,Medium,True
-"Return request bohot din se pending hai, approve karoo",Returns_Refunds,Medium,True
-Return item ko kaise pack karu?,Returns_Refunds,Low,True
-Payment double charge hua hai! turant resolve karo! Refund karo!,Payment_Invoice,High,True
-Refund kb milega? 3 din se wait kar raha hu,Returns_Refunds,Medium,True
-refnd ₹500 ka hona chahiye but sirf ₹2700 aaya,Returns_Refunds,Medium,True
+Payment successful dikha raha hai but order pending hai,Payment_Invoice,Medium,True
+Refund disabled hai but paisa abhi tak nahi aaya,Returns_Refunds,Medium,True
 refnd ke liye koi charge hai kya?,Returns_Refunds,Low,True
+Invoice me kya kya details hoti hai?,Payment_Invoice,Low,True
+Refund status kaise chck karu?,Returns_Refunds,Low,True
+"refnd amount ₹1000 hona chahiye, check karo",Returns_Refunds,Medium,True
+Return item wapas bhej diya! Refund kab aayega? URGENT!,Returns_Refunds,High,True
 "ACOUNT HACK HOGYA LAGTA HAI!!! Unknown orders dikh rahe hain, block it NOWWW.",Account_Technical,High,False
-"App pe error aa raha hai, stopped hai page",Account_Technical,Medium,True
+Account kaise banau?,Account_Technical,Low,True
 Shoe pair me dono sizes same nahin hain.,Wrong_Damaged_Product,Low,False
 Package society gate pe chhod sakte ho kyaa?,Delivery_Issue,Low,False
-Wrong product aaya hai! fatafat! Exchange karo!,Wrong_Damaged_Product,High,True
-delivry boy demanded cash on delivery! Already paid tha! FRAUD!,Delivery_Issue,High,True
+"Wrong product aaya hai, exchange karo",Wrong_Damaged_Product,Medium,True
+Delivery ke baad package damage ho gaya nikla,Delivery_Issue,Medium,True
 "Aaj last promised date hai, abi tak dispatch bhi nhi hua! Escalate this now.",Order_Status,High,False
-Order place karne ke baad phone number change ho sakta hai kya?,Order_Status,Low,True
-Delivery date 1 hafta thi but abhi tak nahin aayi! ESCALATE KARO!,Delivery_Issue,High,True
-"Product toot gaya hai, pura toot gaya ho gaya hai",Wrong_Damaged_Product,Medium,True
+MANAGER SE BAAT KARO! Order 7 din se not updating hai!,Order_Status,High,True
+"Delivery 15 din se delay ho rahi hai, kab aayegi?",Delivery_Issue,Medium,True
+Mera order broken hai product aaya! right now!,Wrong_Damaged_Product,High,True
 My personal address is showing in another acount!!! Escalate privacy breach immediatly.,Account_Technical,High,False
 "Different brand ka charger aaya, compatible nhi hai.",Wrong_Damaged_Product,Low,False
-Invoice ko kaise verify karu?,Payment_Invoice,Low,True
-Return request kaise karu?,Returns_Refunds,Low,True
-Delivery scheduled for 3 din but nobody came,Delivery_Issue,Medium,True
-refnd kaise check karu?,Returns_Refunds,Low,True
-Wrong item ka refund kab aata hai?,Wrong_Damaged_Product,Low,True
-"delivr 13 din lag rahe hain, pehle 9 din mein aata tha",Delivery_Issue,Medium,True
-Payment ke baad oder confirm hota hai kya?,Payment_Invoice,Low,True
+Payment fail ho gaya but wallet balance cut gaya! bahut urgent hai!,Payment_Invoice,High,True
+Refund ₹500 expected tha but ₹7500 aaya! corect KARO!,Returns_Refunds,High,True
+"Delivery 1 hafta se delay ho rahi hai, kab aayegi?",Delivery_Issue,Medium,True
+Refund kitne din me aata hai?,Returns_Refunds,Low,True
+Order dent pada hai product aaya hai! right now! Exchange karo!,Wrong_Damaged_Product,High,True
+Package delivered but outer box completely crushed tha,Delivery_Issue,Medium,True
+paymnt fail ho gaya toh kya karu?,Payment_Invoice,Low,True
 "transction failed dikha raha hai, bank se amount debit ho chuka hai.",Payment_Invoice,Medium,False
 "Item pe chota sa scratch h, replacement possible hai?",Wrong_Damaged_Product,Low,False
-Product dent pada hae hai! Completely unusable hai! URGENT!,Wrong_Damaged_Product,High,True
-"oder me missing item hai, check karo",Order_Status,Medium,True
-payement 5000 ka hua tha but 9000 kat gaya,Payment_Invoice,Medium,True
-Order cancel karne ka option nahi aa raha,Order_Status,Medium,True
-App 1 hafta se failed hai! bohot URGENT!,Account_Technical,High,True
-Refund 15 din pe initiate hua but abhi tak nahi aaya! URGENT!,Returns_Refunds,High,True
+"Product kharab hae hai, jaldi dekho",Wrong_Damaged_Product,Medium,True
+"Order status disabled hai, expected date kab hai?",Order_Status,Medium,True
+Payment 10 din pay kiya but order confirm nahi hua! jaldi karo!,Payment_Invoice,High,True
+"Order confirm nahin ho raha, bht din se try kar raha hu! ESCALATE KARO!",Order_Status,High,True
+"Password reset link blocked hai, naya password set nahi ho raha",Account_Technical,Medium,True
+Refund kaise check karu?,Returns_Refunds,Low,True
 Coupon apply hua but final invoice mein show hoga kya?,Payment_Invoice,Low,False
 Medical device return karna h aur deadline aaj hai. Turant pickup arrange karo.,Returns_Refunds,High,False
-Wrong item ka status kaise check karu?,Wrong_Damaged_Product,Low,True
+"Order me se kuch items missing hain, please complete karo",Wrong_Damaged_Product,Medium,True
 "Wrng refund amount diya, ₹6,000 missing hai. Escalate to finance team immediately.",Returns_Refunds,High,False
 Har baar fake tracking update kyu de rahe ho?? Consumer complaint karunga..,Order_Status,High,False
-Return item kaise bheju?,Returns_Refunds,Low,True
+Refund 15 din se process ho raha hai! KAB HOGA? URGENT!,Returns_Refunds,High,True
 Invoice me company name add krna hai.,Payment_Invoice,Low,False
 Cash diya tha delivery boy ko but app unpaid dikha raha!!! Resolve fraud issue now..,Payment_Invoice,High,False
-"delivr ke baad product missing hai, empty box aaya",Delivery_Issue,Medium,True
-Invoice me extra charges lagaye hai! jaldi karo! Remove karo!,Payment_Invoice,High,True
-Delivery person ne OTP maanga but maine diya nahi,Delivery_Issue,Medium,True
-Refund amount ₹500 tha but sirf ₹7500 credit hua,Returns_Refunds,Medium,True
-retrn reject kar diya! Consumer court me jaunga! fatafat!,Returns_Refunds,High,True
-"Size issue hai, simple exchange krna hai.",Returns_Refunds,Low,False
-"Order 3 din se not responding hai, update do",Order_Status,Medium,True
 "Delivery 5 din ho rahi hai, pehle pehle se hoti thi",Delivery_Issue,Medium,True
-Account me kya kya options hai?,Account_Technical,Low,True
+Payment double hua hai! abhee karo! refnd karo!,Payment_Invoice,High,True
+Package delivered but kisi aur ke naam pe dikha raha hai,Delivery_Issue,Medium,True
+"Return item damaged aaya tha, refund chahiye",Returns_Refunds,Medium,True
+Refund ₹2000 ka hona chahiye but sirf ₹9000 aaya,Returns_Refunds,Medium,True
+"Size issue hai, simple exchange krna hai.",Returns_Refunds,Low,False
+oder place kaise karu?,Order_Status,Low,True
+"Delivery 29 din lag rahe hain, pehle 2 din mein aata tha",Delivery_Issue,Medium,True
+Account security isue hai! Someone else login kar raha! critical hai!,Account_Technical,High,True
 Delivery boy bina call kiye attempt failed mark karke chala gaya..,Delivery_Issue,Medium,False
 Parcl out for delivery tha fir suddenly rescheduled ho gaya.,Delivery_Issue,Medium,False
-"Order status disabled hai, expected date kab hai?",Order_Status,Medium,True
-Account delete karna hai but option nahi mil raha! jaldi karo!,Account_Technical,High,True
-Refund status kaise chck karu?,Returns_Refunds,Low,True
+"Order stopped hai, consumer court me jaunga agar bahut din tak resolve nai hua!",Order_Status,High,True
+Password kaise strong banau?,Account_Technical,Low,True
+Return item ek mahina se return karne ki koshish kar raha hu,Returns_Refunds,Medium,True
 Login password reset kaa option bata do.,Account_Technical,Low,False
-"Return ke baad product wapas nahi bhej pa raha, help karo",Returns_Refunds,Medium,True
+"Return request 15 din sey pending hai, approve karo",Returns_Refunds,Medium,True
 App ne mera GST data kisi aur buisness ke saath mix kar dia. Major privacy issue!,Account_Technical,High,False
-"Order status stuck hai, expected date kab hai?",Order_Status,Medium,True
-Payment showing error but confirmation nahi mila,Payment_Invoice,Medium,True
+oder 18 baar not updating ho raha hai! Fix karo ya paisa wapas karo!,Order_Status,High,True
+"Invoice me address galat hai, update karo",Payment_Invoice,Medium,True
 Product exchange k badle refund choose kar sakta hu?,Returns_Refunds,Low,False
-Invoice me GST kaise dekhu?,Payment_Invoice,Low,True
-"Order stopped hai, kiya problem hai?",Order_Status,Medium,True
+Payment successful but order cancel dikha raha hai! turant resolve karo!,Payment_Invoice,High,True
+"Order confirm ho gaya hai, ab kya hoga?",Order_Status,Low,True
 Order dashboard aur SMS me alag-alag status aa raha h.,Order_Status,Medium,False
-"Payment double charge hua hai, refnd kro",Payment_Invoice,Medium,True
+Invoice amount galat hai! please jaldi! Recalculate karo!,Payment_Invoice,High,True
 Delivry person rude tha aur package security pe fek ke chala gaya.,Delivery_Issue,Medium,False
-Package delivered but seal already broken tha,Delivery_Issue,Medium,True
+Delivery ke baad product exchange ho sakta hai kya?,Delivery_Issue,Low,True
 d invoice PDF is corrupted and won't open.,Payment_Invoice,Medium,False
-"oder 5 items ka hai, sab ek saath aayenge kya?",Order_Status,Low,True
-"Package broken hai hai, fatafat! TURANT REPLACE KARO!",Delivery_Issue,High,True
+Order status kaise check karu?,Order_Status,Low,True
+Delivery 16 din se delay hai! BAHUT URGENT!,Delivery_Issue,High,True
 ORDER LOST h KYA??? Support reply hi nahi kar raha.,Order_Status,High,False
-Order disabled hai but delievery date cross ho gayi! immediately!,Order_Status,High,True
-Delivery ke liye kyaa kyaa kar sakta hu?,Delivery_Issue,Low,True
-OTP nahin aa raha! bahut der ho gayi! Multiple times try kiya!,Account_Technical,High,True
+Order failed hai but confirmation email nahi aaya,Order_Status,Medium,True
+Delivery agent ne wrong person ko de diya! FRAUD! turant resolve karo!,Delivery_Issue,High,True
+Account delete karna hai but option nahee mil raha! right now!,Account_Technical,High,True
 Cosmetic bottle half empty receive hui..,Wrong_Damaged_Product,Medium,False
 Trackng me destination reached hai but delivery date nahii mili.,Order_Status,Medium,False
 Invoice email pe resend kar do plsss.,Payment_Invoice,Low,False
-Payment gateway frozen hai! right now! Release karo!,Payment_Invoice,High,True
+payement disabled hai but order not placed hai! very urgent!,Payment_Invoice,High,True
 "Shoes ke box me left pair do baar hai, right shoe nai.",Wrong_Damaged_Product,Medium,False
 DELIVERY 6 DIN LATE HAI. Har din fake promise band kro!,Delivery_Issue,High,False
 Refund usually kitne working days leta h?,Returns_Refunds,Low,False
 Gate entry ke liye flat number update karna h.,Delivery_Issue,Low,False
-delivry kaafi din se pending hai! Koi action nahi le raha!,Delivery_Issue,High,True
-Return item ko kahan drop karu?,Returns_Refunds,Low,True
+Delivery ke baad product return ho sakta hai kya?,Delivery_Issue,Low,True
+Refund status update kaise hota hai?,Returns_Refunds,Low,True
 "Listing premium model kii thi, cheaper variant bhej diya.",Wrong_Damaged_Product,Medium,False
 "Glass bottle shattered thi, haath cut ho gaya! urgenttt action lo.",Wrong_Damaged_Product,High,False
-Wrong item ka label kaise print karu?,Wrong_Damaged_Product,Low,True
+Product scratch aaya hae hai! very urgent! Full refund do!,Wrong_Damaged_Product,High,True
 Can I pay using two diffrent methods?,Payment_Invoice,Low,False
 "Toy ke multiple pieces missing hain, child use nahin kar sakta.",Wrong_Damaged_Product,Medium,False
 Status baar baar change horha hai processing se packed aur wapas processing.,Order_Status,Medium,False
 "Bank referance number share nai hua, refund trace nai kar pa raha.",Returns_Refunds,Medium,False
-"Refund amount galat aaya hai, ₹5000 instead of ₹7500",Returns_Refunds,Medium,True
-"App showing error hai, data load nahi ho raha",Account_Technical,Medium,True
-Account me kya kiya details hai?,Account_Technical,Low,True
-Product broken hai hai! fatafat! Refund do!,Wrong_Damaged_Product,High,True
+Refund process kaise hota hai?,Returns_Refunds,Low,True
+"App crash ho raha hai, 1 hafta sey bar bar ho raha hai",Account_Technical,Medium,True
+"App disabled hai, data load nahi ho raha",Account_Technical,Medium,True
+Product scratch aaya hai hai! emergency hai! Legal action lunga!,Wrong_Damaged_Product,High,True
 Driver extra ₹500 maang raha hai warna parcel nhi dega. Escalate immediatly!,Delivery_Issue,High,False
-Delivery instructions diye the but follow nahi hue,Delivery_Issue,Low,True
-ordr 29 items ka tha but sirf 2 aaye,Order_Status,Medium,True
-Payment 5 din pe kiya but order confirm nahi hua! please jaldi!,Payment_Invoice,High,True
+delievery slot book kaise karu?,Delivery_Issue,Low,True
+ordr place kiya tha but abhi tak disabled,Order_Status,Medium,True
+Invoice 3 din se generate nahee ho raha! URGENT!,Payment_Invoice,High,True
 Payment receipt PDF me mil sakti h?,Payment_Invoice,Low,False
-"Account failed ho gaya hai, please help",Account_Technical,Medium,True
-Product kharab hai hai! jaldi karo! Replace ya refound do!,Wrong_Damaged_Product,High,True
+Profile kaise dekhu?,Account_Technical,Low,True
+wrng item ka status kaise check karu?,Wrong_Damaged_Product,Low,True
 "Card twice charge hua, rent ke pese kam pad gaye. Turant refund karo.",Payment_Invoice,High,False
 Invoice ordr delivry ke baad generate hota hai kya?,Payment_Invoice,Low,False
 Order placed hogya na? Confirmation check krna tha.,Order_Status,Low,False
-Account me kya kya update kar sakte hai?,Account_Technical,Low,True
-acconut me kya kya update kar sakte hai?,Account_Technical,Low,True
-"Product missing hai hai, updte do",Wrong_Damaged_Product,Medium,True
-"Return ke baad product wapas nahee bhej pa raha, help karo",Returns_Refunds,Medium,True
-Refund ke liye kya kya steps hai?,Wrong_Damaged_Product,Low,True
-Delivery kaafi din se pending hai! Koi action nahi le raha!,Delivery_Issue,High,True
+Account showing error hai but koi response nahi mil raha,Account_Technical,Medium,True
+Account me kya kiya details hai?,Account_Technical,Low,True
+Product phat gaya hai! bht der ho gayi! Immediate action lo!,Wrong_Damaged_Product,High,True
+Refund process kaise hota hai?,Returns_Refunds,Low,True
+Product reurn karne ke liye kya kya chahiye?,Wrong_Damaged_Product,Low,True
+delievery slot book kaise karu?,Delivery_Issue,Low,True
 Package ka location kaise check kru?,Order_Status,Low,False
-Login credentials halted dikha raha hai,Account_Technical,Medium,True
+App update ke baad sab pending ho gaya! very urgent!,Account_Technical,High,True
 "Wishlist sync nahi hui, refresh kaise karu??",Account_Technical,Low,False
-Delivery boy demanded cash on delivery! Already paid tha! FRAUD!,Delivery_Issue,High,True
+"delivr 13 din lag rahe hain, pehle 9 din mein aata tha",Delivery_Issue,Medium,True
 Status delivered hai but CCTV me koi courier nhi aaya. URGENT resolve karo.,Delivery_Issue,High,False
 Five days se trackng frozen hai!!! Jaldiii actual status btao.,Order_Status,High,False
-retrn policy kya hai?,Returns_Refunds,Low,True
+Refund ₹1500 expected tha but ₹4500 aaya! corrct KARO!,Returns_Refunds,High,True
 Promo discount checkout pe tha but payment k baad remove ho gaya.,Payment_Invoice,Medium,False
-Invoice ke liye koi charge he kya?,Payment_Invoice,Low,True
-Refund 5 din pe initiate hua but abhi tak nahi aaya! URGENT!,Returns_Refunds,High,True
-refound status kaise chck karu?,Returns_Refunds,Low,True
+Payment methods kya kya hai?,Payment_Invoice,Low,True
+Refund not updating hai but paisa abhi tak nahi aaya,Returns_Refunds,Medium,True
+refnd kaise check karu?,Returns_Refunds,Low,True
 Fingerprint login enable kaise hota h?,Account_Technical,Low,False
 Return request cancel karni ho to option kaha h?,Returns_Refunds,Low,False
 Courier wale kaa contact number kaha dikhega?,Delivery_Issue,Low,False
-Account disabled hai! Koi explanation nahi diya! asap!,Account_Technical,High,True
+Login kaise karu?,Account_Technical,Low,True
 App update ke baad payment page load nahin ho raha.,Account_Technical,Medium,False
-Product return karne ka time limit kya hai?,Wrong_Damaged_Product,Low,True
+Mera order delivered but product broken hai hai!,Wrong_Damaged_Product,High,True
 "Muje proper tracking update chaiye, last scan purana hai.",Order_Status,Medium,False
-"acount verify nahi ho raha, 5 din se pending hai",Account_Technical,Medium,True
-Order cancel karne ka option nahee aa raha,Order_Status,Medium,True
-Account ko kaise secure karu?,Account_Technical,Low,True
-Delivery boy ne package fek ke diya! right now!,Delivery_Issue,High,True
-Product dent pada hai hai! fatafat! Full refund do!,Wrong_Damaged_Product,High,True
-Product return karne ke liye kya kya chahiye?,Wrong_Damaged_Product,Low,True
-Delivery time change ho sakta hai kya?,Delivery_Issue,Low,True
-Order placed but wrong phone number add ho gaya,Order_Status,Medium,True
-Product broken hai hai! emergency hai! TURANT ACTION LO!,Wrong_Damaged_Product,High,True
+Account security issue hai! Someone else login kar raha! immediately!,Account_Technical,High,True
+Order place kiya tha but abhi tak blocked,Order_Status,Medium,True
+Login nahi ho raha! jaldi karo! 7 baar try kiya!,Account_Technical,High,True
+"Delivery kaafi din ho rahi hai, pehle pehle se hoti thi",Delivery_Issue,Medium,True
+Refund process kaise hota hai?,Wrong_Damaged_Product,Low,True
+"Order delivered but product cracked hai hai, check karo",Wrong_Damaged_Product,Medium,True
+"Delivery date 29 din se delay hai, koi updte do",Delivery_Issue,Medium,True
+Order 17 baar pending ho raha hai! Fix karo ya paisa wapas karo!,Order_Status,High,True
+"Mera ordr scratch aaya he ho ke aaya hai, replace karo",Wrong_Damaged_Product,Medium,True
 Delivery promise tod diya aur stats bhi update nai. MANAGER SE CONNECT KARO.,Order_Status,High,False
 Suport chat crash ho rahi aur urgenttt medicine order edit nahin kar pa raha.,Account_Technical,High,False
-"Delivery 30 din lag rahe hain, pehle 9 din mein aata tha",Delivery_Issue,Medium,True
-Product damage ho toh kya karu?,Wrong_Damaged_Product,Low,True
-Delivery ke baad package damage ho gaya nikla,Delivery_Issue,Medium,True
-Wrong prodct aaya hai! turant resolve karo! Paisa wapas karo!,Wrong_Damaged_Product,High,True
-Invoice me extra charges lagaye hai! critical hai! Remove karo!,Payment_Invoice,High,True
-Order place kiya tha but abhi tak blocked,Order_Status,Medium,True
+Package delivered but seal already broken tha,Delivery_Issue,Medium,True
+Order crushed product aaya hai! immediately! Exchange karo!,Wrong_Damaged_Product,High,True
+delivr boy ko instruction kaise de?,Delivery_Issue,Low,True
+"Mera order damage ho gaya product aaya hai, theek karo",Wrong_Damaged_Product,Medium,True
+Invoice ke liye kya kya chahiye?,Payment_Invoice,Low,True
+"Order pending hai, kya problem hai?",Order_Status,Medium,True
 Exchange prodct dispatch nahi hua even after retrn pickup.,Returns_Refunds,Medium,False
-Return reject kar diya bina reason ke,Returns_Refunds,Medium,True
-Order ka tracking number kahan milega?,Order_Status,Low,True
-Delivery usually kitne din leti h?,Delivery_Issue,Low,True
-Refund ke liye kyaa kya chahiye?,Returns_Refunds,Low,True
-"Delivery 2 din ho rahi hai, pehle pehle se hoti thi",Delivery_Issue,Medium,True
-Return item ko kahan drop karu?,Returns_Refunds,Low,True
-Payment 500 kiya but 9000 kat gaya! abhi karo!,Payment_Invoice,High,True
-Wrong item deliver hua! very urgent! Turant replace karo!,Wrong_Damaged_Product,High,True
-Wrong item ka status kaise chck karu?,Wrong_Damaged_Product,Low,True
+"reurn item deliver ho chuka hai, refound process start karo",Returns_Refunds,Medium,True
+Order cancel karne ka option kahan hai?,Order_Status,Low,True
+Package delivered but kisi aur ke naam pe dikha raha hai,Delivery_Issue,Medium,True
+Return item wapas bhej diya! Refund kab aayega? URGENT!,Returns_Refunds,High,True
+Delivery date change ho gayi bina meri marzi ke,Delivery_Issue,Medium,True
+Refund amount bank mein credit nahin ho raha! turant resolve karo!,Returns_Refunds,High,True
+Payment ke baad oder confirm hota hai kya?,Payment_Invoice,Low,True
+Refund process kaise hota hai?,Wrong_Damaged_Product,Low,True
+"ordr wrong size aaya hai, exchange kaise karu?",Wrong_Damaged_Product,Low,True
 Return label kaha se download hota h?,Returns_Refunds,Low,False
 "Mera prepaid parcel missing hai, ₹8,499 ka loss horha hai. Escalate immediatly.",Order_Status,High,False
-"Payment fail ho gaya but paisa kat gaya, please check",Payment_Invoice,Medium,True
+Payment 500 kiya but 9000 kat gaya! abhi karo!,Payment_Invoice,High,True
 Wrong item pickup hua but refund orginal item ka process nhi hua.,Returns_Refunds,Medium,False
 UPI paymnt success screenshot hai but app failed dikha raha.,Payment_Invoice,Medium,False
 "Parcel wrong route pe ja raha hai, adress se 500 km door! Jaldiii correct karo.",Order_Status,High,False
 "Order auto-confirm hua tha, fir bhi shipment create nai hua.",Order_Status,Medium,False
-Return item ko kaise pack karu?,Returns_Refunds,Low,True
-Profile kaise update karu?,Account_Technical,Low,True
-Delivery boy demanded extra money for delivery,Delivery_Issue,Medium,True
-"Teen baar complaint kii, koi action nahi. Ab social media pe escalate kar raha hu!!!",Delivery_Issue,High,False
-delivr boy ko instruction kaise de?,Delivery_Issue,Low,True
-Order halted hae but confirmation email nahi aaya,Order_Status,Medium,True
-"Wrong prescription glasses deliver kiye, mujhe urgently correct pair chahiye..",Wrong_Damaged_Product,High,False
-Payment usually kitne din me confirm hota hai?,Payment_Invoice,Low,True
-Invoice me product serial number nahi diya h.,Payment_Invoice,Medium,False
 Return policy ke according refund milna chahiye! please jaldi!,Returns_Refunds,High,True
-Refund kitne din me aata hai?,Returns_Refunds,Low,True
+Account kaise banau?,Account_Technical,Low,True
+Delivery ke liye kya kya chahiye?,Delivery_Issue,Low,True
+"Teen baar complaint kii, koi action nahi. Ab social media pe escalate kar raha hu!!!",Delivery_Issue,High,False
+delivry 5 din se delay hai! urgnt resolve karo!,Delivery_Issue,High,True
+Order 17 din se transit me hai! Kya ho raha hai? URGENT!,Order_Status,High,True
+"Wrong prescription glasses deliver kiye, mujhe urgently correct pair chahiye..",Wrong_Damaged_Product,High,False
+"Payment double charge hua hai, refund karo",Payment_Invoice,Medium,True
+Invoice me product serial number nahi diya h.,Payment_Invoice,Medium,False
+Refund usually kitne working days leta h?,Returns_Refunds,Low,True
+refound completed bol rahe ho but paisa nahi aaya! FRAUD hai!,Returns_Refunds,High,True
 "Prodct battery swollen hai, fire hazard ho sakta hai! urgenttt pickup..",Wrong_Damaged_Product,High,False
 Laptop box mein bricks nikli!!! Police complaint aur consumer case kar raha hu.,Wrong_Damaged_Product,High,False
-Invoice ko kaise share karu?,Payment_Invoice,Low,True
-Delivery ke baad product exchange ho sakta hai kya?,Delivery_Issue,Low,True
-Account showing error hai but koi response nahi mil raha,Account_Technical,Medium,True
-Delivery address change kar sakte hai kya?,Delivery_Issue,Low,True
-Delivery person ne OTP maanga but maine diya nahi,Delivery_Issue,Medium,True
-"Product broken hai hai, pura broken hai ho gaya hai",Wrong_Damaged_Product,Medium,True
+Payment stopped hai but confirmation nai mila! URGENT!,Payment_Invoice,High,True
+"delivr instructions follow nahi kiye, gate pe chhod ke chala gaya",Delivery_Issue,Medium,True
+App ek mahina se not updating hai! bht URGENT!,Account_Technical,High,True
+"delivr ke baad product missing hai, empty box aaya",Delivery_Issue,Medium,True
+Package delivered but outer box completely crushed tha,Delivery_Issue,Medium,True
+Product missing hai! Box toot gaya tha! right now!,Wrong_Damaged_Product,High,True
 Checkout bug ke wajah se wrong address pe costly ordr place hua. Cancel urgently!,Account_Technical,High,False
 "Teen baar contact kiya, phir bhi exact stats nai mila. FORAN senior team ko bhejo.",Order_Status,High,False
-"Product dent pada hai hai, completely unusable hai",Wrong_Damaged_Product,Medium,True
-wrrong item mila toh kya karu?,Wrong_Damaged_Product,Low,True
-"delievery ek mahina ho rahi hai, pehle parson sey hoti thi",Delivery_Issue,Medium,True
-Order status kaise check karu?,Order_Status,Low,True
+Wrong item ka status kaise check karu?,Wrong_Damaged_Product,Low,True
+Wrong prodct deliver hua! turant resolve karo! Correct item bhejo!,Wrong_Damaged_Product,High,True
+delivry boy ne extra money manga! FRAUD hai! fatafat!,Delivery_Issue,High,True
+"ordr me msising item hai, check kro",Order_Status,Medium,True
 "COD ordr hai, UPI se delivery time payment chalega?",Delivery_Issue,Low,False
-ordr ka tracking number kahan milega?,Order_Status,Low,True
+"Order not responding hai, bht din sey pareshan hu! TURANT KARO!",Order_Status,High,True
 "Do din se tracking same jagah stuck h, please actual status check karo.",Order_Status,Medium,False
 "Wallet balance ₹7,500 gayab h after login error!!! Urgent investigation.",Account_Technical,High,False
-Order not working hai but confirmation email nahi aaya,Order_Status,Medium,True
+"Order 10 din pe place kiya, expected date kb hai?",Order_Status,Medium,True
 Order ka live status available hai kia?,Order_Status,Low,False
 "Kal pura din wait kiya, delivry person aya hi nahi.",Delivery_Issue,Medium,False
 "Item used jaisa lag raha hai, retrn karna hai.",Wrong_Damaged_Product,Low,False
 "Aaj final deadline hai, parcl abhi tak hub pe hai!!! Same-day deliver karo.",Delivery_Issue,High,False
-Product exchange kaise karu?,Wrong_Damaged_Product,Low,True
+"mra order ka product dent pada hae hai, refund ya replacement do",Wrong_Damaged_Product,Medium,True
 AC unit dented aur gas leak jaisi smell aa rahi hai. Technician/pickup abi bhejo!,Wrong_Damaged_Product,High,False
 Food packet torn tha aur contents spill ho gaye..,Wrong_Damaged_Product,Medium,False
-"Wrong item deliver hua, fashion item tha but kitchen item aaya",Wrong_Damaged_Product,Medium,True
-Refund ₹3000 ka hona chahiye but sirf ₹1400 aaya,Returns_Refunds,Medium,True
+"Product not as described hai, please check",Wrong_Damaged_Product,Medium,True
+Refund ₹8000 expected tha but ₹7500 aaya! CORRECT KARO!,Returns_Refunds,High,True
 "Payment link expired aaraha hai, new link generate karo.",Payment_Invoice,Medium,False
-prodct dent pada hai hai! critical hai! Full refund do!,Wrong_Damaged_Product,High,True
+"Order msising hai product aaya hai, exchange karoo",Wrong_Damaged_Product,Medium,True
 Amount debit message teen baar aaya!!! Bank account almost empty hogya.,Payment_Invoice,High,False
 Seller is asking me to close the retrn before replacement.,Returns_Refunds,Medium,False
-"Order halted hai, asap! Nahi toh police complaint karunga!",Order_Status,High,True
+Order place kaise karu?,Order_Status,Low,True
 Acount me kisi aur ka name show ho raha hai.,Account_Technical,Medium,False
-Wrong item aaya hai! bohot urgnt hai! ESCALATE KARO!,Wrong_Damaged_Product,High,True
-Return item ko kahan bheju?,Returns_Refunds,Low,True
+"Mera order me wrong item aaya hai, exchange karo jaldi",Wrong_Damaged_Product,Medium,True
+Refund ke liye kiya kya documents chahiye?,Returns_Refunds,Low,True
 "DOUBLE CHARGE HUA HAI!!! ₹18,000 extra deduct hua, refnd NOW.",Payment_Invoice,High,False
-paymnt gateway pe amount stuck hai! immediately!,Payment_Invoice,High,True
+Payment fail ho gaya but paisa kat gaya! please jaldi!,Payment_Invoice,High,True
 "Item visibly used h, fingerprints aur scratches bhi hain.",Wrong_Damaged_Product,Medium,False
 "Product size thoda wrong h, replace kar sakte hain?",Wrong_Damaged_Product,Low,False
 Profile name edit kar sakta hu??,Account_Technical,Low,False
-Refund status check kaise karu? Koi option nahi! turant resolve karo!,Returns_Refunds,High,True
-Delivery boy ko instruction kaise de?,Delivery_Issue,Low,True
+Refund status check kaise karu? Koi option nahi! please jaldi!,Returns_Refunds,High,True
+Delivery ke liye kyaa kyaa kar sakta hu?,Delivery_Issue,Low,True
 "INVOICE ME FAKE GSTIN h!!! Legal issue hai, senior team contact kare.",Payment_Invoice,High,False
-"Invoice me customer name galat hai, fix karo",Payment_Invoice,Medium,True
-Order 19 baar not working ho raha hai! Fix kro ya paisa wapas karo!,Order_Status,High,True
+Payment bahut din se pending hai! critical hai!,Payment_Invoice,High,True
+"Order not working hai, paisa kat gaya but kuch nahi mila! FRAUD hai! turant resolve karo!",Order_Status,High,True
 Old adress delete kaise karu account se??,Account_Technical,Low,False
 "LOGIN NAHI HO RAHA AUR ₹30,000 KA ORDER ACCOUNT ME h!!!",Account_Technical,High,False
-Order place kiya tha but abhi tak not updating,Order_Status,Medium,True
+Order place karne ke baad phone number change ho sakta hai kya?,Order_Status,Low,True
 "Invoice me wrong GSTIN print hua hai, corrected invoice chaiye.",Payment_Invoice,Medium,False
 "₹50,000 paymnt stuck hai, bank bol raha merchant ne hold kiya. Release NOW.",Payment_Invoice,High,False
-"Order me missing item hai, check karo",Order_Status,Medium,True
-Delivery boy ne package fek ke diya! very urgent!,Delivery_Issue,High,True
+Order 27 items ka tha but sirf 7 aaye,Order_Status,Medium,True
+Delivery boy ne security guard ko de diya! asap!,Delivery_Issue,High,True
 Delivry boy call karega na aane se pehle?,Delivery_Issue,Low,False
-"Order stopped hai, 7 din se pareshan hu! TURANT KARO!",Order_Status,High,True
-"Order 10 din pe place kiya, expected date kb hai?",Order_Status,Medium,True
+Order 19 baar not working ho raha hai! Fix kro ya paisa wapas karo!,Order_Status,High,True
+Order placed but wrong phone number add ho gaya,Order_Status,Medium,True
 "Kal ghar pe nahi rahunga, parcel evening me deliver ho sakta h?",Delivery_Issue,Low,False
 TV screen cracked hai aur delivery agent bol raha accept kar liya to kuch nahin hoga. manger connect karo!,Wrong_Damaged_Product,High,False
-payement disabled hai but order not placed hai! very urgent!,Payment_Invoice,High,True
+paymnt not updating he but order not placed hai! very urgent!,Payment_Invoice,High,True
 d app freezes whenever I open tracking.,Account_Technical,Medium,False
-Return policy kya hai?,Returns_Refunds,Low,True
+refnd ke liye kyaa kya documents chahiye?,Returns_Refunds,Low,True
 Retrn request baar baar auto-cancel ho rahi hai.,Returns_Refunds,Medium,False
-prodct reurn karne ka tarika kiya hai?,Wrong_Damaged_Product,Low,True
-"Product phat gaya hai, pura phat gaya ho gaya hai",Wrong_Damaged_Product,Medium,True
-Payment 3 din sey pending hai! fatafat!,Payment_Invoice,High,True
-"Order stuck hai, main bahut gussa hu! please jaldi!",Order_Status,High,True
+Refund kaise le sakte hai?,Wrong_Damaged_Product,Low,True
+"Order ka product kharab hai, return option kahan hai?",Wrong_Damaged_Product,Low,True
+"payement fail ho gaya but paisa kat gaya, please check",Payment_Invoice,Medium,True
+ordr cancel karne ka option nahin aa raha,Order_Status,Medium,True
 Package doorstep delivry tha but pickup point pe collect karne bola.,Delivery_Issue,Medium,False
-delievery person ne OTP maanga but maine diya nai,Delivery_Issue,Medium,True
-Delivery 16 din se delay hai! BAHUT URGENT!,Delivery_Issue,High,True
-Delivery ke liye kya kya kar sakta hu?,Delivery_Issue,Low,True
-Refund amount bank mein credit nahi ho raha! critical hai!,Returns_Refunds,High,True
-Payment fail ho gaya toh kyaa karu?,Payment_Invoice,Low,True
-Order 27 items ka tha but sirf 7 aaye,Order_Status,Medium,True
+Delivery instructions follow nahi kiye! immediately!,Delivery_Issue,High,True
+Delivery wrong adress pe ho gayi! right now!,Delivery_Issue,High,True
+Delivery boy demanded cash on delivery! Already paid tha! FRAUD!,Delivery_Issue,High,True
+Refund ke liye kitna wait karna padega? 2 din ho gaya,Returns_Refunds,Medium,True
+Payment fail ho gaya but wallet balance cut gaya! immediately!,Payment_Invoice,High,True
+Order not working hai but confirmation email nahi aaya,Order_Status,Medium,True
 Payment success ke baad ordr cancelled kar diya aur refund missing hai!!!,Payment_Invoice,High,False
 "Pkg wrong hub me chala gaya, isliye delivry delay ho rahi hai.",Delivery_Issue,Medium,False
-Delivery ek mahina sey delay hai! URGENT resolve karo!,Delivery_Issue,High,True
-Delivery ke baad product check kaise karu?,Delivery_Issue,Low,True
-Order place karne ke baad payment change kar sakte hai kya?,Order_Status,Low,True
-"reurn item deliver ho chuka hai, refound process start kro",Returns_Refunds,Medium,True
+delivry wrong address pe ho gayi! immediately!,Delivery_Issue,High,True
+Delivery instructions diye the but follow nahi hue,Delivery_Issue,Low,True
+"Order me missing item hai, check karo",Order_Status,Medium,True
+"Refund kahan aata hai, bank ya wallet?",Returns_Refunds,Low,True
 "Refund voucher nahi chahiye, CASH/BANK REFUND do immediatly.",Returns_Refunds,High,False
-Return approved but refnd kab aayega? kaafi din ho gaya,Returns_Refunds,Medium,True
-Payment stopped hai but confirmation nai mila! URGENT!,Payment_Invoice,High,True
-payement 1000 ka hua tha but 1400 kat gaya,Payment_Invoice,Medium,True
-"Profile update nahee ho raha, not updating hai form",Account_Technical,Medium,True
-Delivery boy ko instruction kaise de?,Delivery_Issue,Low,True
-"Wrong product bheja hai, camera ki jagah kuch aur aaya",Wrong_Damaged_Product,Medium,True
+Refund ke liye kiya kya documents chahiye?,Returns_Refunds,Low,True
+"Invoice me customer name galat hai, fix karo",Payment_Invoice,Medium,True
+Payment double charge hua hai! abhi karo! Refund karo!,Payment_Invoice,High,True
+"Account verify nahi ho raha, 10 din se pending hai",Account_Technical,Medium,True
+Delivery agent ne wrong person ko de diya! FRAUD! asap!,Delivery_Issue,High,True
+Mera order ka product msising hae hai! Refund ya replacement do!,Wrong_Damaged_Product,High,True
 App checkout page pe crash horhi hai.,Account_Technical,Medium,False
-Invoice me kya kya details hoti hai?,Payment_Invoice,Low,True
-Delivery schedule kaise dekhu?,Delivery_Issue,Low,True
-"Delivery 18 din lag rahe hain, pehle 5 din mein aata tha",Delivery_Issue,Medium,True
-"Product cracked hai hai, pura cracked hai ho gaya hai",Wrong_Damaged_Product,Medium,True
-"Product not as described hai, please check",Wrong_Damaged_Product,Medium,True
+Payment ke baad kya kya hota hai?,Payment_Invoice,Low,True
+Delivery date 1 hafta thi but abhi tak nahin aayi! ESCALATE KARO!,Delivery_Issue,High,True
+Delivery bahut din se nahi ho rahi! Consumer court me jaunga!,Delivery_Issue,High,True
+Wrong product aaya hai! bahot der ho gayi! Paisa wapas karo!,Wrong_Damaged_Product,High,True
+"meraa order duplicate product aaya hai, kyaa karu?",Wrong_Damaged_Product,Low,True
 Customer support chat open kaise hota h?,Account_Technical,Low,False
 Mere area me parcel aa gaya phir bhi three days se deliver nahin hua.,Delivery_Issue,Medium,False
-"Invoice me customer name galat hai, fix karo",Payment_Invoice,Medium,True
+paymnt gateway pe amount stuck hai! immediately!,Payment_Invoice,High,True
 Replacement ke badle automaticaly refund process hogya.,Returns_Refunds,Medium,False
 doo delivery attempts fake show ho rahe hain; mujhe koi call nahi mila.,Delivery_Issue,Medium,False
-"Wrong prodct aaya hai, exchange karo",Wrong_Damaged_Product,Medium,True
+"Product phat gaya hai, refund do",Wrong_Damaged_Product,Medium,True
 Laptop delivry hai aur box unattended gate pe chhod dia! Security risk hai.,Delivery_Issue,High,False
-"Product kharab hai hai, pura kharab he ho gaya hae",Wrong_Damaged_Product,Medium,True
+Mera order ka product nahi chal raha! bahut urgent hai!,Wrong_Damaged_Product,High,True
 Cart items baar baar automatically remove ho rahe hain..,Account_Technical,Medium,False
 "The rider marked delivered, but nothing was handed to mein.",Delivery_Issue,Medium,False
 Wrng size aur wrng colour dono deliver hue hain.,Wrong_Damaged_Product,Medium,False
-Wrong item deliver hua! fatafat! Turant replace karo!,Wrong_Damaged_Product,High,True
-OTP disabled hai but verify nahi ho raha! right now!,Account_Technical,High,True
-refnd 7 din sey pending hai! BAHUT URGENT!,Returns_Refunds,High,True
+Order ka product kharab hai! please jaldi! refnd do!,Wrong_Damaged_Product,High,True
+"OTP nahi aa raha, 30 baar try kiya",Account_Technical,Medium,True
+Return request kaise karu?,Returns_Refunds,Low,True
 Office address pe delivry shift kar sakta hu?,Delivery_Issue,Low,False
-App 7 din se stuck hai! BAHUT URGENT!,Account_Technical,High,True
-Order cancel karne ka option kahan hai?,Order_Status,Low,True
-Refund ke liye kiya kya documents chahiye?,Returns_Refunds,Low,True
-Delivery boy rude tha! MANAGER SE BAAT KARO! fatafat!,Delivery_Issue,High,True
-Refund ₹1000 ka hona chahiye but sirf ₹2700 aaya,Returns_Refunds,Medium,True
-Invoice me extra charges lagaye hai! turant resolve karo! Remove karo!,Payment_Invoice,High,True
+"App disabled ho raha hai, bahut din se use nahi ho raha",Account_Technical,Medium,True
+Order status upadte kaise hota hai?,Order_Status,Low,True
+Return request 2 din pe ki thi but ab tak koi update nahin,Returns_Refunds,Medium,True
+"Wrong address pe deliver ho gaya, mera address toh Whitefield, Bangalore hai",Delivery_Issue,Medium,True
+"retrn ke baad product wapas nahi bhej pa raha, help karo",Returns_Refunds,Medium,True
+Payment ke liye kyaa kya steps hai?,Payment_Invoice,Low,True
 "Package ka status pending dikha raha h, please verify kar do.",Order_Status,Medium,False
-"Refund amount galat aaya hai, ₹3000 instead of ₹1800",Returns_Refunds,Medium,True
-Return reject kar diya! Consumer court me jaunga! asap!,Returns_Refunds,High,True
-Refund kab tak milega? Bank account pe transfer karo,Returns_Refunds,Medium,True
-Order place karne ke baad phone number change ho sakta hai kya?,Order_Status,Low,True
-"Product incomplete hai, 8 parts missing hain",Wrong_Damaged_Product,Medium,True
+Return approved but refund kab aayega? 5 din ho gaya,Returns_Refunds,Medium,True
+"reurn item deliver ho chuka hai, refound process start kro",Returns_Refunds,Medium,True
+refnd 2 hafta pe initiate hua tha but abhi tak nahi aaya,Returns_Refunds,Medium,True
+"oder 10 din se transit mein hai, kab milega?",Order_Status,Medium,True
+Order delivered but prduct broken hai hai! right now!,Wrong_Damaged_Product,High,True
 "Phone number verify nhi ho raha, invalid bol raha hai.",Account_Technical,Medium,False
 "₹25,000 REFUND 20 DIN SE PENDING HAI!!! Pese turant wapas karo.",Returns_Refunds,High,False
-refound completed bol rahe ho but paisa nahi aaya! FRAUD hai!,Returns_Refunds,High,True
-"OTP nahi aa raha, 30 baar try kiya",Account_Technical,Medium,True
-Invoice 3 din se generate nahee ho raha! URGENT!,Payment_Invoice,High,True
-wrrong prduct aaya hai! asap! Exchange karo!,Wrong_Damaged_Product,High,True
-Product ka warranty kya hai?,Wrong_Damaged_Product,Low,True
+"refound kahan aata hai, bank ya wallet?",Returns_Refunds,Low,True
+Account me kya kya update kar sakte hai?,Account_Technical,Low,True
+Invoice ke liye koi charge he kya?,Payment_Invoice,Low,True
+Wrong product aaya hai! very urgent! Paisa wapas karo!,Wrong_Damaged_Product,High,True
+"Wrong color aaya hai, maine white ordr kiya tha",Wrong_Damaged_Product,Medium,True
 Package properly sealed tha but andar glass shattered tha..,Wrong_Damaged_Product,Medium,False
 "App me shipped likha hai, iska matlab kal delivery hogi kia?",Order_Status,Low,False
-Package delivered but kisi aur ke naam pe dikha raha hai,Delivery_Issue,Medium,True
-Order status chek karne ka tarika batao,Order_Status,Low,True
-Product cracked hai hai! Consumer court me jaunga! asap!,Wrong_Damaged_Product,High,True
+Delivery ke liye kya kyaa chahiye?,Delivery_Issue,Low,True
+"Order me kitne items hai, confirm karoo",Order_Status,Low,True
+Order crushed hai! mujhe replacement chahiye! abhi karo!,Wrong_Damaged_Product,High,True
 "canceled order ka ₹11,999 abhi tak nhi mila!!! Immediate bank reference do.",Returns_Refunds,High,False
 "UPI ID wrng enter ho gayi, payment retry kaise kru?",Payment_Invoice,Low,False
-"wrng size aaya hai, L manga tha but L aaya",Wrong_Damaged_Product,Medium,True
-Delivery 3 din se pending hai! Koi action nahi le raha!,Delivery_Issue,High,True
-Product phat gaya hai! Consumer court me jaunga! bahut der ho gayi!,Wrong_Damaged_Product,High,True
-Product duplicate hai! Fake hai! right now!,Wrong_Damaged_Product,High,True
+"prduct kharab he hai, 30 din pehle receive hua",Wrong_Damaged_Product,Medium,True
+delivr instructions diye the but follow nahi hue,Delivery_Issue,Low,True
+"prduct crushed hai, ek piece missing hai",Wrong_Damaged_Product,Medium,True
+"ordr me se kuch items missing hain, please complete kro",Wrong_Damaged_Product,Medium,True
 Courier person parcel dene se mana kar raha hai unless I share OTP first. URGENT..,Delivery_Issue,High,False
-"oder 7 din se failed hai, update do",Order_Status,Medium,True
+"oder not working hai, kiya problem hai?",Order_Status,Medium,True
 "Ordr me three products the, ek completely missing hai.",Wrong_Damaged_Product,Medium,False
 Address save karne ke baad disappear ho jata h.,Account_Technical,Medium,False
-"Order tracking stopped hai, IMMEDIATELY fix kro warna consumer forum me complaint karunga!",Order_Status,High,True
-oder place kaise karu?,Order_Status,Low,True
-"oder not working hai, kiya problem hai?",Order_Status,Medium,True
-Password kaise strong banau?,Account_Technical,Low,True
-"Refund amount galat aaya hai, ₹5000 instead of ₹900",Returns_Refunds,Medium,True
-Refund ke liye kyaa kya documents chahiye?,Returns_Refunds,Low,True
+"Order not updating hai, consumer court me jaunga agar 7 din tak resolve nahi hua!",Order_Status,High,True
+Order failed hai but delivery date cross ho gayi! right now!,Order_Status,High,True
+Order confirm hone ke baad cancel kar sakte hai kya?,Order_Status,Low,True
+"App halted ho gaya hai after update, fix karo",Account_Technical,Medium,True
+Return item ko kahan bheju?,Returns_Refunds,Low,True
+Refund kab tak milega? Bank account pe transfer karoo,Returns_Refunds,Medium,True
 Delivry instruction me 'call before arriving' add kar do.,Delivery_Issue,Low,False
 "Electronic item duplicate jaisa lag raha hai, serial verify nai ho raha.",Wrong_Damaged_Product,Medium,False
-refound ke liye kya kya documents chahiye?,Wrong_Damaged_Product,Low,True
-Delivery date change ho gayi bina meri marzi ke,Delivery_Issue,Medium,True
+Mera order delivered but product dent pada hai hai!,Wrong_Damaged_Product,High,True
+"Package broken hai hai, fatafat! TURANT REPLACE KARO!",Delivery_Issue,High,True
 Same order k liye card twice charge hua.,Payment_Invoice,Medium,False
 "Muje abhi ke abhi status chahie, travel se pehle package lena zaroori hai!",Order_Status,High,False
 Mra parcel dispatch hua ya abhi warehouse me hai?,Order_Status,Low,False
 GST invoice kese download karu?,Payment_Invoice,Low,False
-"Delivery 1 hafta se delay ho rahi hai, kab aayegi?",Delivery_Issue,Medium,True
-Account kaise banau?,Account_Technical,Low,True
-Refund stopped hai but paisa abhi tak nahi aaya,Returns_Refunds,Medium,True
-Payment 3000 kiya but 9000 kat gaya! abhi karo!,Payment_Invoice,High,True
+Delivery boy ne package fek ke diya! very urgent!,Delivery_Issue,High,True
+"Password reset link not updating hai, naya password set nahi ho raha",Account_Technical,Medium,True
+Return item ka label kaise print karu?,Returns_Refunds,Low,True
+payement bahut din pe ki thi but abhi tak order confirm nahi hua,Payment_Invoice,Medium,True
 GST number save karne ka option kaha h?,Payment_Invoice,Low,False
-Wrong item ka label kaise print karu?,Wrong_Damaged_Product,Low,True
+"Product dent pada he hai, please check karoo",Wrong_Damaged_Product,Medium,True
 Courier partner ka naam aur trackng ID share kar do.,Order_Status,Low,False
-Wrong item ka status kaise check karu?,Wrong_Damaged_Product,Low,True
-"Wrong item deliver hua, fashion item tha but kitchen item aaya",Wrong_Damaged_Product,Medium,True
-"Return item damaged aaya tha, refund chahiye",Returns_Refunds,Medium,True
-Account delete karna he but option nahi mil raha! right now!,Account_Technical,High,True
-Return request 2 din pe ki thi but ab tak koi update nahin,Returns_Refunds,Medium,True
+Wrong item mila toh kya karu?,Wrong_Damaged_Product,Low,True
+"Mera order ka product nahi chal raha, help karo",Wrong_Damaged_Product,Medium,True
+Return request kaise karu?,Returns_Refunds,Low,True
+"App showing error hai, data load nahi ho raha",Account_Technical,Medium,True
+Return item ko kaise pack karu?,Returns_Refunds,Low,True
 Email verification complet hai but account unverified dikha raha.,Account_Technical,Medium,False
-"Product smashed hai, 10 din ke andar replace karo",Wrong_Damaged_Product,Medium,True
-Return item ka refund nahi mil raha! abhi karo!,Returns_Refunds,High,True
-"App halted ho raha hai, 7 din se use nahi ho raha",Account_Technical,Medium,True
-"Order tracking stuck hai, IMMEDIATELY fix kro warna consumer forum me complaint karunga!",Order_Status,High,True
-"Order pending hai, kya problem hai?",Order_Status,Medium,True
-wrng product aaya hai! bahut urgent hai! Exchange karo!,Wrong_Damaged_Product,High,True
-Order dispatch hone ke baad address change ho sakta he kya?,Order_Status,Low,True
-"Order not updating hai, consumer court me jaunga agar 7 din tak resolve nahi hua!",Order_Status,High,True
+"Product duplicate lag raha hai, original nahi hai",Wrong_Damaged_Product,Medium,True
+Refund amount galat aaya! please jaldi! Correct karo!,Returns_Refunds,High,True
+"App blocked hai, payment process nahi ho raha",Account_Technical,Medium,True
+"Order halted hai, asap! Nahi toh police complaint karunga!",Order_Status,High,True
+oder 13 din sey showing error hai! Bahut urgnt hai! bahut urgent hai!,Order_Status,High,True
+"wrng item deliver hua hai, mene headphones order kiya tha",Wrong_Damaged_Product,Medium,True
+"Order me kya kya aayega, list bhejo",Order_Status,Low,True
+Order disabled hai but delievery date cross ho gayi! immediately!,Order_Status,High,True
 Courier ne return parcl collect kiya but status still pickup pending hai.,Returns_Refunds,Medium,False
-"Delivery 5 din ho rahi hai, pehle pehle se hoti thi",Delivery_Issue,Medium,True
+"Delivery 30 din lag rahe hain, pehle 9 din mein aata tha",Delivery_Issue,Medium,True
 App bug se return deadline miss ho rahi h. Fix TODAY or approve manually.,Account_Technical,High,False
 COD ordr ka refnd bank me kaise milega?,Returns_Refunds,Low,False
 Contactless delivery option available h?,Delivery_Issue,Low,False
-payement 5 din pe ki thi but abhi tak order confirm nahi hua,Payment_Invoice,Medium,True
+Invoice me kiya kya details hoti hai?,Payment_Invoice,Low,True
 Partial retrn possible hai for combo pack?,Returns_Refunds,Low,False
 Package me ek accessory missing lag rahi h.,Wrong_Damaged_Product,Low,False
-Order status chek karne ka tarika batao,Order_Status,Low,True
+Order not responding hai but delivr date cross ho gayi,Order_Status,Medium,True
 Mera item eligible for return h ya nahi check kar do.,Returns_Refunds,Low,False
 "Item broken condition me aaya, screen pe crack h.",Wrong_Damaged_Product,Medium,False
-Return policy ke according refund milna chahiye! very urgent!,Returns_Refunds,High,True
-Profile kaise upadte karu?,Account_Technical,Low,True
+refnd status kaise check karu?,Returns_Refunds,Low,True
+"Account stopped hai, customer care bhi help nai kar raha! ESCALATE KARO!",Account_Technical,High,True
 Account email update karna h.,Account_Technical,Low,False
-wrrong product aaya hai! kaafi din se pehle replace karo!,Wrong_Damaged_Product,High,True
-"Package dent pada hai hai, abbi karo! TURANT REPLACE KARO!",Delivery_Issue,High,True
-"Account stopped hai, custoemr care bhi help nahi kar raha! ESCALATE KARO!",Account_Technical,High,True
+Wrong item ka kya karu?,Wrong_Damaged_Product,Low,True
+Package scratch aaya hai hai! IMMEDIATELY refnd karo!,Delivery_Issue,High,True
+OTP kaise resend karu?,Account_Technical,Low,True
 Used aur damaged prodct ko new bolke bheja hai. Consumer complaint karunga.,Wrong_Damaged_Product,High,False
-"Invoice me service charge extra lagaya hai, remove karo",Payment_Invoice,Medium,True
+Payment 5 din pe ki thi but abhi tak order confirm nai hua,Payment_Invoice,Medium,True
 "Har login pe unknown profile khul rahi h, data leak ho sakta hai!!!",Account_Technical,High,False
-Delivery ke liye kya kya documents chahiye?,Delivery_Issue,Low,True
+Package delivered but outer box completely crushed tha,Delivery_Issue,Medium,True
 "medecine delivery two days late hai, patient ko urgently chahie!",Delivery_Issue,High,False
-Return item wapas bhej diya! Refund kab aayega? URGENT!,Returns_Refunds,High,True
+refound status check kaise karu? Koi option nahi! asap!,Returns_Refunds,High,True
 Card charged in foreign currency instead of INR..,Payment_Invoice,Medium,False
-"Account verify nahi ho raha, kaafi din se pending hai",Account_Technical,Medium,True
-Product damage ho gaya hai! abhi karo! Immediate action lo!,Wrong_Damaged_Product,High,True
+"App crash ho raha hai, 1 hafta se bar bar ho raha hai",Account_Technical,Medium,True
+"Order ka product kharab hai, refund do plss",Wrong_Damaged_Product,Medium,True
 Delivry boy fone nahin utha raha aur status custmer unavailable dikha dia.,Delivery_Issue,Medium,False
 Business invoice me legal name update karna h.,Payment_Invoice,Low,False
-Invoice amount galat hai! please jaldi! Recalculate karo!,Payment_Invoice,High,True
-Refund process kaise hota hai?,Wrong_Damaged_Product,Low,True
+Payment ke baad oder confirm hota hai kya?,Payment_Invoice,Low,True
+"prodct bent ho gaya tha, delivery ke baad pata chala",Wrong_Damaged_Product,Medium,True
 "OTP kisi aur number pe ja raha h, security issue hai. Urgent fix karo!",Account_Technical,High,False
 "Colour mismatch h, bas correct variant chahiye.",Wrong_Damaged_Product,Low,False
 UPI payment option available hai kyaa?,Payment_Invoice,Low,False
-delievery person ne OTP maanga but maine diya nahi,Delivery_Issue,Medium,True
+Delivery kaafi din se pending hai! Koi action nahi le raha!,Delivery_Issue,High,True
 Four complaints k baad bhi refund nahi. Social media pe expose karunga.,Returns_Refunds,High,False
-App update ke baad sab not working ho gaya! right now!,Account_Technical,High,True
-Delivery boy ko instruction kaise de?,Delivery_Issue,Low,True
-App bohot din se not responding hai! BAHUT URGENT!,Account_Technical,High,True
-Refund 3 din se process ho raha hai! KAB HOGA? URGENT!,Returns_Refunds,High,True
+Account disabled hai! critical hai!,Account_Technical,High,True
+Delivery usually kitne din leti h?,Delivery_Issue,Low,True
+App update ke baad sab failed ho gaya hai,Account_Technical,Medium,True
+Refund process kaise hota hai?,Returns_Refunds,Low,True
 Prodct body bent hai and packaging bhi crushed thi.,Wrong_Damaged_Product,Medium,False
 Notification off kaise karte hain??,Account_Technical,Low,False
-Delivery time change ho sakta hai kya?,Delivery_Issue,Low,True
-Payment gateway pe amount stuck hai! jaldi karo!,Payment_Invoice,High,True
+"delievery date 2 din se delay hai, koi update do",Delivery_Issue,Medium,True
+Payment 5 din pe kiya but order confirm nahi hua! jaldi karo!,Payment_Invoice,High,True
 Morning delivery possible hai kia?,Delivery_Issue,Low,False
-payement ke liye kya kya steps hai?,Payment_Invoice,Low,True
-"Order pending hai, immediately! Nahi toh police complaint karunga!",Order_Status,High,True
-prduct damage ho gaya hai! right now! Replace ya refound do!,Wrong_Damaged_Product,High,True
+Payment 5 din pe kiya but order confirm nahi hua! please jaldi!,Payment_Invoice,High,True
+"Order status blocked hai, expected date kab hai?",Order_Status,Medium,True
+"Order ka product scratch aaya hai hai, turant replace karo",Wrong_Damaged_Product,Medium,True
 "Ordr nahii bana aur pese debit hain, EMI bhi start ho gayi. Immediate action!",Payment_Invoice,High,False
 "Pickup date reschedule karni hai, kaise kru?",Returns_Refunds,Low,False
 "Parcel ka koi ata-pata nahin aur amount ₹12,000 hai. Turantt locate karo.",Order_Status,High,False
 Two-factor authentication setup loop mein phas gaya.,Account_Technical,Medium,False
-"oder tracking not working properly, blank page aa raha hai",Order_Status,Medium,True
-App blocked ho raha hai! critical hai! Fix karo!,Account_Technical,High,True
-"Account halted hai, KYC verify nahi ho raha",Account_Technical,Medium,True
+ordr dispatch hone ke baad adres change ho sakta hai kya?,Order_Status,Low,True
+Account security issu hai! Someone else login kar raha! bahut urgent hai!,Account_Technical,High,True
+App 2 din se not updating hai! BAHUT URGENT!,Account_Technical,High,True
 Parcel neighbour ko handover kar sakte ho with OTP??,Delivery_Issue,Low,False
-Product return karne me kitna time lagta hai?,Wrong_Damaged_Product,Low,True
-"Refund amount galat aaya hai, ₹3000 instead of ₹1400",Returns_Refunds,Medium,True
+Product return karne ke baad kya hota hai?,Wrong_Damaged_Product,Low,True
+Refund ke liye kya kya documents chahiye?,Returns_Refunds,Low,True
 ma card was charged after order cancellation. Reverse it immediately.,Payment_Invoice,High,False
 Payment pending status normally kitni der rehta h?,Payment_Invoice,Low,False
-Order confirm hone ke baad cancel kar sakte hai kya?,Order_Status,Low,True
-Order place kaise karu?,Order_Status,Low,True
+ordr ka tracking number kahan milega?,Order_Status,Low,True
+ordr ka expected delievery date kya hai?,Order_Status,Low,True
 Order deadline-sensitive h aur tracking dead hai. Resolve NOW warna cancel karunga.,Order_Status,High,False
 Pickup agent product accept nahiii kar raha becoz outer box missing hai.,Returns_Refunds,Medium,False
-Login pending hai! Password sahi hai! emergency hai!,Account_Technical,High,True
-Account disabled hai! critical hai!,Account_Technical,High,True
+"App pending hai, coupon apply nahi ho raha",Account_Technical,Medium,True
+Account not updating hai! Koi explanation nahee diya! fatafat!,Account_Technical,High,True
 "Tax invoice aaj filing k liye chahiye, URGENTLY corrected PDF bhejo.",Payment_Invoice,High,False
 "Mera area serviceable h na, bas confirm karna tha.",Delivery_Issue,Low,False
-"ordr tracking not responding hai, koi batao kya ho raha hai",Order_Status,Medium,True
+"oder 7 din se failed hai, update do",Order_Status,Medium,True
 "Mera order transit me h kya, thoda bata do.",Order_Status,Low,False
-Package delivered but seal broken hai! immediately!,Delivery_Issue,High,True
-wrrong product aaya hai! right now! Exchange karo!,Wrong_Damaged_Product,High,True
-Login kaise karu?,Account_Technical,Low,True
+Delivery time change ho sakta hai kya?,Delivery_Issue,Low,True
+"Product crushed hai, 3 din ke andar replace karo",Wrong_Damaged_Product,Medium,True
+Account not working hai but maine kuch nahi kiya! please jaldi!,Account_Technical,High,True
 Someone changed my email and phone number. urgenttt account recovery chahie.,Account_Technical,High,False
 DELIVRY BOY NE PARCEL DELIVERED MARK KAR DIYA BUT MUJHE MILA HI NAHI!!!,Delivery_Issue,High,False
-acconut me kya kya update kar sakte hai?,Account_Technical,Low,True
-Profile name kaise change karu?,Account_Technical,Low,True
-"App crash ho raha hai, 1 hafta se bar bar ho raha hai",Account_Technical,Medium,True
-Product return karne ka option kahan hai?,Wrong_Damaged_Product,Low,True
-Delivery ke baad product ka status kaise check karu?,Delivery_Issue,Low,True
-Return request kaise karu?,Returns_Refunds,Low,True
+Login kaise karu?,Account_Technical,Low,True
+OTP kaise resend karu?,Account_Technical,Low,True
+"Account not updating hai, koi explanation nahi diya",Account_Technical,Medium,True
+"Wrong color aaya hai, maine white oder kiya tha",Wrong_Damaged_Product,Medium,True
+Delivery 2 din se delay hai! URGENT resolve karo!,Delivery_Issue,High,True
+Refund 1 hafta pay initiate hua but abhi tak nahi aaya! URGENT!,Returns_Refunds,High,True
 "Courier wale ne gate tak aane se mana kar diya, plz check.",Delivery_Issue,Medium,False
 Account logout from all devices option kaha h?,Account_Technical,Low,False
 "₹45,000 KA PHONE BROKEN AAYA h!!! Immediate replacement chahiye.",Wrong_Damaged_Product,High,False
-Account security isue hai! Someone else login kar raha! critical hai!,Account_Technical,High,True
-Return item ko kaise pack karu?,Returns_Refunds,Low,True
-Invoice ko kaise share karu?,Payment_Invoice,Low,True
-Order failed hai but confirmation email nahi aaya,Order_Status,Medium,True
+"Profile update nahee ho raha, not updating hai form",Account_Technical,Medium,True
+Return request approve hone me kitna time lagta hai?,Returns_Refunds,Low,True
+payement 5 din pe ki thi but abhi tak order confirm nahi hua,Payment_Invoice,Medium,True
+Order 11 baar not working ho raha hai! Fix karo ya paisa wapas karo!,Order_Status,High,True
 "Mere ₹17,500 atke hue hain, har support agent fake timeline deta h!!!",Returns_Refunds,High,False
 Product label pe expiry date unclear h.,Wrong_Damaged_Product,Low,False
-Refund 2 din pe initiate hua but abhi tak nahi aaya! URGENT!,Returns_Refunds,High,True
-delievery usually kitne din leti h?,Delivery_Issue,Low,True
-Payment 7 din pay kiya but order confirm nahin hua! very urgent!,Payment_Invoice,High,True
+Return approved but refund kab aayega? 7 din ho gaya,Returns_Refunds,Medium,True
+Delivery boy rude tha! MANAGER sey BAAT KARO! immediately!,Delivery_Issue,High,True
+Payment gateway frozen hai! right now! Release karo!,Payment_Invoice,High,True
 "₹20,000 kaa prepaid parcel kisi aur ko de diya!!! Immediate investigation karo.",Delivery_Issue,High,False
 "Partial refnd mla hai, remaining amount ka update do.",Returns_Refunds,Medium,False
 Pkg khola to pura oil leak hua tha aur furniture kharab hogya. Compensation chahiye!,Wrong_Damaged_Product,High,False
 One item cancelled but full invioce amount still charged hai.,Payment_Invoice,Medium,False
-"paymnt gateway pay amount stuck hai, release kro",Payment_Invoice,Medium,True
-"Order me kitne items hai, confirm karoo",Order_Status,Low,True
+Invoice me kya kya details hoti hai?,Payment_Invoice,Low,True
+oder 17 baar pending ho raha hai! Fix karo ya paisa wapas karo!,Order_Status,High,True
 Mere card se unauthorized third charge hua!!! Fraud team ko escalate kro.,Payment_Invoice,High,False
 Pickup agent ko invioce dena hota hai?,Returns_Refunds,Low,False
-Return request kaise karu?,Returns_Refunds,Low,True
-Return request approve karo! Item missng hai hai! TURANT!,Returns_Refunds,High,True
+"Return item deliver ho chuka hai, refnd process start karoo",Returns_Refunds,Medium,True
+Return request approve karo! Item broken hai hai! TURANT!,Returns_Refunds,High,True
 Order confirmed hai lekin shipment update bilkul nai aya.,Order_Status,Medium,False
 Parcel shipped dikh raha hai but courier website pe record nahii mil raha.,Order_Status,Medium,False
-Payment double charge hua hai! abhi karo! refound karo!,Payment_Invoice,High,True
-"Invoice me address galat hai, update karo",Payment_Invoice,Medium,True
-Login nahi ho raha! right now! 17 baar try kiya!,Account_Technical,High,True
-"Invoice download nahi ho raha, failed hai page",Payment_Invoice,Medium,True
-"Mera order 5 din se stuck hai! URGENT hai, turant resolve karo!",Order_Status,High,True
-Delivery ke baad product return ho sakta hai kya?,Delivery_Issue,Low,True
-"Order status update nahi ho raha, please check karo",Order_Status,Medium,True
+"Invoice me service charge extra lagaya hai, remove karo",Payment_Invoice,Medium,True
+Payment double charge hua hai! asap! Refund karo!,Payment_Invoice,High,True
+Profile photo kaise lagau?,Account_Technical,Low,True
+Invoice ko kaise print karu?,Payment_Invoice,Low,True
+"Order pending hai, turant resolve karo! Nahi toh police complaint karunga!",Order_Status,High,True
+"Delivery 1 hafta sey delay ho rahi hai, kab aayegi?",Delivery_Issue,Medium,True
+Expected delievery date kya hai?,Order_Status,Low,True
 "Tracking page blank aa raha hai, support se exact location bta do.",Order_Status,Medium,False
-"Order blocked hai, mujhe urgent delievery chahiye",Order_Status,Medium,True
+"Order 24 din se transit mein hai, kb milega?",Order_Status,Medium,True
 "Ordr processing me atka hua hai since Monday, reason kia hai?",Order_Status,Medium,False
-"Invoice me customer name galat hai, fix kro",Payment_Invoice,Medium,True
+Invoice me extra charges lagaye hai! turant resolve karo! Remove karo!,Payment_Invoice,High,True
 "Mra expensive order gayab lag raha hai, pese bhi deduct ho gaye. urgenttt CHECK KARO.",Order_Status,High,False
 "Mera paisa double block hai, refnd TODAY chahiye warna consumer court jaunga.",Returns_Refunds,High,False
-Delivery address change kar sakte hai kya?,Delivery_Issue,Low,True
+delivry kaafi din se pending hai! Koi action nahi le raha!,Delivery_Issue,High,True
 "Return pickup doo baar cancel hua, naya slot arrange karo.",Returns_Refunds,Medium,False
-Order status check karne ka tarika batao,Order_Status,Low,True
-Login credentials halted dikha raha hai,Account_Technical,Medium,True
-Delivery usually kitne din leti h?,Delivery_Issue,Low,True
-payement 1000 ka hua tha but 1400 kat gaya,Payment_Invoice,Medium,True
-Package delivered but outer box completely crushed tha,Delivery_Issue,Medium,True
+Order 26 din se not responding hai! Bahut urgent hai! asap!,Order_Status,High,True
+OTP nahin aa raha! bahut der ho gayi! Multiple times try kiya!,Account_Technical,High,True
+Delivery boy ko instruction kaise de?,Delivery_Issue,Low,True
+Payment double hua hai! jaldi karo! refnd karo!,Payment_Invoice,High,True
+Delivery schedule kaise dekhu?,Delivery_Issue,Low,True
 Two-factor code bypass hua lagta hai. securty team call me immediately.,Account_Technical,High,False
-Invoice me extra charges lagaye hai! fatafat! Remove karo!,Payment_Invoice,High,True
-"retrn request reject without inspection, please reopen",Returns_Refunds,Medium,True
+Payment methods kya kiya hai?,Payment_Invoice,Low,True
+"Return ke baad prodct vapas nahin bhej pa raha, help karo",Returns_Refunds,Medium,True
 "buisness purchase hai, invoice without GST details generate hua.",Payment_Invoice,Medium,False
 "Refund promised date cross ho gayi, amount account me nahin hai.",Returns_Refunds,Medium,False
-Invoice ke liye kya kya chahiye?,Payment_Invoice,Low,True
-Wrong item deliver hua! very urgent! Turant replace karo!,Wrong_Damaged_Product,High,True
-"Order confirm nahin ho raha, bht din se try kar raha hu! ESCALATE KARO!",Order_Status,High,True
-Product kharab hai hai! turant resolve karo! Full refund do!,Wrong_Damaged_Product,High,True
+Payment 1500 kiya but 9000 kat gaya! emergency hai!,Payment_Invoice,High,True
+"Order wrong color aaya, exchange ho sakta hai kya?",Wrong_Damaged_Product,Low,True
+Order 17 baar halted ho raha hai! Fix karo ya paisa wapas karo!,Order_Status,High,True
+Product return karne ka option kahan hai?,Wrong_Damaged_Product,Low,True
 COD se prepaid me paymnt change ho sakti hai?,Payment_Invoice,Low,False
 Dispatch message mil gaya tha par uske baad koi movement nahiii hai.,Order_Status,Medium,False
-"Order 25 items ka hai, sab ek saath aayenge kya?",Order_Status,Low,True
-Wrong item ka kya karu?,Wrong_Damaged_Product,Low,True
-parcl damage ho gaya hai! IMMEDIATELY refound karo!,Delivery_Issue,High,True
-oder 17 baar pending ho raha hai! Fix karo ya paisa wapas karo!,Order_Status,High,True
-Account failed hai! Koi explanation nahi diya! emergency hai!,Account_Technical,High,True
-Invoice 1 hafta se generate nahi ho raha! URGENT!,Payment_Invoice,High,True
-Profile photo kaise lagau?,Account_Technical,Low,True
-Payment pending hai since yesterday even though UPI succesful tha.,Payment_Invoice,Medium,False
-"App crash ho raha hai, 3 din sey bar bar ho raha hai",Account_Technical,Medium,True
-"App halted hai, payement nahi ho raha! URGENT!",Account_Technical,High,True
-Delivery boy ne security guard ko de diya! asap!,Delivery_Issue,High,True
-ordr ka expected delievery date kya hai?,Order_Status,Low,True
-"Account security issu hai, someone else is logging in",Account_Technical,Medium,True
-"Refund amount galat aaya hai, ₹10000 instead of ₹900",Returns_Refunds,Medium,True
 "Order status update nahi ho raha, please chck karo",Order_Status,Medium,True
+Order delivered but prduct phat gaya hai! jaldi karo!,Wrong_Damaged_Product,High,True
+delievery address change kar sakte hai kya?,Delivery_Issue,Low,True
+Order halted hae but delivery date cross ho gayi! please jaldi!,Order_Status,High,True
+Account delete kaise karu?,Account_Technical,Low,True
+Payment showing error but confirmation nahi mila,Payment_Invoice,Medium,True
+Account settings kahan hai?,Account_Technical,Low,True
+Payment pending hai since yesterday even though UPI succesful tha.,Payment_Invoice,Medium,False
+Account 7 din se not working hai! Help karo!,Account_Technical,High,True
+Account me kya kya update kar sakte hai?,Account_Technical,Low,True
+Delivery boy demanded extra money for delivery,Delivery_Issue,Medium,True
+Order 30 items ka tha but sirf 9 aaye,Order_Status,Medium,True
+App blocked ho raha hai! critical hai! Fix karo!,Account_Technical,High,True
+Refund amount ₹2000 tha but sirf ₹2700 credit hua,Returns_Refunds,Medium,True
+Order status check karne ka tarika batao,Order_Status,Low,True
 Agent ne badtameezi ki aur phone kaat diya. Escalate to supervisor noww.,Delivery_Issue,High,False
-Payment successful dikha raha hai but order disabled hai,Payment_Invoice,Medium,True
+Invoice ko kaise share karu?,Payment_Invoice,Low,True
 Order ID ke against koi latest update h kya?,Order_Status,Low,False
-Payment ₹500 kat gaya but oder nahi hua! FRAUD hai!,Payment_Invoice,High,True
-"Mera order 2 din se stuck hai! urgnt hai, immediately!",Order_Status,High,True
-paymnt not updating he but order not placed hai! very urgent!,Payment_Invoice,High,True
+"Invoice download nahi ho raha, disabled hai page",Payment_Invoice,Medium,True
+"Order confirm ho gaya hai, ab kya hoga?",Order_Status,Low,True
+Payment double charge hua hai! abhi karo! refound karo!,Payment_Invoice,High,True
 App desktop browser pe bhi same account sey chalega?,Account_Technical,Low,False
 App white screen pe stuck h since morning.,Account_Technical,Medium,False
-Profile kaise update karu?,Account_Technical,Low,True
+Account delete karna hai but option nahi mil raha! jaldi karo!,Account_Technical,High,True
 Pickup agent product le gaya but retrn proof nahi diya. Urgent investigation chahiye.,Returns_Refunds,High,False
-"Product smashed hai, ek piece missing hai",Wrong_Damaged_Product,Medium,True
-Product phat gaya hai! bahut urgent hai! Consumer forum me complaint karunga!,Wrong_Damaged_Product,High,True
-"Invoice download nahi ho raha, failed hai page",Payment_Invoice,Medium,True
-"Refund amount ₹3000 hona chahiye, chck karoo",Returns_Refunds,Medium,True
-Order 17 baar halted ho raha hai! Fix karo ya paisa wapas karo!,Order_Status,High,True
-Return approved but refund kab aayega? 5 din ho gaya,Returns_Refunds,Medium,True
+"Order delivered wrong item, exchange kro please",Wrong_Damaged_Product,Medium,True
+Refund process kaise hota hai?,Wrong_Damaged_Product,Low,True
+Invoice ko kaise share karu?,Payment_Invoice,Low,True
+Return policy ke according refound milna chahiye! turant resolve karo!,Returns_Refunds,High,True
+Order me address change kar sakte hai kya?,Order_Status,Low,True
+"Refund amount galat aaya hai, ₹3000 instead of ₹1400",Returns_Refunds,Medium,True
 Delivery attempt ke naam pe sirf missed call aaya aur order retrn kar diya.,Delivery_Issue,Medium,False
 Delivery agent usually kis time tak aata h?,Delivery_Issue,Low,False
 "Order history download karni h, option kaha hai?",Account_Technical,Low,False
-"Product duplicate lag raha hai, original nahi hae",Wrong_Damaged_Product,Medium,True
-Order place kiya tha but abhi tak failed,Order_Status,Medium,True
+Refund ke liye kya kya documents chahiye?,Wrong_Damaged_Product,Low,True
+Order cancel karne ka option nahi aa raha,Order_Status,Medium,True
 "Wrng fragrance deliver hui, exchange request kaha se dalu?",Wrong_Damaged_Product,Low,False
-retrn request approve karo! Item cracked he hai! TURANT!,Returns_Refunds,High,True
-App 2 din se not updating hai! BAHUT URGENT!,Account_Technical,High,True
-Invoice me kiya kya details hoti hai?,Payment_Invoice,Low,True
+Refund kaise check karu?,Returns_Refunds,Low,True
+Profile name kaise change karu?,Account_Technical,Low,True
+Payment successful but order cancel dikha raha hai! bahut urgent hai!,Payment_Invoice,High,True
 My account iz locked without any explanation.,Account_Technical,Medium,False
-Login kaise karu?,Account_Technical,Low,True
+App update ke baad sab stuck ho gaya! turant resolve karo!,Account_Technical,High,True
 "OTP aa hi nahi raha, multiple times resend try kiya..",Account_Technical,Medium,False
-Wrong product aaya hai! asap! Paisa wapas karo!,Wrong_Damaged_Product,High,True
-Refund ke liye koi charge hai kya?,Returns_Refunds,Low,True
+"Order me wrong product aaya hai, please check karo",Wrong_Damaged_Product,Medium,True
+"retrn request reject without inspection, please reopen",Returns_Refunds,Medium,True
 "Quantity two thi, packet me sirf one piece mila..",Wrong_Damaged_Product,Low,False
 Courier team parcl kisi aur building me le gayi thi.,Delivery_Issue,Medium,False
-"ordr tracking not working properly, blank page aa raha hai",Order_Status,Medium,True
-Delivery bahut din se nahi ho rahi! Consumer court me jaunga!,Delivery_Issue,High,True
-"Return item deliver ho chuka hai, refnd process start karoo",Returns_Refunds,Medium,True
-Payment fail ho gaya but paisa kat gaya! please jaldi!,Payment_Invoice,High,True
-Payment ke baad kya kya hota hai?,Payment_Invoice,Low,True
+"ordr 6 items ka hai, sab ek saath aayenge kya?",Order_Status,Low,True
+Delivery halted hai but expected date cross ho gayi,Delivery_Issue,Medium,True
+Refund 11 din sey pending hai! BAHUT URGENT!,Returns_Refunds,High,True
+Invoice 7 din se generate nahi ho raha,Payment_Invoice,Medium,True
+Invoice me GST kaise dekhu?,Payment_Invoice,Low,True
 OTP kitni der valid rehta h?,Account_Technical,Low,False
-"Refund kahan aata hai, bank ya wallet?",Returns_Refunds,Low,True
+"Return item damaged aaya tha, refund chahiye",Returns_Refunds,Medium,True
 Mere saved cards visible hain but login control nahi mil raha. Acount freeze immediately.,Account_Technical,High,False
-Product duplicate hai! Fake hai! critical hai!,Wrong_Damaged_Product,High,True
+meraa order me missing items hain! bahut der ho gayi! Complete karo!,Wrong_Damaged_Product,High,True
 Company GST claim lose ho jayega due 2 your wrong invoice. Escalate immediately.,Payment_Invoice,High,False
-Login credentials halted dikha raha hai,Account_Technical,Medium,True
-Refund usually kitne working days leta h?,Returns_Refunds,Low,True
-Account me kya kya update kar sakte hai?,Account_Technical,Low,True
-"delivr instructions follow nahi kiye, gate pe chhod ke chala gaya",Delivery_Issue,Medium,True
-acconut me kya kya options hai?,Account_Technical,Low,True
-delivry 5 din se delay hai! urgnt resolve karo!,Delivery_Issue,High,True
+Login credentials kya hai?,Account_Technical,Low,True
+reurn request kab tak kar sakte hai?,Returns_Refunds,Low,True
+App pending hai! Data load nahi ho raha! URGENT!,Account_Technical,High,True
+"Delivery 2 din sey delay ho rahi hai, kab aayegi?",Delivery_Issue,Medium,True
+Login nahi ho raha! emergency hai! 10 baar try kiya!,Account_Technical,High,True
+Delivery boy ko tip de sakte hai kya?,Delivery_Issue,Low,True
 Ordr ka current status bata dena pls.,Order_Status,Low,False
 "Mra pkg dispatch kab hoga, koi idea?",Order_Status,Low,False
-Payment showing error hai but confirmation nai mila! URGENT!,Payment_Invoice,High,True
-Order dispatch hone ke baad address change ho sakta hai kya?,Order_Status,Low,True
-"Invoice download nahi ho raha, disabled hai page",Payment_Invoice,Medium,True
-Return item ka packaging kaise karu?,Returns_Refunds,Low,True
+paymnt ₹1000 kat gaya but order nahin hua! FRAUD hai!,Payment_Invoice,High,True
+Order ka tracking number kahan milega?,Order_Status,Low,True
+Payment 7 din pay kiya but order confirm nahin hua! very urgent!,Payment_Invoice,High,True
+Return request 7 din pay ki thi! turant resolve karo! Koi response nahi!,Returns_Refunds,High,True
 OTP email pe mil sakta h instead of SMS?,Account_Technical,Low,False
-Refund ke liye kiya kya documents chahiye?,Wrong_Damaged_Product,Low,True
+"Mera oder wrong item aaya hai, sahi product bhejo",Wrong_Damaged_Product,Medium,True
 "Website pe login ho jata hai, app me nhi hota.",Account_Technical,Medium,False
 "Ek attempt miss hogya, next attempt kab hoga?",Delivery_Issue,Low,False
 "Food item expired h, health risk hai. Escalate this urgently.",Wrong_Damaged_Product,High,False
-"Profile update nai ho raha, failed hai form",Account_Technical,Medium,True
-"Refund amount ₹10000 hona chahiye, check karo",Returns_Refunds,Medium,True
+acconut kaise manage karu?,Account_Technical,Low,True
+"Refund amount ₹2000 hona chahiye, chck karo",Returns_Refunds,Medium,True
 "DAMAGED PRODUCT KI COMPLAINT 4 BAAR KI, KOI RESPONSE NHI!!!",Wrong_Damaged_Product,High,False
-"Order confirm nahi ho raha, ek mahina se try kar raha hu! ESCALATE KARO!",Order_Status,High,True
+Order status chek karne ka tarika batao,Order_Status,Low,True
 "Refund wallet me credit hua, mujhe bank acount me chahiye tha.",Returns_Refunds,Medium,False
-Return item crushed tha! Full refnd do! emergency hai!,Returns_Refunds,High,True
+Return request 7 din pe ki thi! critical hai! Koi response nahi!,Returns_Refunds,High,True
 "Box seal open thi, kyaa replacement mil sakta hai?",Wrong_Damaged_Product,Low,False
 "₹40,000 ka refund hold karke rakha h, EMI due ho rahi hai!!!",Returns_Refunds,High,False
-Product return karne ka option kahan hai?,Wrong_Damaged_Product,Low,True
+"Mera order wrong item aaya hai, sahi product bhejo",Wrong_Damaged_Product,Medium,True
 corect password ke baad bhi login failed dikha raha hai.,Account_Technical,Medium,False
 Wallet balance aur card combine kar sakte hain??,Payment_Invoice,Low,False
 Return request seller ne reject kar di without proper reason..,Returns_Refunds,Medium,False
-Product exchange ke liye kya chahiye?,Wrong_Damaged_Product,Low,True
+Product scratch aaya he hai! asap! TURANT ACTION LO!,Wrong_Damaged_Product,High,True
 Pls check whether my package has actually left the warehouse.,Order_Status,Medium,False
-"Product not as described hai, please check",Wrong_Damaged_Product,Medium,True
-Payment gateway pe amount stuck hai! very urgent!,Payment_Invoice,High,True
-Invoice me extra charges lagaye hai! immediately! Remove karo!,Payment_Invoice,High,True
-"ordr ek mahina pay place kiya tha, abbi tak pending! BAHUT URGENT!",Order_Status,High,True
-Payment 500 kiya but 1400 kat gaya! right now!,Payment_Invoice,High,True
-"Account showing error hai, KYC verify nahin ho raha",Account_Technical,Medium,True
+Wrong item deliver hua! bahot der ho gayi! Turant replace karo!,Wrong_Damaged_Product,High,True
+Invoice ko kaise save karu?,Payment_Invoice,Low,True
+Payment successful but merchant ko nahi pahuncha! abbi karo!,Payment_Invoice,High,True
+Order placed but wrong phone number add ho gaya,Order_Status,Medium,True
+paymnt 8000 kiya but 7500 kat gaya! critical hai!,Payment_Invoice,High,True
+Account disabled hai! Koi explanation nahi diya! asap!,Account_Technical,High,True
 "Kal se out for delivery dikha raha h, parcel kaha hai urgently batao!",Order_Status,High,False
-Refund stopped hai but paisa abhi tak nahi aaya,Returns_Refunds,Medium,True
-Product return karne ka option kahan hai?,Wrong_Damaged_Product,Low,True
-Payment ke baad oder status updte hota hai kya?,Payment_Invoice,Low,True
-"App halted ho gaya he after update, fix karo",Account_Technical,Medium,True
-Payment successful but order cancel dikha raha hai! turant resolve karo!,Payment_Invoice,High,True
-Order cancel karna hai but option stopped hai! fatafat!,Order_Status,High,True
+Return item wapas bhej diya! Refund kab aayega? URGENT!,Returns_Refunds,High,True
+Wrong product deliver hua! emergency hai! Correct item bhejo!,Wrong_Damaged_Product,High,True
+Payment ₹500 kat gaya but oder nahi hua! FRAUD hai!,Payment_Invoice,High,True
+Login kaise karu?,Account_Technical,Low,True
+"payement fail ho gaya but paisa kat gaya, please chek",Payment_Invoice,Medium,True
+Order place karne ke baad phone number change ho sakta hai kya?,Order_Status,Low,True
 Billing address edit kar sakta hu order k baad?,Payment_Invoice,Low,False
-"refound kahan aata hai, bank ya wallet?",Returns_Refunds,Low,True
-Order 27 din se transit me hai! Kya ho raha hai? URGENT!,Order_Status,High,True
-Payment ke liye kyaa kya steps hai?,Payment_Invoice,Low,True
-"App pe error aa raha hai, stopped hai page",Account_Technical,Medium,True
-ordr place kiya tha but abhi tak disabled,Order_Status,Medium,True
-"Refund amount galat aaya hai, ₹1000 instead of ₹1800",Returns_Refunds,Medium,True
-"Order status stopped hai, customer care bhi help nahi kar raha! MANAGER KO BULAO!",Order_Status,High,True
-payement bahut din pe ki thi but abhi tak order confirm nahi hua,Payment_Invoice,Medium,True
-prodct exchange ke liye kya chahiye?,Wrong_Damaged_Product,Low,True
-Order 30 items ka tha but sirf 9 aaye,Order_Status,Medium,True
-Delivery ke liye kya kya chahiye?,Delivery_Issue,Low,True
+refound not responding hai but paisa abhi tak nahi aaya,Returns_Refunds,Medium,True
+"oder ek mahina pe place kiya, expected date kab hai?",Order_Status,Medium,True
+Payment 3000 kiya but 9000 kat gaya! abhi karo!,Payment_Invoice,High,True
+"App stopped hai, data load nahi ho raha",Account_Technical,Medium,True
+"oder me missing item hai, check karo",Order_Status,Medium,True
+Return reject kar diya! Consumer court me jaunga! asap!,Returns_Refunds,High,True
+Order dispatch hone ke baad address change ho sakta hai kya?,Order_Status,Low,True
+Payment ke liye kya kyaa steps hai?,Payment_Invoice,Low,True
+Mera order scratch aaya hai ho ke aaya hai! plss jaldi!,Wrong_Damaged_Product,High,True
+"Order stopped hai, kiya problem hai?",Order_Status,Medium,True
+Delivery boy ko instruction kaise de?,Delivery_Issue,Low,True
 EMI select kii thi but full amount card se deduct ho gaya.,Payment_Invoice,Medium,False
-Order 16 din se transit me hai! Kya ho raha hai? URGENT!,Order_Status,High,True
-Wrong product aaya hai! immediately! Bahut gussa hu!,Wrong_Damaged_Product,High,True
-Delivery ke baad product ka status kaise check karu?,Delivery_Issue,Low,True
+"oder halted hai, kiya problem hai?",Order_Status,Medium,True
+Order delivered but product cracked hai hai! right now!,Wrong_Damaged_Product,High,True
+"Delivery ke baad product missing hai, empty box aaya",Delivery_Issue,Medium,True
 "Retrn pickup ho gaya aur system deny kar raha hai. This is fraud, escalate NOW.",Returns_Refunds,High,False
-Invoice me extra charges lagaye hai! very urgent! Remove karo!,Payment_Invoice,High,True
+Payment blocked but confirmation nahi mila,Payment_Invoice,Medium,True
 Maine fone cover ordr kiya tha aur parcel me cable nikli.,Wrong_Damaged_Product,Medium,False
-"Order halted hai, bht urgent hai! Legal action lunga!",Order_Status,High,True
-Return item wapas bhej diya! Refund kb aayega? URGENT!,Returns_Refunds,High,True
-"Return request 15 din sey pending hai, approve karo",Returns_Refunds,Medium,True
-"Product dent pada hai hai, battery dent pada hai ho gayi he",Wrong_Damaged_Product,Medium,True
-"Order confirm nahee ho raha, ek mahina se try kar raha hu! ESCALATE KARO!",Order_Status,High,True
-Profile photo kaise lagau?,Account_Technical,Low,True
-Sunday ko delivry hoti hai ya nahi?,Delivery_Issue,Low,False
-Payment 5 din pe ki thi but abhi tak order confirm nai hua,Payment_Invoice,Medium,True
+Order place karne ke baad payment change kar sakte hai kya?,Order_Status,Low,True
+Refund 15 din se nahi mila! immediately!,Returns_Refunds,High,True
 Return item ko kahan bheju?,Returns_Refunds,Low,True
+"oder damage ho gaya prodct aaya hai, exchange kro",Wrong_Damaged_Product,Medium,True
+"Order status update nahi ho raha, please check karo",Order_Status,Medium,True
+Login credentials kya hai?,Account_Technical,Low,True
+Sunday ko delivry hoti hai ya nahi?,Delivery_Issue,Low,False
+Invoice galat hai! emergency hai! Correct karo!,Payment_Invoice,High,True
+Refund status check kaise karu? Koi option nahi! emergency hai!,Returns_Refunds,High,True
 Refnd orginal payment method me aayega na?,Returns_Refunds,Low,False
-Refund status check kaise karu? Koi option nahi! please jaldi!,Returns_Refunds,High,True
-Product kharab hai hai! fatafat! Legal action lunga!,Wrong_Damaged_Product,High,True
-"Order 2 din pe place kiya tha, abhi tak not updating! BAHUT URGENT!",Order_Status,High,True
-"Payment double charge hua hai, refund karo",Payment_Invoice,Medium,True
+"Refund amount ₹8000 hona chahiye, check karo",Returns_Refunds,Medium,True
+Product exchange ke liye kya chahiye?,Wrong_Damaged_Product,Low,True
+Order place karne ke baad phone number change ho sakta hai kya?,Order_Status,Low,True
+"paymnt gateway pay amount stuck hai, release kro",Payment_Invoice,Medium,True
 "I NEED d PACKAGE TODAY. Generic reply mat dena, actual scan details do.",Order_Status,High,False
 "Refund amount me delivery fee deduct hui hai, reason explain kro.",Returns_Refunds,Medium,False
-Invoice ke liye koi charge hai kya?,Payment_Invoice,Low,True
-Refund 1 hafta pay initiate hua but abhi tak nahi aaya! URGENT!,Returns_Refunds,High,True
+payement successful but merchant ko nahi pahuncha! asap!,Payment_Invoice,High,True
 retrn reject kar diya bina reason ke,Returns_Refunds,Medium,True
+Refund stopped hai but paisa abhi tak nahi aaya,Returns_Refunds,Medium,True
 "₹9,999 debit hua aur suport proof ignore kar raha. Consumer complaint raise karunga.",Payment_Invoice,High,False
-Product return karne ka tarika kyaa hai?,Wrong_Damaged_Product,Low,True
-Product reurn karne ka tarika kya hai?,Wrong_Damaged_Product,Low,True
+Product duplicate hai! Fake hai! bahut urgent hai!,Wrong_Damaged_Product,High,True
+Order prduct bent ho gaya hai! turant resolve karo! Action lo!,Wrong_Damaged_Product,High,True
 Refund wallet me lene ka option h kya?,Returns_Refunds,Low,False
-Order halted hae but delivery date cross ho gayi! please jaldi!,Order_Status,High,True
-Account kaise manage karu?,Account_Technical,Low,True
-delievery address change kar sakte hai kya?,Delivery_Issue,Low,True
-Pickup person OTP lekar gaya but receipt nahi di..,Returns_Refunds,Medium,False
-Delivery 15 din se delay hai! urgnt resolve karo!,Delivery_Issue,High,True
-"Refund kahan aata hai, bank ya wallet?",Returns_Refunds,Low,True
-Expected delievery date kya hai?,Order_Status,Low,True
-"Order stopped hai, consumer court me jaunga agar bahut din tak resolve nai hua!",Order_Status,High,True
-Order ka tracking number kahan milega?,Order_Status,Low,True
-Refund ₹1000 hona chahiye! bahut der ho gayi! Check karo!,Returns_Refunds,High,True
-Account kaise banau?,Account_Technical,Low,True
 Order placed but wrong phone number add ho gaya,Order_Status,Medium,True
-reurn request kab tak kar sakte hai?,Returns_Refunds,Low,True
-Login credentials kya hai?,Account_Technical,Low,True
-Delivery 7 din se pending hai! Koi action nahi le raha!,Delivery_Issue,High,True
-Order me address change kar sakte hai kya?,Order_Status,Low,True
-Refund amount ₹1500 tha but sirf ₹9000 credit hua,Returns_Refunds,Medium,True
-Account 2 hafta sey pending hai! Help karo!,Account_Technical,High,True
+App update ke baad sab not working ho gaya! right now!,Account_Technical,High,True
+Delivery boy ne OTP maanga without delivery! SCAM hai! fatafat!,Delivery_Issue,High,True
+Pickup person OTP lekar gaya but receipt nahi di..,Returns_Refunds,Medium,False
+Delivery ke liye kya kyaa kar sakta hu?,Delivery_Issue,Low,True
+Refund amount ₹500 tha but sirf ₹7500 credit hua,Returns_Refunds,Medium,True
+"Order stopped hai, 7 din se pareshan hu! TURANT KARO!",Order_Status,High,True
+Order dispatch hone ke baad address change ho sakta hai kya?,Order_Status,Low,True
+"Order blocked hai, main bahot gussa hu! immediately!",Order_Status,High,True
+"Refund amount galat aaya hai, ₹1000 instead of ₹1800",Returns_Refunds,Medium,True
+"App halted ho gaya he after update, fix karo",Account_Technical,Medium,True
+Order place karne ke baad phone number change ho sakta he kya?,Order_Status,Low,True
+Return item ko kahan bheju?,Returns_Refunds,Low,True
+Account failed hai! Koi explanation nahi diya! emergency hai!,Account_Technical,High,True
+Delivery 28 din se delay hai! bahot URGENT!,Delivery_Issue,High,True
+"Order tracking stuck hai, IMMEDIATELY fix kro warna consumer forum me complaint karunga!",Order_Status,High,True
+Refund completed bol rahe ho but paisa nai aaya! FRAUD hai!,Returns_Refunds,High,True
+"Account failed ho gaya hai, please help",Account_Technical,Medium,True
 "Box me user manual nai tha, kya digital copy milegi??",Wrong_Damaged_Product,Low,False
 Reset password link open karte hi expired aaraha.,Account_Technical,Medium,False
-Invoice amount galat hai! critical hai! Recalculate karo!,Payment_Invoice,High,True
+Payment fail ho gaya but paisa kat gaya! bahut urgent hai!,Payment_Invoice,High,True
 "Bottle ka cap loose tha, thoda leakage hua h.",Wrong_Damaged_Product,Low,False
-Delivery 2 din se delay hai! bahot URGENT!,Delivery_Issue,High,True
+"Delivery instructions follow nai kiye, gate pay chhod ke chala gaya",Delivery_Issue,Medium,True
 Invoice amount aur bank debit amount match nahi kar rahe..,Payment_Invoice,Medium,False
-Delivery 2 din se delay hai! URGENT resolve karo!,Delivery_Issue,High,True
+delivry ke baad product return ho sakta hai kya?,Delivery_Issue,Low,True
 canceled order ka refund ten days se pending hai.,Returns_Refunds,Medium,False
-Return request kaise karu?,Returns_Refunds,Low,True
-"App crash ho raha hai, 1 hafta sey bar bar ho raha hai",Account_Technical,Medium,True
-acconut kaise manage karu?,Account_Technical,Low,True
-Profile name kaise change karu?,Account_Technical,Low,True
-ordr showing error hai but delivery date cross ho gayi,Order_Status,Medium,True
-Payment ke liye kya kya steps hai?,Payment_Invoice,Low,True
+Return item ka packaging kaise karu?,Returns_Refunds,Low,True
+Account disabled hai! New device pe login nahi ho raha! URGENT!,Account_Technical,High,True
+Profile kaise upadte karu?,Account_Technical,Low,True
+Profile kaise update karu?,Account_Technical,Low,True
+Order place kiya tha but abhi tak not updating,Order_Status,Medium,True
+Payment ₹500 kat gaya but oder nahi hua! FRAUD hai!,Payment_Invoice,High,True
 "Aaj chargeback file karunga if ₹21,000 is not reversed immediatly.",Payment_Invoice,High,False
-Delivery boy demanded cash on delivery! Already paid tha! FRAUD!,Delivery_Issue,High,True
+Delivery ke baad product return ho sakta hai kya?,Delivery_Issue,Low,True
 Mje kisi aur customer ka item aur invoice mila.,Wrong_Damaged_Product,Medium,False
-Payment fail ho gaya but paisa kat gaya! bahut der ho gayi!,Payment_Invoice,High,True
-Refund kab tak milega? Bank acconut pe transfer karo,Returns_Refunds,Medium,True
-Invoice me extra charges lagaye hai! emergency hai! Remove karo!,Payment_Invoice,High,True
-"Wrong size aaya hai, L manga tha but XL aaya",Wrong_Damaged_Product,Medium,True
-"Delivery 2 din sey delay ho rahi hai, kab aayegi?",Delivery_Issue,Medium,True
-"App disabled hai, data load nahi ho raha",Account_Technical,Medium,True
+"Invoice me customer name galat hai, fix kro",Payment_Invoice,Medium,True
+Return policy kya hai?,Returns_Refunds,Low,True
+Payment not responding ho gaya but order still pending he,Payment_Invoice,Medium,True
+"Order me wrong prodct aaya hai, please chek karo",Wrong_Damaged_Product,Medium,True
+Delivery 7 din se pending hai! Koi action nahi le raha!,Delivery_Issue,High,True
+Account delete karna he but option nahi mil raha! right now!,Account_Technical,High,True
 Ordr status aur delivery estimate dono mismatch dikha rahe hain.,Order_Status,Medium,False
-Wrong item ka kya karu?,Wrong_Damaged_Product,Low,True
-App not updating hai! Data load nahi ho raha! URGENT!,Account_Technical,High,True
-Product smashed hai! fatafat! Consumer forum me complaint karunga!,Wrong_Damaged_Product,High,True
-Payment ke liye kya kyaa steps hai?,Payment_Invoice,Low,True
-Account delete karna hai but option nahee mil raha! right now!,Account_Technical,High,True
+Wrong item ka status kaise chck karu?,Wrong_Damaged_Product,Low,True
+Account stuck hai but maine kuch nahi kiya! bahut der ho gayi!,Account_Technical,High,True
+"Mera order msising items hai, refound kaise lunga?",Wrong_Damaged_Product,Low,True
+Payment 500 kiya but 1400 kat gaya! right now!,Payment_Invoice,High,True
+Account kaise banau?,Account_Technical,Low,True
 App crash kii wajah se payment twice submit hua!!! Technical team escalate karo.,Account_Technical,High,False
 Return reject kar diya bina inspection k. Reopen it RIGHT NOW.,Returns_Refunds,High,False
-Payment successful but order cancel dikha raha hai! bahut urgent hai!,Payment_Invoice,High,True
-Return item wapas bhej diya! Refund kab aayega? URGENT!,Returns_Refunds,High,True
-Order cancel karne ka option nahi aa raha,Order_Status,Medium,True
-Refund ₹10000 ka hona chahiye but sirf ₹450 aaya,Returns_Refunds,Medium,True
-Payment ke baad oder confirm hota hai kya?,Payment_Invoice,Low,True
-Delivery ke liye koi extra charge he kya?,Delivery_Issue,Low,True
-Invoice me GST kaise dekhu?,Payment_Invoice,Low,True
-payement showing error ho gaya but ordr still pending hai,Payment_Invoice,Medium,True
+Invoice download nahi ho raha! asap!,Payment_Invoice,High,True
+Return item ka label kaise print karu?,Returns_Refunds,Low,True
+"Order tracking not working properly, blank page aa raha hai",Order_Status,Medium,True
+refound ₹1500 ka hona chahiye but sirf ₹1400 aaya,Returns_Refunds,Medium,True
+Payment fail ho gaya but paisa kat gaya! bahut der ho gayi!,Payment_Invoice,High,True
+Delivery boy ne package fek ke diya! right now!,Delivery_Issue,High,True
+Payment kaafi din pe ki thi but abhi tak oder confirm nahi hua,Payment_Invoice,Medium,True
+Payment ₹10000 kat gaya but ordr nahin hua! FRAUD hai!,Payment_Invoice,High,True
 Wrng book edition deliver hui hai.,Wrong_Damaged_Product,Low,False
-App not updating hai! Data load nahi ho raha! URGENT!,Account_Technical,High,True
-paymnt not responding hai but confirmation nahi mila! URGENT!,Payment_Invoice,High,True
-Delivery ke liye kya kyaa chahiye?,Delivery_Issue,Low,True
-"prduct scratch aaya hae tha, delivr ke baad pata chala",Wrong_Damaged_Product,Medium,True
-Delivery instructions diye the but follow nahi hue,Delivery_Issue,Low,True
+"App pe error aa raha hai, stopped hai page",Account_Technical,Medium,True
+Invoice me GST kaise dekhu?,Payment_Invoice,Low,True
+delivr date 2 din thi but abbi tak nahi aayi! ESCALATE KARO!,Delivery_Issue,High,True
+"Order delivered wrrong item, exchange karo please",Wrong_Damaged_Product,Medium,True
+Delivery 15 din se delay hai! urgnt resolve karo!,Delivery_Issue,High,True
 "Mujhe blue kii jagah black color mila, exchange kaise hoga?",Wrong_Damaged_Product,Low,False
 "Sealed box me product missing tha, sirf charger mila. ₹30,000 ka fraud h!",Wrong_Damaged_Product,High,False
-Payment failed hai but oder not placed hai! asap!,Payment_Invoice,High,True
-OTP kaise resend karu?,Account_Technical,Low,True
+"Invoice me service charge extra lagaya hai, remove karo",Payment_Invoice,Medium,True
+Login nahi ho raha! right now! 17 baar try kiya!,Account_Technical,High,True
 "This is urgenttt, medicine ordr ka status immediatly confirm karo!",Order_Status,High,False
 "Payment gateway timeout hua, order cart me hi h but paise kat gaye.",Payment_Invoice,Medium,False
 "Payment gateway ne amount freeze kar diya, medical purchase urgent h!",Payment_Invoice,High,False
-App failed ho raha hai! asap! Fix karo!,Account_Technical,High,True
+"App pe error aa raha hai, stopped hai page",Account_Technical,Medium,True
 "Tracking link open kiya but update nahi dikh raha, check karoge??",Order_Status,Low,False
-"Delivery 15 din se delay ho rahi hai, kab aayegi?",Delivery_Issue,Medium,True
-Invoice download nahi ho raha! asap!,Payment_Invoice,High,True
-"prduct broken hai hai, kaafi din ke andar replace karoo",Wrong_Damaged_Product,Medium,True
+Delivery ke baad package toot gaya nikla,Delivery_Issue,Medium,True
+payement ke baad ordr status update hota hai kya?,Payment_Invoice,Low,True
+"prodct cracked hai hai, battery cracked hai ho gayi hai",Wrong_Damaged_Product,Medium,True
 Pkg road pe fek ke gaya aur damaged ho gaya. ACTION LO ABI.,Delivery_Issue,High,False
-"Product kharab hai hai, battery kharab hai ho gayi hai",Wrong_Damaged_Product,Medium,True
-Return request approve hone me kitna time lagta hai?,Returns_Refunds,Low,True
-Wrong product aaya hai! turant resolve karo! bahot gussa hu!,Wrong_Damaged_Product,High,True
-"Refund amount ₹2000 hona chahiye, check karo",Returns_Refunds,Medium,True
-"Delivery 29 din lag rahe hain, pehle 2 din mein aata tha",Delivery_Issue,Medium,True
+"Mera ordr incomplete hai, kya karu?",Wrong_Damaged_Product,Low,True
+Return request kaise karu?,Returns_Refunds,Low,True
+Mera order ka item crushed hai! turant resolve karo!,Wrong_Damaged_Product,High,True
+"Return pickup kaafi din se nahi ho raha, schedule karoo",Returns_Refunds,Medium,True
+Delivery boy ne package fek ke diya! right now!,Delivery_Issue,High,True
 Delivery kaa time slot select kar sakte hain kya?,Delivery_Issue,Low,False
 OTP aaraha hai but enter karte hi incorrect bolta hai.,Account_Technical,Medium,False
-"Delivery date 29 din se delay hai, koi updte do",Delivery_Issue,Medium,True
-Return item ka label kaise print karu?,Returns_Refunds,Low,True
+Package missng hai! immediately! Police complaint karunga!,Delivery_Issue,High,True
+Refund kb milega? 3 din se wait kar raha hu,Returns_Refunds,Medium,True
 Mera order kaha h? Teen din se bas in transit likha aa raha hai.,Order_Status,Medium,False
-Order place karne ke baad phone number change ho sakta he kya?,Order_Status,Low,True
-"Delivery 1 hafta sey delay ho rahi hai, kab aayegi?",Delivery_Issue,Medium,True
-"Account verify nahi ho raha, 10 din se pending hai",Account_Technical,Medium,True
-Order delivered dikh raha he but mujhe kuch nahin mila,Order_Status,Medium,True
+Order halted hae but confirmation email nahi aaya,Order_Status,Medium,True
+Delivery boy demanded cash on delivery! Already paid tha! FRAUD!,Delivery_Issue,High,True
+Login credentials halted dikha raha hai,Account_Technical,Medium,True
+"Order 25 items ka hai, sab ek saath aayenge kya?",Order_Status,Low,True
 Address me landmark add krna hai delivery se pehle.,Delivery_Issue,Low,False
-"App stopped hai, data load nahi ho raha",Account_Technical,Medium,True
+Account kaise manage karu?,Account_Technical,Low,True
 "Refund completed bolke jhooth mat bolo, account me zero credit h!!!",Returns_Refunds,High,False
 "Saved card remove karna h, steps bata do.",Account_Technical,Low,False
 Tax amount kaa calculation explain kar do.,Payment_Invoice,Low,False
-Delivery ke baad package toot gaya nikla,Delivery_Issue,Medium,True
-Product missing hai! Box scratch aaya hai tha! immediately!,Wrong_Damaged_Product,High,True
+"Delivery 5 din ho rahi hai, pehle pehle se hoti thi",Delivery_Issue,Medium,True
+Wrong product aaya hai! jaldi karo! Exchange karo!,Wrong_Damaged_Product,High,True
 "Courier ne address incomplete bola, app me full address saved h.",Delivery_Issue,Medium,False
-"payement fail ho gaya but paisa kat gaya, please check",Payment_Invoice,Medium,True
+Invoice me extra charges lagaye hai! immediately! Remove karo!,Payment_Invoice,High,True
 Payment successful hua ya nahin confirm kar do.,Payment_Invoice,Low,False
-Account kaise manage karu?,Account_Technical,Low,True
+Password kaise strong banau?,Account_Technical,Low,True
 "Paymnt failed but ₹32,000 kat gaye. Urgently reverse karo!",Payment_Invoice,High,False
-App ek mahina se not updating hai! bht URGENT!,Account_Technical,High,True
+App failed ho raha hai! asap! Fix karo!,Account_Technical,High,True
 "Aaj hi parcel chaiye, kal se wedding hai. TURANT delivery arrange karo!",Delivery_Issue,High,False
-payement successful but merchant ko nahi pahuncha! asap!,Payment_Invoice,High,True
-payement 10 din pay ki thi but abhi tak order confirm nahee hua,Payment_Invoice,Medium,True
-Payment methods kya kiya hai?,Payment_Invoice,Low,True
+"Invoice download nahi ho raha, failed hai page",Payment_Invoice,Medium,True
+Invoice change ho sakta hae kya?,Payment_Invoice,Low,True
+"Payment double charge hua hai, refnd kro",Payment_Invoice,Medium,True
 Can I merge ma two accounts?,Account_Technical,Low,False
-Payment double hua hai! abhee karo! refnd karo!,Payment_Invoice,High,True
+Payment usually kitne din me confirm hota hai?,Payment_Invoice,Low,True
 Suport chat send button work nai kar raha.,Account_Technical,Medium,False
-paymnt ₹1000 kat gaya but order nahin hua! FRAUD hai!,Payment_Invoice,High,True
-Wrong item ka kya karu?,Wrong_Damaged_Product,Low,True
-Product missing hai! Box damage ho gaya tha! right now!,Wrong_Damaged_Product,High,True
-"Order not working hai, paisa kat gaya but kuch nahi mila! FRAUD hai! turant resolve karo!",Order_Status,High,True
-Login kaise karu?,Account_Technical,Low,True
-Account security issue hai! Someone else login kar raha! immediately!,Account_Technical,High,True
+"Payment fail ho gaya but paisa kat gaya, please check",Payment_Invoice,Medium,True
+"Product scratch aaya hai hai, battery scratch aaya hai ho gayi hae",Wrong_Damaged_Product,Medium,True
+"meraa order ka product broken hae hai, refund ya replacement do",Wrong_Damaged_Product,Medium,True
+"oder tracking not working properly, blank page aa raha hai",Order_Status,Medium,True
+"Account failed ho gaya hai, please help",Account_Technical,Medium,True
+"App halted hai, payement nahi ho raha! URGENT!",Account_Technical,High,True
 Mujhe office leave lena pada aur rider aaya hi nahi. Compensation chaiye!,Delivery_Issue,High,False
 "Furniture ka main panel cracked h, installation possible nahi.",Wrong_Damaged_Product,Medium,False
 Return request submit ho gayi kya confirm kar do..,Returns_Refunds,Low,False
-delivry boy ne extra money manga! FRAUD hai! fatafat!,Delivery_Issue,High,True
-Payment kaafi din pe ki thi but abhi tak oder confirm nahi hua,Payment_Invoice,Medium,True
-"Product duplicate lag raha hai, original nai he",Wrong_Damaged_Product,Medium,True
-Payment fail ho gaya but paisa kat gaya! bahut urgent hai!,Payment_Invoice,High,True
-"delievery date 2 din se delay hai, koi update do",Delivery_Issue,Medium,True
-App update ke baad sab pending ho gaya! very urgent!,Account_Technical,High,True
-Payment successful but merchant ko nahi pahuncha! abbi karo!,Payment_Invoice,High,True
+Delivery ke liye kya kya documents chahiye?,Delivery_Issue,Low,True
+Payment ke liye kya kya steps hai?,Payment_Invoice,Low,True
+wrng item ka status kaise check karu?,Wrong_Damaged_Product,Low,True
+Invoice 1 hafta se generate nahi ho raha! URGENT!,Payment_Invoice,High,True
+delivry boy demanded cash on delivery! Already paid tha! FRAUD!,Delivery_Issue,High,True
+Profile kaise update karu?,Account_Technical,Low,True
+"Payment gateway pe amount stuck hai, release karo",Payment_Invoice,Medium,True
 "Delivry guy OTP lekar parcel le gaya, ye fraud hai!!! Police complaint karunga.",Delivery_Issue,High,False
-Delivery wrrong address pe ho gayi! fatafat!,Delivery_Issue,High,True
-Product dent pada hai hai! turant resolve karo! Full refund do!,Wrong_Damaged_Product,High,True
+"Delivery 18 din lag rahe hain, pehle 5 din mein aata tha",Delivery_Issue,Medium,True
+refnd ke liye kya kya steps hai?,Wrong_Damaged_Product,Low,True
 "₹18,500 kaa item missing parts ke saath bheja. Immediate full refund do.",Wrong_Damaged_Product,High,False
-Order cancel karne ka option kahan hai?,Order_Status,Low,True
-Order 17 din se transit me hai! Kya ho raha hai? URGENT!,Order_Status,High,True
-Package delivered but outer box completely crushed tha,Delivery_Issue,Medium,True
+"Order status stopped hai, customer care bhi help nahi kar raha! MANAGER KO BULAO!",Order_Status,High,True
+oder confirm hone ke baad delivery date change ho gayi,Order_Status,Medium,True
+"Delivery date 4 din se delay hai, koi update do",Delivery_Issue,Medium,True
 Agent wrong address pe gaya aur mje blame kar raha hai. Manager call kare abhi.,Delivery_Issue,High,False
 Credit card EMI kaa breakup kaha dikhega?,Payment_Invoice,Low,False
 UPI transaction complete h but app payment maang raha again. I will not pay twice!,Payment_Invoice,High,False
-"Payment gateway pe amount stuck hai, release karo",Payment_Invoice,Medium,True
-Delivery ke liye kya kyaa kar sakta hu?,Delivery_Issue,Low,True
-Wrong item mila toh kya karu?,Wrong_Damaged_Product,Low,True
-"prodct toot gaya hai, 2 din ke andar replace karo",Wrong_Damaged_Product,Medium,True
-Product missing hai! Box dent pada hai tha! turant resolve karo!,Wrong_Damaged_Product,High,True
+Payment failed hai but oder not placed hai! asap!,Payment_Invoice,High,True
+Delivery address change kar sakte hai kya?,Delivery_Issue,Low,True
+"Order delivered wrong item hai, refound kaise lunga?",Wrong_Damaged_Product,Low,True
+Product return karne ka option kahan hai?,Wrong_Damaged_Product,Low,True
+"Wrong product aaya hai, exchange karoo",Wrong_Damaged_Product,Medium,True
 "Refund stats completed hai, bank statement me credit nai dikha.",Returns_Refunds,Medium,False
 Estimated delivery date change hui h kya?,Order_Status,Low,False
-Order status update kaise hota hai?,Order_Status,Low,True
-"Delivery date 4 din se delay hai, koi update do",Delivery_Issue,Medium,True
+Expected delivery date kya hai?,Order_Status,Low,True
+Delivery usually kitne din leti h?,Delivery_Issue,Low,True
 Ye order out fr delivery kab hoga?,Order_Status,Low,False
-payement ke baad ordr status update hota hai kya?,Payment_Invoice,Low,True
+Invoice me extra charges lagaye hai! critical hai! Remove karo!,Payment_Invoice,High,True
 COD order deliver nai hua but convenience fee charge ho gayi.,Payment_Invoice,Medium,False
 Kia delivry date ek din postpone ho sakti hai?,Delivery_Issue,Low,False
 Dark mode available h kya app me?,Account_Technical,Low,False
-Return item ka packaging kaise karu?,Returns_Refunds,Low,True
-"Product cracked hai hai, check karo",Wrong_Damaged_Product,Medium,True
+Return reject kar diya! Consumer court me jaunga! emergency hai!,Returns_Refunds,High,True
+Product exchange ke liye kya chahiye?,Wrong_Damaged_Product,Low,True
 Wrong laptop bhej diya aur mera paisa block h. Escalate NOW!,Wrong_Damaged_Product,High,False
 "Aaj birthday gift dena tha, order abhi tak unknown location pe h!!!",Order_Status,High,False
-Account security issu hai! Someone else login kar raha! bahut urgent hai!,Account_Technical,High,True
-MANAGER SE BAAT KARO! Order 7 din se not updating hai!,Order_Status,High,True
-refound not responding hai but paisa abhi tak nahi aaya,Returns_Refunds,Medium,True
-Profile name kaise change karu?,Account_Technical,Low,True
-Delivery agent ne wrong person ko de diya! FRAUD! turant resolve karo!,Delivery_Issue,High,True
-"Order pending hai, turant resolve karo! Nahi toh police complaint karunga!",Order_Status,High,True
-"Delivery kaafi din ho rahi hai, pehle pehle se hoti thi",Delivery_Issue,Medium,True
-App update ke baad sab failed ho gaya hai,Account_Technical,Medium,True
+Profile photo kaise lagau?,Account_Technical,Low,True
+"ordr stuck hai, kya problem hai?",Order_Status,Medium,True
+Refund ke liye koi charge hai kya?,Returns_Refunds,Low,True
+"App stuck ho gaya he after update, fix karo",Account_Technical,Medium,True
+delievery person ne OTP maanga but maine diya nahi,Delivery_Issue,Medium,True
+Order status chek karne ka tarika batao,Order_Status,Low,True
+Delivery ek mahina sey delay hai! URGENT resolve karo!,Delivery_Issue,High,True
+"Account stopped hai, custoemr care bhi help nahi kar raha! ESCALATE KARO!",Account_Technical,High,True
 GST invoice download button kaam nai kar raha.,Payment_Invoice,Medium,False
-Delivery ke baad product return ho sakta hai kya?,Delivery_Issue,Low,True
-Account failed hai but maine kuch nahi kiya! immediately!,Account_Technical,High,True
-delievery 2 din sey pending hai! Koi action nahi le raha!,Delivery_Issue,High,True
-"Invoice me service charge extra lagaya hai, remove kro",Payment_Invoice,Medium,True
+delievery usually kitne din leti h?,Delivery_Issue,Low,True
+Account security issue hai! Someone else login kar raha! right now!,Account_Technical,High,True
+Delivery wrrong address pe ho gayi! fatafat!,Delivery_Issue,High,True
+Payment successful but merchant ko nahi pahuncha! immediately!,Payment_Invoice,High,True
 Bas confirm karna tha kii order kab tak aa jayega.,Order_Status,Low,False
-Invoice ko kaise save karu?,Payment_Invoice,Low,True
-Payment 5 din pe kiya but order confirm nahi hua! jaldi karo!,Payment_Invoice,High,True
-Delivery boy ne OTP maanga without delivery! SCAM hai! fatafat!,Delivery_Issue,High,True
-Invoice me extra charges lagaye hai! emergency hai! Remove karo!,Payment_Invoice,High,True
-delivry wrong address pe ho gayi! immediately!,Delivery_Issue,High,True
+Payment ke baad oder status updte hota hai kya?,Payment_Invoice,Low,True
+"Invoice me customer name galat hai, fix karo",Payment_Invoice,Medium,True
+Delivery boy ko instruction kaise de?,Delivery_Issue,Low,True
+Invoice amount galat hai! fatafat! Recalculate karo!,Payment_Invoice,High,True
+Delivery boy demanded extra money for delivery,Delivery_Issue,Medium,True
 recieved item already registered in someone else's name. This is serious fraud!,Wrong_Damaged_Product,High,False
-Package missng hai! immediately! Police complaint karunga!,Delivery_Issue,High,True
-Package delivered but kisi aur ke naam pe dikha raha hai,Delivery_Issue,Medium,True
-Account delete kaise karu?,Account_Technical,Low,True
-payement usually kitne din me confirm hota hai?,Payment_Invoice,Low,True
+Delivery person ne OTP maanga but maine diya nahi,Delivery_Issue,Medium,True
+Delivery boy demanded cash on delivery! Already paid tha! FRAUD!,Delivery_Issue,High,True
+Login credentials kya hai?,Account_Technical,Low,True
+payement 5000 ka hua tha but 9000 kat gaya,Payment_Invoice,Medium,True
 Paymnt deduct ho gaya but order confirm nhi hua.,Payment_Invoice,Medium,False
 Refund trackng kaha dikhegi app me?,Returns_Refunds,Low,False
 "Expected date kal thi, ab app mein koi new date show nahi ho rahi.",Order_Status,Medium,False
-"Product scratch aaya hai hai, ek piece missng hai",Wrong_Damaged_Product,Medium,True
+Product crushed hai! right now! Consumer forum me complaint karunga!,Wrong_Damaged_Product,High,True
 Refunded paymnt ka credit note invioce me missing hai.,Payment_Invoice,Medium,False
 "App bol raha delivered soon, lekin parcel abhi dusre state me hai..",Order_Status,Medium,False
-"oder 10 din se transit mein hai, kab milega?",Order_Status,Medium,True
+Order dispatch hone ke baad address change ho sakta he kya?,Order_Status,Low,True
 Agent adress nai mil raha bol raha hai jabki adress bilkul corect hai.,Delivery_Issue,Medium,False
-Product exchange ke liye kya chahiye?,Wrong_Damaged_Product,Low,True
-"App disabled ho raha hai, bahut din se use nahi ho raha",Account_Technical,Medium,True
-"Product not as described hai, please check",Wrong_Damaged_Product,Medium,True
-Delivery boy ko tip de sakte hai kya?,Delivery_Issue,Low,True
+"Order ka product cracked hai hai, turant replace kro",Wrong_Damaged_Product,Medium,True
+Login kaise karu?,Account_Technical,Low,True
+"Order ka product kharab hai, return option kahan hai?",Wrong_Damaged_Product,Low,True
+Delivery scheduled for 3 din but nobody came,Delivery_Issue,Medium,True
 Parcl retrn kar dia bina contact kiye!!! Aaj re-delivery nai hui to complaint karunga.,Delivery_Issue,High,False
-Payment successful dikha raha hai but order pending hai,Payment_Invoice,Medium,True
+payement ke liye kya kya steps hai?,Payment_Invoice,Low,True
 "ORDER KAHA HAI?? Aaj function hai, mujhe parcl TURANT chahiye!",Order_Status,High,False
-"Return ke baad prodct vapas nahin bhej pa raha, help karo",Returns_Refunds,Medium,True
+"Return ke baad product wapas nahi bhej pa raha, help karo",Returns_Refunds,Medium,True
 "Four fake attempts dikha rahe ho, ek bhi call nahin aaya. Consumer forum jaunga.",Delivery_Issue,High,False
-Refund kaise check karu?,Returns_Refunds,Low,True
-App not responding hai! Data load nahi ho raha! URGENT!,Account_Technical,High,True
+Return policy ke according refund milna chahiye! very urgent!,Returns_Refunds,High,True
+Account failed hai but maine kuch nahi kiya! immediately!,Account_Technical,High,True
 Card payment k liye international transaction enable hona chahiye?,Payment_Invoice,Low,False
-Product damage ho gaya hai! immediately! Replace ya refound do!,Wrong_Damaged_Product,High,True
+Product broken hai hai! Completely unusable hai! URGENT!,Wrong_Damaged_Product,High,True
 Pkg me wrong capacity wala storage device mila.,Wrong_Damaged_Product,Medium,False
-Wrong prduct aaya hai! 10 din se pehle replace karo!,Wrong_Damaged_Product,High,True
+"Mera order damage aaya hai, return kaise karu?",Wrong_Damaged_Product,Low,True
 "Prodct ke parts missing hain, assemble nhi ho pa raha.",Wrong_Damaged_Product,Medium,False
 "Hi, mera order abhi kaha tak pohcha h?",Order_Status,Low,False
-prodct bent ho gaya hai! emergency hai! Immediate action lo!,Wrong_Damaged_Product,High,True
+"Product scratch aaya hai hai, battery scratch aaya hai ho gayi hae",Wrong_Damaged_Product,Medium,True
 "₹15,000 prepaid kiya hai, parcl missing dikha raha hai!!! Immediate investigation chahiye.",Order_Status,High,False
-Return request approve hone me kitna time lagta hai?,Returns_Refunds,Low,True
+retrn request kaise karu?,Returns_Refunds,Low,True
 cn I reschedule delivery for Saturday?,Delivery_Issue,Low,False
-Payment fail ho gaya but wallet balance cut gaya! immediately!,Payment_Invoice,High,True
+Payment successful dikha raha hai but order disabled hai,Payment_Invoice,Medium,True
 "RETURN WINDOW APP ERROR SE EXPIRE HUI. Meri galti nahin, abhi approve karo!",Returns_Refunds,High,False
 "Photo me shade diffrent tha, return option hai kya?",Wrong_Damaged_Product,Low,False
 "Mere order ke do items hain, ek ka status missing h.",Order_Status,Medium,False
-Login credentials kya hai?,Account_Technical,Low,True
-Product return karne ka option kahan hai?,Wrong_Damaged_Product,Low,True
+"App showing error ho raha hai, ek mahina sey use nai ho raha",Account_Technical,Medium,True
+Product missing hai! Box kharab hai tha! very urgent!,Wrong_Damaged_Product,High,True
 recieved appliance switch on hi nai ho raha.,Wrong_Damaged_Product,Medium,False

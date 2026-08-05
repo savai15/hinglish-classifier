@@ -73,96 +73,56 @@ def get_data_stats(df):
     return stats
 
 
+import re
+from sklearn.model_selection import GroupShuffleSplit, GroupKFold
+
+def get_template_group(text):
+    """
+    Mask transaction IDs and numbers to extract the underlying text template.
+    """
+    if not isinstance(text, str):
+        return ""
+    text = re.sub(r'\b(ORD|TRK|INV|TXN)\d+\b', '[REF]', text, flags=re.IGNORECASE)
+    text = re.sub(r'\b\d{4,}\b', '[NUM]', text)
+    return " ".join(text.lower().split())
+
+
 def split_data(df, test_size=0.2, random_state=42):
     """
-    Split data into train and test sets with stratification.
-
-    Parameters
-    ----------
-    df : pd.DataFrame
-        Full dataset
-    test_size : float
-        Fraction for test set
-    random_state : int
-        Random seed for reproducibility
-
-    Returns
-    -------
-    tuple
-        (df_train, df_test) - two DataFrames
+    Split data into train and test sets grouped by template to prevent leakage.
     """
-    df_train, df_test = train_test_split(
-        df,
-        test_size=test_size,
-        random_state=random_state,
-        stratify=df['category']
-    )
+    df['template_group'] = df['text'].apply(get_template_group)
+    
+    gss = GroupShuffleSplit(n_splits=1, test_size=test_size, random_state=random_state)
+    train_idx, test_idx = next(gss.split(df, groups=df['template_group']))
 
-    print(f"  Train: {len(df_train)} | Test: {len(df_test)}")
+    df_train = df.iloc[train_idx].reset_index(drop=True)
+    df_test = df.iloc[test_idx].reset_index(drop=True)
 
-    return df_train.reset_index(drop=True), df_test.reset_index(drop=True)
+    print(f"  Group-split (Leakage Free): Train: {len(df_train)} samples ({df_train['template_group'].nunique()} templates) | Test: {len(df_test)} samples ({df_test['template_group'].nunique()} templates)")
+
+    return df_train, df_test
 
 
 def get_cv_splits(df, n_splits=5, random_state=42, label_column='category'):
     """
-    Generate stratified k-fold cross-validation splits.
-
-    Parameters
-    ----------
-    df : pd.DataFrame
-        Full dataset
-    n_splits : int
-        Number of CV folds
-    random_state : int
-        Random seed for reproducibility
-    label_column : str
-        Column to stratify on
-
-    Yields
-    ------
-    tuple
-        (train_idx, val_idx) for each fold
+    Generate GroupKFold cross-validation splits grouped by text template.
     """
-    skf = StratifiedKFold(
-        n_splits=n_splits,
-        shuffle=True,
-        random_state=random_state
-    )
+    if 'template_group' not in df.columns:
+        df['template_group'] = df['text'].apply(get_template_group)
 
+    gkf = GroupKFold(n_splits=n_splits)
     X = df['clean_text'].to_numpy()
     y = df[label_column].to_numpy()
+    groups = df['template_group'].to_numpy()
 
-    for fold_idx, (train_idx, val_idx) in enumerate(skf.split(X, y)):
-        yield fold_idx, train_idx, val_idx
+    for train_idx, val_idx in gkf.split(X, y, groups=groups):
+        yield train_idx, val_idx
 
 
 def get_cv_splits_multi(df, n_splits=5, random_state=42):
     """
-    Generate CV splits that work for both category and urgency tasks.
-    Uses category for stratification (primary task).
-
-    Parameters
-    ----------
-    df : pd.DataFrame
-        Full dataset with 'clean_text', 'category', 'urgency' columns
-    n_splits : int
-        Number of CV folds
-    random_state : int
-        Random seed
-
-    Yields
-    ------
-    tuple
-        (fold_idx, train_idx, val_idx) for each fold
+    Generate GroupKFold CV splits.
     """
-    skf = StratifiedKFold(
-        n_splits=n_splits,
-        shuffle=True,
-        random_state=random_state
-    )
+    return get_cv_splits(df, n_splits=n_splits, random_state=random_state, label_column='category')
 
-    X = df['clean_text'].to_numpy()
-    y = df['category'].to_numpy()  # Stratify on category
-
-    for fold_idx, (train_idx, val_idx) in enumerate(skf.split(X, y)):
-        yield fold_idx, train_idx, val_idx

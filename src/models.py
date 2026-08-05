@@ -341,9 +341,28 @@ class EnsembleClassifier:
         return np.mean(all_probas, axis=0)
 
 
-def build_ensemble(models_dict):
-    """Build an ensemble from a dictionary of trained pipelines."""
-    return EnsembleClassifier(models_dict)
+from sklearn.ensemble import StackingClassifier
+
+def build_ensemble(models_dict, final_estimator=None, cv=3, n_jobs=-1):
+    """
+    Build a Stacking Classifier ensemble from a dictionary of base estimators.
+    """
+    estimators = list(models_dict.items())
+    if final_estimator is None:
+        final_estimator = LogisticRegression(
+            max_iter=1000,
+            C=1.0,
+            class_weight='balanced',
+            random_state=42
+        )
+    return StackingClassifier(
+        estimators=estimators,
+        final_estimator=final_estimator,
+        cv=cv,
+        n_jobs=n_jobs,
+        passthrough=False
+    )
+
 
 
 def save_model(pipeline, filepath):

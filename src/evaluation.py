@@ -84,11 +84,14 @@ def evaluate_cv(pipeline, X, y, cv=5, scoring='f1_macro', task_name="CV Evaluati
     dict
         CV results with mean, std, and per-fold scores
     """
-    from sklearn.model_selection import StratifiedKFold
+    from sklearn.model_selection import StratifiedKFold, GroupKFold
 
-    skf = StratifiedKFold(n_splits=cv, shuffle=True, random_state=42)
+    if isinstance(cv, int):
+        cv_splitter = StratifiedKFold(n_splits=cv, shuffle=True, random_state=42)
+    else:
+        cv_splitter = list(cv)
 
-    scores = cross_val_score(pipeline, X, y, cv=skf, scoring=scoring, n_jobs=-1)
+    scores = cross_val_score(pipeline, X, y, cv=cv_splitter, scoring=scoring, n_jobs=-1)
 
     results = {
         'mean': float(scores.mean()),
@@ -98,7 +101,8 @@ def evaluate_cv(pipeline, X, y, cv=5, scoring='f1_macro', task_name="CV Evaluati
         'max': float(scores.max()),
     }
 
-    print(f"\n  {task_name} ({cv}-fold CV):")
+    n_folds = len(cv_splitter) if isinstance(cv_splitter, list) else cv
+    print(f"\n  {task_name} ({n_folds}-fold CV):")
     print(f"    F1 (macro): {results['mean']:.4f} ± {results['std']:.4f}")
     print(f"    Range: [{results['min']:.4f}, {results['max']:.4f}]")
     print(f"    Per-fold: {[f'{s:.4f}' for s in scores]}")

@@ -10,9 +10,17 @@ cd hinglish-classifier
 start.bat
 ```
 
-`start.bat` handles everything — checks Python/Node, installs deps, launches both servers, opens browser.
+`start.bat` handles everything — checks Python/Node, installs all dependencies (first time takes ~2 min), kills old processes, launches both servers, opens browser automatically. Press any key to stop.
 
 **Requires:** Python 3.10+, Node.js 18+
+
+**Manual start:**
+```bash
+pip install -r requirements.txt
+cd frontend && npm install && cd ..
+python -m uvicorn api.main:app --reload --port 8000
+cd frontend && npm run dev
+```
 
 ## What's Inside
 

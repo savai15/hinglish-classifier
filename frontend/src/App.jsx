@@ -790,14 +790,14 @@ function DashboardPage() {
           <h3 className="text-sm font-medium text-gray-300 mb-4">Model Performance</h3>
           <div className="space-y-3">
             {[
-              { label: 'TF-IDF + SVM (Category)', score: 99.7, color: '#6366f1' },
-              { label: 'Combined Ensemble (Urgency)', score: 99.96, color: '#22d3ee' },
+              { label: 'TF-IDF + SVM — Category F1', score: 99.69, color: '#6366f1' },
+              { label: 'Combined Ensemble — Urgency F1', score: 99.96, color: '#22d3ee' },
               { label: 'MuRIL (GPU Fine-tuned)', score: 0, color: '#8b5cf6', note: 'Not trained yet' },
             ].map((m, i) => (
               <div key={i}>
                 <div className="flex items-center justify-between text-xs mb-1">
                   <span className="text-gray-400">{m.label}</span>
-                  <span className="text-white font-medium">{m.note || `${m.score}%`}</span>
+                  <span className="text-white font-medium">{m.note || `F1: ${m.score.toFixed(2)}%`}</span>
                 </div>
                 <div className="h-2 bg-white/5 rounded-full overflow-hidden">
                   <motion.div

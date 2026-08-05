@@ -9,6 +9,7 @@ fastapi>=0.110.0
 uvicorn>=0.29.0
 pydantic>=2.0.0
 requests>=2.31.0
+slowapi>=0.1.9
 
 # Optional - for MuRIL GPU training (large ~2GB download)
 # Uncomment these lines to enable MuRIL fine-tuning:

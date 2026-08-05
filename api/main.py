@@ -7,6 +7,10 @@ import sys
 import io
 import csv
 import json
+import uuid
+import time
+import logging
+import sqlite3
 from pathlib import Path
 from contextlib import asynccontextmanager
 from collections import Counter
@@ -14,29 +18,40 @@ from collections import Counter
 PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
-from pydantic import BaseModel
-from typing import Optional, List
+from fastapi.responses import StreamingResponse, HTMLResponse
+from pydantic import BaseModel, Field
+from typing import Optional, List, Literal
 from datetime import datetime
 
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+
+import numpy as np
 from src.active_learning import ComplaintPredictor, ComplaintDB, RetrainManager
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 predictor = None
 db = None
+
+CATEGORIES = ["Account_Technical", "Customer_Service", "Delivery_Issue", "Order_Status", "Payment_Invoice", "Pricing_Discount", "Product_Quality", "Returns_Refunds", "Wrong_Damaged_Product"]
+URGENCY_LEVELS = ["High", "Medium", "Low"]
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global predictor, db
-    print("Loading models...")
+    logger.info("Loading models...")
     predictor = ComplaintPredictor(use_muril=False)
     predictor.load_models()
     db = ComplaintDB()
-    print("Models loaded! API ready.")
+    logger.info("Models loaded! API ready.")
     yield
-    print("Shutting down...")
+    logger.info("Shutting down...")
 
 
 app = FastAPI(
@@ -45,6 +60,10 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan,
 )
+
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.add_middleware(
     CORSMiddleware,
@@ -55,17 +74,36 @@ app.add_middleware(
 )
 
 
+@app.middleware("http")
+async def add_request_id(request: Request, call_next):
+    request_id = str(uuid.uuid4())[:8]
+    request.state.request_id = request_id
+    response = await call_next(request)
+    response.headers["X-Request-ID"] = request_id
+    return response
+
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start = time.time()
+    request_id = getattr(request.state, 'request_id', 'unknown')
+    response = await call_next(request)
+    duration = round((time.time() - start) * 1000)
+    logger.info(f"{request.method} {request.url.path} -> {response.status_code} ({duration}ms) [{request_id}]")
+    return response
+
+
 # ============================================================================
 # SCHEMAS
 # ============================================================================
 
 class PredictionRequest(BaseModel):
-    text: str
+    text: str = Field(..., min_length=1, max_length=5000, description="Complaint text to classify")
     session_id: Optional[str] = None
 
 
 class BatchPredictionRequest(BaseModel):
-    texts: List[str]
+    texts: List[str] = Field(..., min_length=1, max_length=100, description="List of complaints to classify")
     session_id: Optional[str] = None
 
 
@@ -73,8 +111,8 @@ class CorrectionRequest(BaseModel):
     prediction_id: int
     is_correct_category: bool = True
     is_correct_urgency: bool = True
-    corrected_category: Optional[str] = None
-    corrected_urgency: Optional[str] = None
+    corrected_category: Optional[Literal[tuple(CATEGORIES)]] = None
+    corrected_urgency: Optional[Literal[tuple(URGENCY_LEVELS)]] = None
 
 
 class PredictionResponse(BaseModel):
@@ -96,6 +134,7 @@ class PredictionResponse(BaseModel):
 # ============================================================================
 
 @app.get("/")
+@limiter.exempt
 def root():
     return {
         "message": "Hinglish Complaint Classifier API",
@@ -105,11 +144,40 @@ def root():
 
 
 @app.get("/health")
-def health():
-    return {"status": "ok", "timestamp": datetime.now().isoformat()}
+@limiter.exempt
+async def health():
+    health_status = {"status": "ok", "timestamp": datetime.now().isoformat()}
+
+    try:
+        if db:
+            conn = sqlite3.connect(db.db_path)
+            conn.execute("SELECT 1")
+            conn.close()
+            health_status["database"] = "ok"
+        else:
+            health_status["database"] = "not initialized"
+            health_status["status"] = "degraded"
+    except Exception as e:
+        health_status["database"] = f"error: {str(e)}"
+        health_status["status"] = "degraded"
+
+    try:
+        if predictor:
+            health_status["model"] = "loaded"
+        else:
+            health_status["model"] = "not loaded"
+            health_status["status"] = "degraded"
+    except Exception as e:
+        health_status["model"] = f"error: {str(e)}"
+
+    groq_key = os.environ.get("GROQ_API_KEY", "")
+    health_status["groq_api"] = "configured" if groq_key else "not configured"
+
+    return health_status
 
 
 @app.get("/categories")
+@limiter.exempt
 def get_categories():
     return {
         "categories": [
@@ -137,22 +205,117 @@ def get_categories():
 # ============================================================================
 
 @app.post("/predict", response_model=PredictionResponse)
-def predict(request: PredictionRequest):
+@limiter.limit("30/minute")
+def predict(body: PredictionRequest, request: Request):
     if not predictor:
         raise HTTPException(status_code=503, detail="Models not loaded")
-    result = predictor.predict(request.text, session_id=request.session_id)
+    result = predictor.predict(body.text, session_id=body.session_id)
     return result
 
 
 @app.post("/predict/batch")
-def predict_batch(request: BatchPredictionRequest):
+@limiter.limit("10/minute")
+def predict_batch(body: BatchPredictionRequest, request: Request):
     if not predictor:
         raise HTTPException(status_code=503, detail="Models not loaded")
     results = []
-    for text in request.texts:
-        result = predictor.predict(text, session_id=request.session_id)
+    for text in body.texts:
+        result = predictor.predict(text, session_id=body.session_id)
         results.append(result)
     return {"predictions": results, "count": len(results)}
+
+
+@app.post("/predict/compare")
+@limiter.limit("20/minute")
+async def compare_predictions(request: Request, req: PredictionRequest):
+    """Run all 3 models and return individual + ensemble predictions."""
+    if not predictor:
+        raise HTTPException(status_code=503, detail="Models not loaded")
+
+    import time
+    from src.models import load_model
+
+    start = time.time()
+    cleaned = predictor.sklearn_preprocessor.preprocess(req.text)
+
+    MODEL_DIR = Path(__file__).parent.parent / "models"
+    models_config = {
+        'tfidf_svm': {
+            'cat': MODEL_DIR / 'category_tf-idf__svm.pkl',
+            'urg': MODEL_DIR / 'urgency_tf-idf__svm.pkl',
+            'label': 'TF-IDF + SVM',
+        },
+        'tfidf_lr': {
+            'cat': MODEL_DIR / 'category_tf-idf__lr.pkl',
+            'urg': MODEL_DIR / 'urgency_tf-idf__lr.pkl',
+            'label': 'TF-IDF + LR',
+        },
+        'ensemble': {
+            'cat': MODEL_DIR / 'category_ensemble.pkl',
+            'urg': MODEL_DIR / 'urgency_ensemble.pkl',
+            'label': 'Combined Ensemble',
+        },
+    }
+
+    results = {}
+    for name, config in models_config.items():
+        try:
+            cat_model = load_model(config['cat'])
+            urg_model = load_model(config['urg'])
+
+            cat_pred, cat_conf, cat_probs_dict = None, 0.0, {}
+            if hasattr(cat_model, 'predict_proba'):
+                probs = cat_model.predict_proba([cleaned])[0]
+                classes = cat_model.classes_
+                cat_pred = classes[np.argmax(probs)]
+                cat_conf = float(np.max(probs))
+                cat_probs_dict = {c: round(float(p), 4) for c, p in zip(classes, probs)}
+            else:
+                cat_pred = cat_model.predict([cleaned])[0]
+                cat_conf = 1.0
+
+            urg_pred, urg_conf, urg_probs_dict = None, 0.0, {}
+            if hasattr(urg_model, 'predict_proba'):
+                u_probs = urg_model.predict_proba([cleaned])[0]
+                u_classes = urg_model.classes_
+                urg_pred = u_classes[np.argmax(u_probs)]
+                urg_conf = float(np.max(u_probs))
+                urg_probs_dict = {c: round(float(p), 4) for c, p in zip(u_classes, u_probs)}
+            else:
+                urg_pred = urg_model.predict([cleaned])[0]
+                urg_conf = 1.0
+
+            results[name] = {
+                "label": config['label'],
+                "category": cat_pred,
+                "category_confidence": round(cat_conf, 4),
+                "category_probabilities": cat_probs_dict,
+                "urgency": urg_pred,
+                "urgency_confidence": round(urg_conf, 4),
+                "urgency_probabilities": urg_probs_dict,
+            }
+        except Exception as e:
+            results[name] = {"label": config.get('label', name), "error": str(e)}
+
+    cat_predictions = [r.get('category') for r in results.values() if r.get('category')]
+    urg_predictions = [r.get('urgency') for r in results.values() if r.get('urgency')]
+
+    cat_agreement = len(set(cat_predictions)) == 1 if cat_predictions else False
+    urg_agreement = len(set(urg_predictions)) == 1 if urg_predictions else False
+
+    duration = round((time.time() - start) * 1000)
+
+    return {
+        "text": req.text,
+        "models": results,
+        "consensus": {
+            "category_agreement": cat_agreement,
+            "urgency_agreement": urg_agreement,
+            "category": max(set(cat_predictions), key=cat_predictions.count) if cat_predictions else None,
+            "urgency": max(set(urg_predictions), key=urg_predictions.count) if urg_predictions else None,
+        },
+        "inference_time_ms": duration,
+    }
 
 
 # ============================================================================
@@ -160,7 +323,9 @@ def predict_batch(request: BatchPredictionRequest):
 # ============================================================================
 
 @app.get("/history")
+@limiter.limit("120/minute")
 def get_history(
+    request: Request,
     limit: int = Query(50, ge=1, le=500),
     offset: int = Query(0, ge=0),
     category: Optional[str] = None,
@@ -203,7 +368,7 @@ def get_history(
     conn.close()
 
     return {
-        "predictions": df.to_dict(orient="records"),
+        "predictions": [{k: (None if pd.isna(v) else v) for k, v in row.items()} for row in df.to_dict(orient="records")],
         "count": len(df),
         "total": total,
         "limit": limit,
@@ -212,7 +377,8 @@ def get_history(
 
 
 @app.get("/search")
-def search_predictions(q: str = Query(..., min_length=1), limit: int = 50):
+@limiter.limit("120/minute")
+def search_predictions(request: Request, q: str = Query(..., min_length=1), limit: int = 50):
     if not db:
         raise HTTPException(status_code=503, detail="Database not initialized")
 
@@ -227,7 +393,7 @@ def search_predictions(q: str = Query(..., min_length=1), limit: int = 50):
     """, conn, params=(f"%{q}%", limit))
     conn.close()
 
-    return {"predictions": df.to_dict(orient="records"), "count": len(df)}
+    return {"predictions": [{k: (None if pd.isna(v) else v) for k, v in row.items()} for row in df.to_dict(orient="records")], "count": len(df)}
 
 
 # ============================================================================
@@ -235,14 +401,16 @@ def search_predictions(q: str = Query(..., min_length=1), limit: int = 50):
 # ============================================================================
 
 @app.get("/stats")
-def get_stats():
+@limiter.limit("120/minute")
+def get_stats(request: Request):
     if not db:
         raise HTTPException(status_code=503, detail="Database not initialized")
     return db.get_stats()
 
 
 @app.get("/analytics/timeline")
-def get_timeline(hours: int = Query(24, ge=1, le=168)):
+@limiter.limit("120/minute")
+def get_timeline(request: Request, hours: int = Query(24, ge=1, le=168)):
     if not db:
         raise HTTPException(status_code=503, detail="Database not initialized")
 
@@ -282,7 +450,8 @@ def get_timeline(hours: int = Query(24, ge=1, le=168)):
 
 
 @app.get("/analytics/word-frequency")
-def get_word_frequency(category: Optional[str] = None, limit: int = 20):
+@limiter.limit("120/minute")
+def get_word_frequency(request: Request, category: Optional[str] = None, limit: int = 20):
     if not db:
         raise HTTPException(status_code=503, detail="Database not initialized")
 
@@ -325,7 +494,8 @@ def get_word_frequency(category: Optional[str] = None, limit: int = 20):
 
 
 @app.get("/analytics/confidence")
-def get_confidence_distribution():
+@limiter.limit("120/minute")
+def get_confidence_distribution(request: Request):
     if not db:
         raise HTTPException(status_code=503, detail="Database not initialized")
 
@@ -358,7 +528,8 @@ def get_confidence_distribution():
 
 
 @app.get("/analytics/patterns")
-def get_patterns():
+@limiter.limit("120/minute")
+def get_patterns(request: Request):
     if not db:
         raise HTTPException(status_code=503, detail="Database not initialized")
 
@@ -391,12 +562,131 @@ def get_patterns():
     }
 
 
+@app.get("/analytics/suggestions")
+@limiter.exempt
+async def get_suggestions():
+    """Analyze patterns and return actionable suggestions."""
+    if not db:
+        raise HTTPException(status_code=503, detail="Database not initialized")
+
+    import sqlite3
+    conn = sqlite3.connect(db.db_path)
+    suggestions = []
+
+    # 1. Low confidence predictions (potential misclassifications)
+    low_conf = conn.execute(
+        "SELECT COUNT(*) FROM predictions WHERE confidence_category < 0.5"
+    ).fetchone()[0]
+    if low_conf > 0:
+        suggestions.append({
+            "type": "warning",
+            "title": "Low Confidence Predictions",
+            "description": f"{low_conf} predictions have confidence below 50%. Consider reviewing these in the Review Queue.",
+            "action": "/review",
+            "action_label": "Review Queue",
+            "priority": "high",
+        })
+
+    # 2. Correction patterns (model confusion)
+    confused = conn.execute("""
+        SELECT corrected_category, predicted_category, COUNT(*) as cnt
+        FROM predictions
+        WHERE is_correct_category = 0 AND corrected_category IS NOT NULL
+        GROUP BY corrected_category, predicted_category
+        HAVING cnt >= 3
+        ORDER BY cnt DESC
+        LIMIT 5
+    """).fetchall()
+
+    for corrected, predicted, count in confused:
+        suggestions.append({
+            "type": "insight",
+            "title": f"Model Confusion: {predicted} → {corrected}",
+            "description": f"{count} complaints predicted as '{predicted}' were corrected to '{corrected}'. The model may struggle distinguishing these categories.",
+            "priority": "medium",
+        })
+
+    # 3. Category imbalance
+    imbalance = conn.execute("""
+        SELECT predicted_category, COUNT(*) as cnt
+        FROM predictions
+        GROUP BY predicted_category
+        ORDER BY cnt DESC
+    """).fetchall()
+
+    if imbalance:
+        total = sum(cnt for _, cnt in imbalance)
+        top_cat, top_cnt = imbalance[0]
+        if top_cnt / max(total, 1) > 0.5:
+            suggestions.append({
+                "type": "info",
+                "title": f"Category Imbalance: {top_cat}",
+                "description": f"{top_cat} makes up {round(top_cnt/total*100)}% of all predictions. Consider if this reflects real distribution or model bias.",
+                "priority": "low",
+            })
+
+    # 4. Time-based pattern
+    hourly = conn.execute("""
+        SELECT strftime('%H', timestamp) as hour, COUNT(*) as cnt
+        FROM predictions
+        GROUP BY hour
+        ORDER BY cnt DESC
+        LIMIT 1
+    """).fetchone()
+
+    if hourly:
+        suggestions.append({
+            "type": "insight",
+            "title": f"Peak Hour: {hourly[0]}:00",
+            "description": f"Most complaints arrive around {hourly[0]}:00 with {hourly[1]} predictions. Consider staffing accordingly.",
+            "priority": "low",
+        })
+
+    # 5. Spam detection (very short texts)
+    spam = conn.execute(
+        "SELECT COUNT(*) FROM predictions WHERE LENGTH(text) < 10"
+    ).fetchone()[0]
+    if spam > 0:
+        suggestions.append({
+            "type": "warning",
+            "title": "Possible Spam Detected",
+            "description": f"{spam} predictions have very short text (< 10 chars). These may be spam or invalid inputs.",
+            "priority": "medium",
+        })
+
+    # 6. Retrain readiness
+    try:
+        retrain_mgr = RetrainManager()
+        should_retrain, correction_count = retrain_mgr.should_retrain()
+        if should_retrain:
+            suggestions.append({
+                "type": "action",
+                "title": "Model Retrain Ready",
+                "description": f"{correction_count} corrections collected (threshold: {retrain_mgr.CORRECTION_THRESHOLD}). Retraining may improve accuracy.",
+                "action": "/classify",
+                "action_label": "Retrain Now",
+                "priority": "high",
+            })
+    except Exception:
+        pass
+
+    conn.close()
+
+    # Sort by priority
+    priority_order = {"high": 0, "medium": 1, "low": 2}
+    suggestions.sort(key=lambda x: priority_order.get(x.get("priority", "low"), 3))
+
+    return {"suggestions": suggestions, "total": len(suggestions)}
+
+
 # ============================================================================
 # EXPORT
 # ============================================================================
 
 @app.get("/export/csv")
+@limiter.limit("120/minute")
 def export_csv(
+    request: Request,
     category: Optional[str] = None,
     urgency: Optional[str] = None,
 ):
@@ -441,7 +731,9 @@ def export_csv(
 
 
 @app.get("/export/json")
+@limiter.limit("120/minute")
 def export_json(
+    request: Request,
     category: Optional[str] = None,
     urgency: Optional[str] = None,
 ):
@@ -472,10 +764,109 @@ def export_json(
     conn.close()
 
     return {
-        "predictions": df.to_dict(orient="records"),
+        "predictions": [{k: (None if pd.isna(v) else v) for k, v in row.items()} for row in df.to_dict(orient="records")],
         "count": len(df),
         "exported_at": datetime.now().isoformat(),
     }
+
+
+@app.get("/export/report")
+@limiter.exempt
+async def export_report():
+    """Generate a comprehensive HTML report for PDF export."""
+    if not db:
+        raise HTTPException(status_code=503, detail="Database not initialized")
+
+    import sqlite3
+    conn = sqlite3.connect(db.db_path)
+
+    # Gather data
+    stats = db.get_stats()
+
+    # Category distribution
+    cat_dist = conn.execute(
+        "SELECT predicted_category, COUNT(*) as cnt FROM predictions GROUP BY predicted_category ORDER BY cnt DESC"
+    ).fetchall()
+
+    # Urgency distribution
+    urg_dist = conn.execute(
+        "SELECT predicted_urgency, COUNT(*) as cnt FROM predictions GROUP BY predicted_urgency ORDER BY cnt DESC"
+    ).fetchall()
+
+    # Recent predictions
+    recent = conn.execute(
+        "SELECT text, predicted_category, predicted_urgency, confidence_category, timestamp FROM predictions ORDER BY timestamp DESC LIMIT 20"
+    ).fetchall()
+
+    # Correction rate
+    total = stats.get('total_predictions', 0)
+    corrections = stats.get('correction_count', 0)
+
+    conn.close()
+
+    # Build HTML
+    cat_rows = "".join(f"<tr><td>{c}</td><td>{n}</td><td>{round(n/max(total,1)*100, 1)}%</td></tr>" for c, n in cat_dist)
+    urg_rows = "".join(f"<tr><td>{u}</td><td>{n}</td><td>{round(n/max(total,1)*100, 1)}%</td></tr>" for u, n in urg_dist)
+    pred_rows = "".join(f"<tr><td>{text[:80]}{'...' if len(text)>80 else ''}</td><td>{cat}</td><td>{urg}</td><td>{round(conf*100, 1)}%</td><td>{ts}</td></tr>" for text, cat, urg, conf, ts in recent)
+
+    html = f"""<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>HinglishAI - Classification Report</title>
+<style>
+  body {{ font-family: 'Segoe UI', system-ui, sans-serif; margin: 40px; color: #1a1a2e; background: #fff; }}
+  h1 {{ color: #6366f1; border-bottom: 3px solid #6366f1; padding-bottom: 10px; }}
+  h2 {{ color: #334155; margin-top: 30px; }}
+  .stats {{ display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 20px 0; }}
+  .stat {{ background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; text-align: center; }}
+  .stat .value {{ font-size: 28px; font-weight: bold; color: #6366f1; }}
+  .stat .label {{ font-size: 12px; color: #64748b; text-transform: uppercase; margin-top: 4px; }}
+  table {{ width: 100%; border-collapse: collapse; margin: 16px 0; }}
+  th, td {{ padding: 10px 12px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 13px; }}
+  th {{ background: #f1f5f9; font-weight: 600; color: #334155; }}
+  .footer {{ margin-top: 40px; padding-top: 20px; border-top: 1px solid #e2e8f0; color: #94a3b8; font-size: 12px; text-align: center; }}
+  @media print {{ body {{ margin: 20px; }} }}
+</style>
+</head>
+<body>
+<h1>HinglishAI — Classification Report</h1>
+<p style="color: #64748b;">Generated: {datetime.now().strftime('%B %d, %Y at %I:%M %p')}</p>
+
+<div class="stats">
+  <div class="stat"><div class="value">{total}</div><div class="label">Total Predictions</div></div>
+  <div class="stat"><div class="value">{round(stats.get('category_accuracy', 0)*100, 1)}%</div><div class="label">Category Accuracy</div></div>
+  <div class="stat"><div class="value">{round(stats.get('urgency_accuracy', 0)*100, 1)}%</div><div class="label">Urgency Accuracy</div></div>
+  <div class="stat"><div class="value">{corrections}</div><div class="label">Corrections</div></div>
+</div>
+
+<h2>Category Distribution</h2>
+<table><thead><tr><th>Category</th><th>Count</th><th>Percentage</th></tr></thead>
+<tbody>{cat_rows}</tbody></table>
+
+<h2>Urgency Distribution</h2>
+<table><thead><tr><th>Urgency</th><th>Count</th><th>Percentage</th></tr></thead>
+<tbody>{urg_rows}</tbody></table>
+
+<h2>Model Performance</h2>
+<table><thead><tr><th>Model</th><th>Metric</th><th>Score</th></tr></thead>
+<tbody>
+<tr><td>TF-IDF + SVM</td><td>Category F1</td><td>99.69%</td></tr>
+<tr><td>Combined Ensemble</td><td>Urgency F1</td><td>99.96%</td></tr>
+</tbody></table>
+
+<h2>Recent Predictions (Last 20)</h2>
+<table><thead><tr><th>Complaint</th><th>Category</th><th>Urgency</th><th>Confidence</th><th>Time</th></tr></thead>
+<tbody>{pred_rows}</tbody></table>
+
+<div class="footer">
+  <p>HinglishAI — Hinglish E-Commerce Complaint Classifier</p>
+  <p>Powered by scikit-learn TF-IDF + SVM | FastAPI Backend | React Frontend</p>
+</div>
+</body>
+</html>"""
+
+    return HTMLResponse(content=html)
 
 
 # ============================================================================
@@ -483,15 +874,16 @@ def export_json(
 # ============================================================================
 
 @app.post("/feedback")
-def submit_feedback(request: CorrectionRequest):
+@limiter.limit("60/minute")
+def submit_feedback(body: CorrectionRequest, request: Request):
     if not predictor:
         raise HTTPException(status_code=503, detail="Models not loaded")
     predictor.submit_correction(
-        pred_id=request.prediction_id,
-        is_correct_cat=request.is_correct_category,
-        is_correct_urg=request.is_correct_urgency,
-        corrected_cat=request.corrected_category,
-        corrected_urg=request.corrected_urgency,
+        pred_id=body.prediction_id,
+        is_correct_cat=body.is_correct_category,
+        is_correct_urg=body.is_correct_urgency,
+        corrected_cat=body.corrected_category,
+        corrected_urg=body.corrected_urgency,
     )
     retrain_mgr = RetrainManager()
     should_retrain, correction_count = retrain_mgr.should_retrain()
@@ -504,7 +896,8 @@ def submit_feedback(request: CorrectionRequest):
 
 
 @app.post("/retrain")
-def trigger_retrain():
+@limiter.limit("5/hour")
+def trigger_retrain(request: Request):
     retrain_mgr = RetrainManager()
     should_retrain, correction_count = retrain_mgr.should_retrain()
     if not should_retrain:
@@ -526,7 +919,8 @@ def trigger_retrain():
 
 
 @app.get("/low-confidence")
-def get_low_confidence(limit: int = 20):
+@limiter.limit("120/minute")
+def get_low_confidence(request: Request, limit: int = 20):
     if not db:
         raise HTTPException(status_code=503, detail="Database not initialized")
     df = db.get_low_confidence_predictions()
@@ -543,7 +937,8 @@ def get_low_confidence(limit: int = 20):
 # ============================================================================
 
 @app.get("/retrain/history")
-def get_retrain_history():
+@limiter.limit("120/minute")
+def get_retrain_history(request: Request):
     if not db:
         raise HTTPException(status_code=503, detail="Database not initialized")
     import sqlite3
@@ -563,7 +958,8 @@ def get_retrain_history():
 
 
 @app.get("/retrain/status")
-def get_retrain_status():
+@limiter.exempt
+def get_retrain_status(request: Request):
     retrain_mgr = RetrainManager()
     should_retrain, correction_count = retrain_mgr.should_retrain()
     return {
@@ -585,25 +981,26 @@ class AIRequest(BaseModel):
 
 
 @app.post("/ai/resolve")
-def ai_resolve(request: AIRequest):
+@limiter.limit("10/minute")
+def ai_resolve(body: AIRequest, request: Request):
     api_key = os.environ.get("GROQ_API_KEY", "")
     if not api_key:
         raise HTTPException(status_code=503, detail="GROQ_API_KEY not set. Set it as environment variable.")
 
-    import requests as req
+    import requests as http_requests
 
-    cat_info = f"Category: {request.category}. " if request.category else ""
-    urg_info = f"Urgency: {request.urgency}. " if request.urgency else ""
+    cat_info = f"Category: {body.category}. " if body.category else ""
+    urg_info = f"Urgency: {body.urgency}. " if body.urgency else ""
 
     prompt = f"""You are an e-commerce customer support expert. Analyze this complaint and provide resolution steps.
 
-Complaint: "{request.text}"
+Complaint: "{body.text}"
 {cat_info}{urg_info}
 
 Provide exactly 3 actionable resolution steps numbered 1-2-3. Be specific and practical. Keep each step under 30 words. Write in English."""
 
     try:
-        resp = req.post(
+        resp = http_requests.post(
             "https://api.groq.com/openai/v1/chat/completions",
             headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
             json={"model": "llama-3.3-70b-versatile", "messages": [{"role": "user", "content": prompt}],
@@ -622,27 +1019,28 @@ Provide exactly 3 actionable resolution steps numbered 1-2-3. Be specific and pr
 
 
 @app.post("/ai/draft-response")
-def ai_draft_response(request: AIRequest):
+@limiter.limit("10/minute")
+def ai_draft_response(body: AIRequest, request: Request):
     api_key = os.environ.get("GROQ_API_KEY", "")
     if not api_key:
         raise HTTPException(status_code=503, detail="GROQ_API_KEY not set. Set it as environment variable.")
 
-    import requests as req
+    import requests as http_requests
 
-    cat_info = f"Complaint category: {request.category}. " if request.category else ""
-    urg_info = f"Urgency level: {request.urgency}. " if request.urgency else ""
+    cat_info = f"Complaint category: {body.category}. " if body.category else ""
+    urg_info = f"Urgency level: {body.urgency}. " if body.urgency else ""
 
     prompt = f"""You are a professional customer service representative for an Indian e-commerce company.
 Write a polite, empathetic response to this customer complaint. Write in English.
 The response should acknowledge the issue, apologize, and explain next steps.
 
-Customer complaint: "{request.text}"
+Customer complaint: "{body.text}"
 {cat_info}{urg_info}
 
 Write a professional 3-4 sentence response. Be warm but professional."""
 
     try:
-        resp = req.post(
+        resp = http_requests.post(
             "https://api.groq.com/openai/v1/chat/completions",
             headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
             json={"model": "llama-3.3-70b-versatile", "messages": [{"role": "user", "content": prompt}],

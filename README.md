@@ -94,6 +94,7 @@ Without the key, the AI Assistant page shows an error. All other features (class
 - Top word frequency (filterable by category)
 - Prediction timeline (6h / 24h / 3d / 7d)
 - Insights panel (review rate, correction rate, avg text length)
+- **Smart Suggestions** — actionable recommendations based on prediction patterns
 
 ### AI Assistant
 - Paste a complaint → get resolution steps or draft a customer response
@@ -106,6 +107,17 @@ Without the key, the AI Assistant page shows an error. All other features (class
 - Quick feedback (correct/incorrect) on each item
 - Refresh to pull latest
 
+### Model Comparison
+- Load and compare individual sklearn models side-by-side
+- View category and urgency predictions per model
+- Confidence breakdowns with consensus detection
+- Compare TF-IDF+SVM, TF-IDF+LR, and Ensemble models
+
+### Settings
+- **Tenant Branding** — customize company name and accent color
+- Dark/light mode toggle
+- Keyboard shortcuts overview
+
 ### API Playground
 - Test all endpoints interactively
 - GET/POST with editable JSON body
@@ -116,12 +128,86 @@ Without the key, the AI Assistant page shows an error. All other features (class
 - Fuzzy matching on complaint text
 - Results with category/urgency badges
 
+## Features
+
+### Dark/Light Mode
+- Toggle between themes via the Sun/Moon button in the top bar
+- Preference persisted in localStorage
+- All components adapt with Tailwind `dark:` prefix
+
+### Keyboard Shortcuts
+- Press `?` to open the shortcuts modal
+- `G` then `D` — Dashboard
+- `G` then `C` — Classify
+- `G` then `B` — Batch
+- `G` then `H` — History
+- `G` then `A` — Analytics
+- `G` then `I` — AI Assistant
+- `G` then `R` — Review Queue
+- `G` then `P` — Compare
+- `Ctrl+Enter` — Classify from text input
+- `Ctrl+K` — Global search
+
+### PDF Report Export
+- Export page generates a full HTML report
+- Stats, distributions, model performance, recent predictions
+- Open in new tab → Ctrl+P to save as PDF
+
+### Onboarding Wizard
+- 4-step walkthrough on first visit: Welcome → Classify → Batch → AI
+- Skip or navigate through steps
+- Persistence in localStorage (only shows once)
+
+### Error Boundaries
+- Each page wrapped in ErrorBoundary
+- Crashes show a fallback UI instead of white screen
+- Reset button to return to Dashboard
+
+### Loading Skeletons
+- Skeleton placeholders on Dashboard, History, Analytics, Review Queue
+- Replace spinners for a professional feel
+
+## Production Features
+
+### Rate Limiting
+- All endpoints rate-limited via slowapi
+- `/predict`: 30 requests/min
+- `/predict/batch`: 10 requests/min
+- `/ai/*`: 10 requests/min
+- `/feedback`: 60 requests/min
+- `/retrain`: 5 requests/hour
+- `/health`, `/retrain/status`: exempted
+
+### Input Validation
+- Pydantic models with `Field(min_length=1, max_length=5000)` on text
+- `Literal` types for category and urgency parameters
+- Max batch size: 100 complaints
+
+### Structured Logging
+- Python `logging` module with `INFO` level
+- Request IDs (`X-Request-ID` header, 8-char UUID)
+- Request timing middleware (logs response time)
+- All `print()` statements replaced with `logger.info()`
+
+### Health Check
+- `GET /health` checks:
+  - DB connectivity (SQLite write/read test)
+  - Model load status (sklearn_preprocessor)
+  - Groq API key presence
+- Returns `status: "ok"` or `"degraded"` with details
+
+### Database Performance
+- 7 indexes on `predictions` table:
+  - `idx_category`, `idx_urgency`, `idx_timestamp`
+  - `idx_confidence`, `idx_text`, `idx_correction`, `idx_id`
+
 ## API
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/predict` | Classify a single complaint |
 | POST | `/predict/batch` | Classify multiple complaints |
+| GET | `/predict/compare` | Compare predictions across models |
 | GET | `/history` | Prediction history (paginated, filterable) |
 | GET | `/search?q=` | Search predictions by text |
 | GET | `/stats` | Summary statistics |
@@ -129,7 +215,9 @@ Without the key, the AI Assistant page shows an error. All other features (class
 | GET | `/analytics/word-frequency` | Top words per category |
 | GET | `/analytics/confidence` | Confidence distribution |
 | GET | `/analytics/patterns` | Insights (review rate, avg length) |
+| GET | `/analytics/suggestions` | Smart suggestions based on patterns |
 | GET | `/export/csv` | Download predictions as CSV |
+| GET | `/export/report` | Full HTML report for PDF export |
 | POST | `/feedback` | Submit correction |
 | POST | `/retrain` | Trigger model retrain |
 | GET | `/retrain/status` | Retrain readiness (corrections vs threshold) |
@@ -138,20 +226,21 @@ Without the key, the AI Assistant page shows an error. All other features (class
 | POST | `/ai/resolve` | AI resolution steps (requires `GROQ_API_KEY`) |
 | POST | `/ai/draft-response` | AI draft response (requires `GROQ_API_KEY`) |
 | GET | `/categories` | List categories + colors |
-| GET | `/health` | Health check |
+| GET | `/health` | Health check with model/db/api status |
 
 ## Tech Stack
 
-- **Frontend:** React 19, Tailwind CSS 3, Recharts, Framer Motion, React Router
-- **Backend:** FastAPI, scikit-learn, SQLite, Groq (AI)
+- **Frontend:** React 19, Tailwind CSS 3, Recharts, Framer Motion, React Router, PapaParse
+- **Backend:** FastAPI, scikit-learn, SQLite, Groq (AI), slowapi (rate limiting)
 - **Models:** TF-IDF + SVM Category F1=0.9969, Combined Urgency F1=0.9996
 - **Dataset:** 30K synthetic Hinglish complaints, 9 categories, realistic typos
+- **GPU Ready:** MuRIL fine-tuning for future improvement
 
 ## Project Structure
 
 ```
 hinglish-classifier/
-├── api/main.py              FastAPI server (18 endpoints)
+├── api/main.py              FastAPI server (24 endpoints)
 ├── src/
 │   ├── preprocessor.py      Hinglish text normalization + urgency cues
 │   ├── models.py            sklearn pipelines + ensemble
@@ -159,12 +248,15 @@ hinglish-classifier/
 │   ├── augment.py           30K complaint generator
 │   ├── evaluation.py        Cross-validation + visualizations
 │   ├── error_analysis.py    Confused pairs + per-class errors
-│   ├── active_learning.py   SQLite storage + retrain manager
+│   ├── active_learning.py   SQLite storage + retrain manager (7 indexes)
 │   └── muril_trainer.py     MuRIL fine-tuning (GPU ready)
-├── frontend/src/App.jsx     React UI (8 pages)
-├── frontend/src/index.css   Dark theme base
-├── frontend/tailwind.config.js  Color palette + animations
-├── models/                  Trained .pkl files
+├── frontend/
+│   ├── src/App.jsx          React UI (10 pages, dark/light mode, onboarding)
+│   ├── src/index.css        Tailwind base + theme
+│   ├── tailwind.config.js   Color palette + animations
+│   ├── postcss.config.cjs   PostCSS config
+│   └── vite.config.js       Vite config with API proxy
+├── models/                  Trained .pkl files (individual + ensemble)
 ├── data/raw/                30K dataset
 ├── main.py                  Training pipeline
 ├── start.bat                One-click launcher

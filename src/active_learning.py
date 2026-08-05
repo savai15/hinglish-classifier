@@ -63,6 +63,14 @@ class ComplaintDB:
             )
         """)
 
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_predictions_category ON predictions(predicted_category)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_predictions_urgency ON predictions(predicted_urgency)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_predictions_timestamp ON predictions(timestamp)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_predictions_confidence ON predictions(confidence_category)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_predictions_text ON predictions(text)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_predictions_correct_cat ON predictions(is_correct_category)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_predictions_correct_urg ON predictions(is_correct_urgency)")
+
         conn.commit()
         conn.close()
 

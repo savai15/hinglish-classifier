@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback, useRef, createContext, useContext } from 'react'
-import { BrowserRouter, Routes, Route, NavLink, useNavigate, useLocation } from 'react-router-dom'
+import React, { useState, useEffect, useCallback, useRef, createContext, useContext } from 'react'
+import { BrowserRouter, Routes, Route, NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -16,7 +16,7 @@ import {
   FileText, Filter, RefreshCw, Eye, EyeOff, X, Menu,
   Keyboard, Sparkles, Target, Activity, PieChart as PieChartIcon,
   ThumbsUp, ThumbsDown, Bot, ClipboardList, Check, SquareX,
-  Loader2, CornerDownLeft,
+  Loader2, CornerDownLeft, Sun, Moon,
 } from 'lucide-react'
 
 const API = '/api'
@@ -29,6 +29,281 @@ const CAT_SHORT = {
 }
 const CATEGORIES = Object.keys(CAT_SHORT)
 const RETRAIN_THRESHOLD = 20
+
+// ============================================================================
+// ERROR BOUNDARY
+// ============================================================================
+
+class ErrorBoundary extends React.Component {
+  constructor(props) { super(props); this.state = { hasError: false, error: null } }
+  static getDerivedStateFromError(error) { return { hasError: true, error } }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-[60vh] flex items-center justify-center">
+          <div className="dark:bg-[#131825] bg-white border dark:border-white/10 border-gray-200 rounded-xl p-8 max-w-md text-center">
+            <AlertTriangle className="mx-auto mb-4 text-red-400" size={48} />
+            <h2 className="text-xl font-bold dark:text-white text-gray-900 mb-2">Something went wrong</h2>
+            <p className="dark:text-gray-400 text-gray-500 mb-4">{this.state.error?.message || 'An unexpected error occurred'}</p>
+            <button onClick={() => this.setState({ hasError: false, error: null })} className="px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-500 transition-colors">
+              Try Again
+            </button>
+          </div>
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
+
+// ============================================================================
+// THEME SYSTEM
+// ============================================================================
+
+const ThemeContext = createContext()
+
+function ThemeProvider({ children }) {
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark')
+  useEffect(() => {
+    localStorage.setItem('theme', theme)
+    document.documentElement.classList.toggle('dark', theme === 'dark')
+    document.documentElement.classList.toggle('light', theme === 'light')
+  }, [theme])
+  return <ThemeContext.Provider value={{ theme, toggleTheme: () => setTheme(t => t === 'dark' ? 'light' : 'dark') }}>{children}</ThemeContext.Provider>
+}
+
+function useTheme() { return useContext(ThemeContext) }
+
+// ============================================================================
+// BRANDING SYSTEM
+// ============================================================================
+
+const BrandingContext = createContext()
+
+function BrandingProvider({ children }) {
+  const [branding, setBranding] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('branding')) || { companyName: 'HinglishAI', accentColor: '#6366f1' } }
+    catch { return { companyName: 'HinglishAI', accentColor: '#6366f1' } }
+  })
+
+  useEffect(() => {
+    localStorage.setItem('branding', JSON.stringify(branding))
+    document.documentElement.style.setProperty('--accent', branding.accentColor)
+  }, [branding])
+
+  return <BrandingContext.Provider value={{ branding, setBranding }}>{children}</BrandingContext.Provider>
+}
+
+function useBranding() { return useContext(BrandingContext) }
+
+// ============================================================================
+// SKELETON COMPONENTS
+// ============================================================================
+
+function Skeleton({ className = '', count = 1 }) {
+  return (
+    <div className={`animate-pulse ${className}`}>
+      {Array.from({ length: count }).map((_, i) => (
+        <div key={i} className="bg-white/5 rounded" style={{ height: '100%', width: '100%' }} />
+      ))}
+    </div>
+  )
+}
+
+function CardSkeleton() {
+  return <Skeleton className="dark:bg-[#131825] bg-white border dark:border-white/5 border-gray-200 rounded-xl p-5 h-32" />
+}
+
+function TableSkeleton({ rows = 5, cols = 4 }) {
+  return (
+    <div className="space-y-3">
+      {Array.from({ length: rows }).map((_, i) => (
+        <div key={i} className="flex gap-4">
+          {Array.from({ length: cols }).map((_, j) => (
+            <Skeleton key={j} className="h-10 flex-1 rounded-lg" />
+          ))}
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function ChartSkeleton() {
+  return <Skeleton className="dark:bg-[#131825] bg-white border dark:border-white/5 border-gray-200 rounded-xl p-5 h-64" />
+}
+
+function KeyboardShortcutsModal({ open, onClose }) {
+  const { theme } = useTheme()
+  const shortcuts = [
+    { category: 'Navigation', items: [
+      { keys: ['G', 'D'], desc: 'Go to Dashboard' },
+      { keys: ['G', 'C'], desc: 'Go to Classify' },
+      { keys: ['G', 'B'], desc: 'Go to Batch' },
+      { keys: ['G', 'H'], desc: 'Go to History' },
+      { keys: ['G', 'A'], desc: 'Go to Analytics' },
+      { keys: ['G', 'I'], desc: 'Go to AI Assistant' },
+      { keys: ['G', 'R'], desc: 'Go to Review Queue' },
+      { keys: ['G', 'P'], desc: 'Go to API Playground' },
+    ]},
+    { category: 'Actions', items: [
+      { keys: ['Ctrl', 'K'], desc: 'Search' },
+      { keys: ['Ctrl', 'Enter'], desc: 'Classify complaint' },
+      { keys: ['?'], desc: 'Show shortcuts' },
+      { keys: ['Esc'], desc: 'Close modal' },
+    ]},
+  ]
+
+  if (!open) return null
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+        onClick={onClose}
+      >
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: -10 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: -10 }}
+          className={`w-full max-w-lg rounded-xl border p-6 shadow-2xl ${
+            theme === 'dark' ? 'bg-[#131825] border-white/10' : 'bg-white border-gray-200'
+          }`}
+          onClick={e => e.stopPropagation()}
+        >
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-2">
+              <Keyboard size={20} className="text-violet-400" />
+              <h2 className="text-lg font-bold text-white">Keyboard Shortcuts</h2>
+            </div>
+            <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/10 text-gray-400">
+              <X size={18} />
+            </button>
+          </div>
+          <div className="space-y-5">
+            {shortcuts.map(group => (
+              <div key={group.category}>
+                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">{group.category}</h3>
+                <div className="space-y-1.5">
+                  {group.items.map(item => (
+                    <div key={item.desc} className="flex items-center justify-between py-1.5">
+                      <span className="text-sm text-gray-300">{item.desc}</span>
+                      <div className="flex gap-1">
+                        {item.keys.map(key => (
+                          <kbd key={key} className="px-2 py-0.5 text-xs font-mono bg-white/10 border border-white/10 rounded text-gray-300">
+                            {key}
+                          </kbd>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="mt-4 text-xs text-gray-500 text-center">Press <kbd className="px-1.5 py-0.5 bg-white/10 rounded text-gray-400">?</kbd> anytime to show this</p>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  )
+}
+
+// ============================================================================
+// ONBOARDING WIZARD
+// ============================================================================
+
+function OnboardingWizard({ onComplete }) {
+  const [step, setStep] = useState(0)
+  const { theme } = useTheme()
+  const navigate = useNavigate()
+
+  const steps = [
+    {
+      title: 'Welcome to HinglishAI',
+      desc: 'Classify Hinglish e-commerce complaints into 9 categories and 3 urgency levels using machine learning.',
+      icon: Zap,
+      color: 'from-violet-500 to-purple-500',
+    },
+    {
+      title: 'Classify Complaints',
+      desc: 'Type or paste any Hinglish complaint and get instant AI-powered classification with confidence scores.',
+      icon: MessageSquareWarning,
+      color: 'from-cyan-500 to-blue-500',
+    },
+    {
+      title: 'Batch Process',
+      desc: 'Upload a CSV file or paste multiple complaints to classify them all at once.',
+      icon: Layers,
+      color: 'from-emerald-500 to-teal-500',
+    },
+    {
+      title: 'AI Assistant',
+      desc: 'Get AI-powered resolution steps and draft customer responses using Groq.',
+      icon: Bot,
+      color: 'from-amber-500 to-orange-500',
+    },
+  ]
+
+  const handleComplete = () => {
+    localStorage.setItem('onboarding_complete', 'true')
+    onComplete()
+  }
+
+  const handleSkip = () => {
+    localStorage.setItem('onboarding_complete', 'true')
+    onComplete()
+  }
+
+  const current = steps[step]
+  const Icon = current.icon
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="fixed inset-0 z-[300] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+    >
+      <motion.div
+        key={step}
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.9, y: -20 }}
+        className={`w-full max-w-md rounded-2xl border p-8 text-center ${
+          theme === 'dark' ? 'bg-[#131825] border-white/10' : 'bg-white border-gray-200'
+        }`}
+      >
+        <div className={`w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br ${current.color} flex items-center justify-center mb-6`}>
+          <Icon size={32} className="text-white" />
+        </div>
+        <h2 className="text-xl font-bold text-white mb-2">{current.title}</h2>
+        <p className="text-gray-400 text-sm mb-8">{current.desc}</p>
+
+        <div className="flex justify-center gap-1.5 mb-6">
+          {steps.map((_, i) => (
+            <div key={i} className={`h-1.5 rounded-full transition-all ${i === step ? 'w-8 bg-violet-500' : 'w-2 bg-white/20'}`} />
+          ))}
+        </div>
+
+        <div className="flex gap-3">
+          <button onClick={handleSkip} className="flex-1 py-2.5 text-sm text-gray-400 hover:text-white transition-colors">
+            Skip
+          </button>
+          {step < steps.length - 1 ? (
+            <button onClick={() => setStep(s => s + 1)} className="flex-1 py-2.5 bg-violet-600 text-white rounded-lg hover:bg-violet-500 transition-colors font-medium">
+              Next
+            </button>
+          ) : (
+            <button onClick={handleComplete} className="flex-1 py-2.5 bg-violet-600 text-white rounded-lg hover:bg-violet-500 transition-colors font-medium">
+              Get Started
+            </button>
+          )}
+        </div>
+      </motion.div>
+    </motion.div>
+  )
+}
 
 // ============================================================================
 // TOAST SYSTEM
@@ -175,7 +450,7 @@ function LoadingState() {
     <div className="flex items-center justify-center h-64">
       <div className="flex flex-col items-center gap-3">
         <div className="w-8 h-8 border-2 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin" />
-        <p className="text-sm text-gray-500">Loading...</p>
+        <p className="text-sm dark:text-gray-500 text-gray-400">Loading...</p>
       </div>
     </div>
   )
@@ -244,9 +519,9 @@ function FeedbackPanel({ predictionId, text, predictedCategory, predictedUrgency
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="mt-4 p-4 rounded-lg bg-white/5 border border-white/10"
+      className="mt-4 p-4 rounded-lg dark:bg-white/5 bg-gray-100 dark:border-white/10 border-gray-200"
     >
-      <p className="text-xs text-gray-400 mb-3">Was this classification correct?</p>
+      <p className="text-xs dark:text-gray-400 text-gray-500 mb-3">Was this classification correct?</p>
       <div className="flex items-center gap-3 mb-3">
         <button
           onClick={() => handleSubmit(true)}
@@ -270,16 +545,16 @@ function FeedbackPanel({ predictionId, text, predictedCategory, predictedUrgency
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
-          className="space-y-3 mt-3 pt-3 border-t border-white/5"
+          className="space-y-3 mt-3 pt-3 border-t dark:border-white/5 border-gray-200"
         >
-          <p className="text-xs text-gray-500">Provide corrections:</p>
+          <p className="text-xs dark:text-gray-500 text-gray-400">Provide corrections:</p>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Correct Category</label>
+              <label className="text-[10px] dark:text-gray-500 text-gray-400 uppercase tracking-wider block mb-1">Correct Category</label>
               <select
                 value={correctedCategory}
                 onChange={e => setCorrectedCategory(e.target.value)}
-                className="w-full px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs text-white outline-none focus:border-cyan-500/50"
+                className="w-full px-3 py-1.5 dark:bg-white/5 bg-gray-50 dark:border-white/10 border-gray-200 rounded-lg text-xs dark:text-white text-gray-900 outline-none focus:border-cyan-500/50"
               >
                 <option value="">Keep: {CAT_SHORT[predictedCategory]}</option>
                 {CATEGORIES.map(c => (
@@ -288,11 +563,11 @@ function FeedbackPanel({ predictionId, text, predictedCategory, predictedUrgency
               </select>
             </div>
             <div>
-              <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Correct Urgency</label>
+              <label className="text-[10px] dark:text-gray-500 text-gray-400 uppercase tracking-wider block mb-1">Correct Urgency</label>
               <select
                 value={correctedUrgency}
                 onChange={e => setCorrectedUrgency(e.target.value)}
-                className="w-full px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs text-white outline-none focus:border-cyan-500/50"
+                className="w-full px-3 py-1.5 dark:bg-white/5 bg-gray-50 dark:border-white/10 border-gray-200 rounded-lg text-xs dark:text-white text-gray-900 outline-none focus:border-cyan-500/50"
               >
                 <option value="">Keep: {predictedUrgency}</option>
                 <option value="High">High</option>
@@ -387,28 +662,70 @@ function RetrainBanner({ correctionsTotal, onRetrain }) {
 // LAYOUT
 // ============================================================================
 
-function Layout({ children }) {
+function Layout() {
   const [collapsed, setCollapsed] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState([])
   const [searching, setSearching] = useState(false)
   const [retrainStatus, setRetrainStatus] = useState(null)
+  const [shortcutsOpen, setShortcutsOpen] = useState(false)
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    return !localStorage.getItem('onboarding_complete')
+  })
+  const [pendingKey, setPendingKey] = useState(null)
+  const keyTimeoutRef = useRef(null)
   const searchRef = useRef(null)
   const navigate = useNavigate()
   const location = useLocation()
+  const { theme, toggleTheme } = useTheme()
+  const { branding } = useBranding()
 
   useEffect(() => {
     function handleKey(e) {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return
+
+      // Chord detection: G then D/C/B/etc
+      if (pendingKey === 'g') {
+        clearTimeout(keyTimeoutRef.current)
+        setPendingKey(null)
+        const routes = { d: '/', c: '/classify', b: '/batch', h: '/history', a: '/analytics', i: '/ai', r: '/review', p: '/playground' }
+        if (routes[e.key]) {
+          e.preventDefault()
+          navigate(routes[e.key])
+        }
+        return
+      }
+
+      if (e.key === 'g' && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault()
+        setPendingKey('g')
+        keyTimeoutRef.current = setTimeout(() => setPendingKey(null), 500)
+        return
+      }
+
+      // ? key opens shortcuts
+      if (e.key === '?' && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault()
+        setShortcutsOpen(true)
+        return
+      }
+
+      // Ctrl+K for search
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault()
         setSearchOpen(true)
       }
-      if (e.key === 'Escape') setSearchOpen(false)
+
+      // Escape closes modals
+      if (e.key === 'Escape') {
+        setSearchOpen(false)
+        setShortcutsOpen(false)
+      }
     }
     window.addEventListener('keydown', handleKey)
     return () => window.removeEventListener('keydown', handleKey)
-  }, [])
+  }, [pendingKey, navigate])
 
   useEffect(() => {
     if (!searchOpen) return
@@ -429,7 +746,11 @@ function Layout({ children }) {
 
   useEffect(() => {
     getRetrainStatus().then(setRetrainStatus).catch(() => {})
-  }, [location.pathname])
+    const interval = setInterval(() => {
+      getRetrainStatus().then(setRetrainStatus).catch(() => {})
+    }, 30000)
+    return () => clearInterval(interval)
+  }, [])
 
   const nav = [
     { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
@@ -440,24 +761,26 @@ function Layout({ children }) {
     { to: '/ai', icon: Bot, label: 'AI Assistant' },
     { to: '/review', icon: ClipboardList, label: 'Review Queue' },
     { to: '/playground', icon: Code2, label: 'API' },
+    { to: '/compare', icon: Layers, label: 'Compare' },
+    { to: '/settings', icon: Settings, label: 'Settings' },
   ]
 
   const shouldShowRetrainBadge = retrainStatus && retrainStatus.should_retrain
 
   return (
-    <div className="flex h-screen bg-[#0a0e1a] text-gray-200 overflow-hidden">
+    <div className="flex h-screen dark:bg-[#0a0e1a] bg-gray-50 dark:text-gray-200 text-gray-800 overflow-hidden">
       {/* Sidebar */}
       <motion.aside
         animate={{ width: collapsed ? 64 : 220 }}
-        className="flex-shrink-0 bg-[#0d1220] border-r border-white/5 flex flex-col z-20"
+        className="flex-shrink-0 dark:bg-[#0d1220] bg-white border-r dark:border-white/5 border-gray-200 flex flex-col z-20"
       >
-        <div className="h-14 flex items-center px-4 border-b border-white/5">
+        <div className="h-14 flex items-center px-4 border-b dark:border-white/5 border-gray-200">
           {!collapsed && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2 min-w-0">
               <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-cyan-500 to-violet-500 flex items-center justify-center flex-shrink-0">
                 <Zap size={14} className="text-white" />
               </div>
-              <span className="font-semibold text-sm text-white truncate">HinglishAI</span>
+              <span className="font-semibold text-sm dark:text-white text-gray-900 truncate">{branding.companyName}</span>
             </motion.div>
           )}
           {collapsed && (
@@ -496,8 +819,8 @@ function Layout({ children }) {
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 group relative ${
                   isActive
-                    ? 'bg-white/10 text-white'
-                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                    ? 'dark:bg-white/10 bg-gray-100 dark:text-white text-gray-900'
+                    : 'dark:text-gray-400 text-gray-500 dark:hover:text-white hover:text-gray-900 dark:hover:bg-white/5 hover:bg-gray-100'
                 } ${collapsed ? 'justify-center' : ''}`
               }
             >
@@ -511,18 +834,18 @@ function Layout({ children }) {
         </nav>
 
         {/* Sidebar Footer */}
-        <div className="p-2 border-t border-white/5 space-y-1">
+        <div className="p-2 border-t dark:border-white/5 border-gray-200 space-y-1">
           {!collapsed && retrainStatus && (
-            <div className="px-3 py-2 rounded-lg bg-white/5 text-xs text-gray-500 flex items-center justify-between">
+            <div className="px-3 py-2 rounded-lg dark:bg-white/5 bg-gray-100 text-xs dark:text-gray-500 text-gray-400 flex items-center justify-between">
               <span>Corrections</span>
-              <span className="text-gray-400 font-medium">
+              <span className="dark:text-gray-400 text-gray-500 font-medium">
                 {retrainStatus.corrections_total}/{retrainStatus.threshold || RETRAIN_THRESHOLD}
               </span>
             </div>
           )}
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-gray-500 hover:text-white hover:bg-white/5 transition text-sm"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg dark:text-gray-500 text-gray-400 dark:hover:text-white hover:text-gray-900 dark:hover:bg-white/5 hover:bg-gray-100 transition text-sm"
           >
             {collapsed ? <ChevronRight size={16} /> : <><ChevronLeft size={16} /><span className="truncate">Collapse</span></>}
           </button>
@@ -532,21 +855,27 @@ function Layout({ children }) {
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Bar */}
-        <header className="h-14 flex items-center justify-between px-6 border-b border-white/5 bg-[#0d1220]/80 backdrop-blur-sm z-10">
+        <header className="h-14 flex items-center justify-between px-6 border-b dark:border-white/5 border-gray-200 dark:bg-[#0d1220]/80 bg-white/80 backdrop-blur-sm z-10">
           <div className="flex items-center gap-3">
-            <h1 className="text-sm font-medium text-gray-300">
+            <h1 className="text-sm font-medium dark:text-gray-300 text-gray-600">
               {nav.find(n => n.to === location.pathname)?.label || 'Hinglish Complaint Classifier'}
             </h1>
           </div>
 
           <div className="flex items-center gap-2">
             <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 transition-colors dark:text-gray-400 text-gray-500 dark:hover:text-white hover:text-gray-900"
+            >
+              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
+            <button
               onClick={() => setSearchOpen(true)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:border-white/20 transition text-sm"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg dark:bg-white/5 bg-gray-100 dark:border-white/10 border-gray-200 dark:text-gray-400 text-gray-500 dark:hover:text-white hover:text-gray-900 dark:hover:border-white/20 border-gray-300 transition text-sm"
             >
               <Search size={14} />
               <span className="hidden sm:inline">Search</span>
-              <kbd className="hidden sm:inline text-[10px] bg-white/10 px-1.5 py-0.5 rounded text-gray-500">Ctrl+K</kbd>
+              <kbd className="hidden sm:inline text-[10px] dark:bg-white/10 bg-gray-200 px-1.5 py-0.5 rounded dark:text-gray-500 text-gray-400">Ctrl+K</kbd>
             </button>
           </div>
         </header>
@@ -554,7 +883,7 @@ function Layout({ children }) {
         {/* Content */}
         <main className="flex-1 overflow-y-auto">
           <div className="max-w-[1400px] mx-auto p-6">
-            {children}
+            <Outlet />
           </div>
         </main>
       </div>
@@ -573,35 +902,35 @@ function Layout({ children }) {
               initial={{ opacity: 0, scale: 0.95, y: -10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: -10 }}
-              className="w-full max-w-lg bg-[#131825] border border-white/10 rounded-xl shadow-2xl overflow-hidden"
+              className="w-full max-w-lg dark:bg-[#131825] bg-white border dark:border-white/10 border-gray-200 rounded-xl shadow-2xl overflow-hidden"
               onClick={e => e.stopPropagation()}
             >
-              <div className="flex items-center gap-3 px-4 py-3 border-b border-white/5">
-                <Search size={16} className="text-gray-500" />
+              <div className="flex items-center gap-3 px-4 py-3 border-b dark:border-white/5 border-gray-200">
+                <Search size={16} className="dark:text-gray-500 text-gray-400" />
                 <input
                   ref={searchRef}
                   autoFocus
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
                   placeholder="Search complaints..."
-                  className="flex-1 bg-transparent text-sm text-white placeholder-gray-500 outline-none"
+                  className="flex-1 bg-transparent text-sm dark:text-white text-gray-900 placeholder-gray-500 outline-none"
                 />
-                <kbd className="text-[10px] bg-white/10 px-1.5 py-0.5 rounded text-gray-500">ESC</kbd>
+                <kbd className="text-[10px] dark:bg-white/10 bg-gray-200 px-1.5 py-0.5 rounded dark:text-gray-500 text-gray-400">ESC</kbd>
               </div>
               <div className="max-h-80 overflow-y-auto">
-                {searching && <div className="px-4 py-6 text-center text-gray-500 text-sm">Searching...</div>}
+                {searching && <div className="px-4 py-6 text-center dark:text-gray-500 text-gray-400 text-sm">Searching...</div>}
                 {!searching && searchResults.length === 0 && searchQuery.length > 1 && (
-                  <div className="px-4 py-6 text-center text-gray-500 text-sm">No results found</div>
+                  <div className="px-4 py-6 text-center dark:text-gray-500 text-gray-400 text-sm">No results found</div>
                 )}
                 {searchResults.map((p, i) => (
                   <button
                     key={i}
-                    className="w-full text-left px-4 py-3 hover:bg-white/5 transition border-b border-white/5 last:border-0"
+                    className="w-full text-left px-4 py-3 dark:hover:bg-white/5 hover:bg-gray-100 transition border-b dark:border-white/5 border-gray-200 last:border-0"
                     onClick={() => { setSearchOpen(false); navigate('/history') }}
                   >
-                    <p className="text-sm text-white truncate">{p.text}</p>
+                    <p className="text-sm dark:text-white text-gray-900 truncate">{p.text}</p>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-xs px-1.5 py-0.5 rounded bg-white/10 text-gray-400">{CAT_SHORT[p.predicted_category] || p.predicted_category}</span>
+                      <span className="text-xs px-1.5 py-0.5 rounded dark:bg-white/10 bg-gray-100 dark:text-gray-400 text-gray-500">{CAT_SHORT[p.predicted_category] || p.predicted_category}</span>
                       <span className="text-xs" style={{ color: URGENCY_COLORS[p.predicted_urgency] }}>{p.predicted_urgency}</span>
                     </div>
                   </button>
@@ -611,6 +940,10 @@ function Layout({ children }) {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <KeyboardShortcutsModal open={shortcutsOpen} onClose={() => setShortcutsOpen(false)} />
+
+      {showOnboarding && <OnboardingWizard onComplete={() => setShowOnboarding(false)} />}
     </div>
   )
 }
@@ -626,6 +959,8 @@ function DashboardPage() {
   const [categories, setCategories] = useState(null)
   const [retrainHistory, setRetrainHistory] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [suggestions, setSuggestions] = useState(null)
+  const navigate = useNavigate()
 
   useEffect(() => {
     Promise.all([getStats(), getPatterns(), getTimeline(24), getCategories(), getRetrainHistory()])
@@ -634,7 +969,20 @@ function DashboardPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  if (loading) return <LoadingState />
+  useEffect(() => {
+    apiFetch('/analytics/suggestions').then(setSuggestions).catch(() => {})
+  }, [])
+
+  if (loading) return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {Array.from({ length: 4 }).map((_, i) => <CardSkeleton key={i} />)}
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {Array.from({ length: 3 }).map((_, i) => <ChartSkeleton key={i} />)}
+      </div>
+    </div>
+  )
 
   const catData = stats?.category_distribution ? Object.entries(stats.category_distribution).map(([k, v]) => ({
     name: CAT_SHORT[k] || k, fullName: k, value: v
@@ -667,12 +1015,12 @@ function DashboardPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="bg-[#131825] border border-white/5 rounded-xl p-5 hover:border-white/10 transition-all duration-300"
+            className="dark:bg-[#131825] bg-white border dark:border-white/5 border-gray-200 rounded-xl p-5 dark:hover:border-white/10 hover:border-gray-300 transition-all duration-300"
           >
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-xs text-gray-500 uppercase tracking-wider">{card.label}</p>
-                <p className="text-3xl font-bold text-white mt-1">
+                <p className="text-xs dark:text-gray-500 text-gray-400 uppercase tracking-wider">{card.label}</p>
+                <p className="text-3xl font-bold dark:text-white text-gray-900 mt-1">
                   <AnimNum value={card.value} decimals={card.decimals || 0} />{card.suffix || ''}
                 </p>
               </div>
@@ -683,7 +1031,7 @@ function DashboardPage() {
             <div className="mt-3 flex items-center gap-1">
               <ArrowUpRight size={12} className="text-emerald-400" />
               <span className="text-xs text-emerald-400">{card.trend}</span>
-              <span className="text-xs text-gray-600 ml-1">vs last week</span>
+              <span className="text-xs dark:text-gray-600 text-gray-400 ml-1">vs last week</span>
             </div>
           </motion.div>
         ))}
@@ -696,9 +1044,9 @@ function DashboardPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-[#131825] border border-white/5 rounded-xl p-5"
+          className="dark:bg-[#131825] bg-white border dark:border-white/5 border-gray-200 rounded-xl p-5"
         >
-          <h3 className="text-sm font-medium text-gray-300 mb-4">Category Distribution</h3>
+          <h3 className="text-sm font-medium dark:text-gray-300 text-gray-600 mb-4">Category Distribution</h3>
           {catData.length > 0 ? (
             <ResponsiveContainer width="100%" height={220}>
               <PieChart>
@@ -709,13 +1057,13 @@ function DashboardPage() {
               </PieChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-[220px] flex items-center justify-center text-gray-600 text-sm">No data yet</div>
+            <div className="h-[220px] flex items-center justify-center dark:text-gray-600 text-gray-400 text-sm">No data yet</div>
           )}
           <div className="flex flex-wrap gap-2 mt-2">
             {catData.slice(0, 6).map((d, i) => (
               <div key={i} className="flex items-center gap-1.5">
                 <div className="w-2 h-2 rounded-full" style={{ background: COLORS[i] }} />
-                <span className="text-[10px] text-gray-500">{d.name}</span>
+                <span className="text-[10px] dark:text-gray-500 text-gray-400">{d.name}</span>
               </div>
             ))}
           </div>
@@ -726,9 +1074,9 @@ function DashboardPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="bg-[#131825] border border-white/5 rounded-xl p-5"
+          className="dark:bg-[#131825] bg-white border dark:border-white/5 border-gray-200 rounded-xl p-5"
         >
-          <h3 className="text-sm font-medium text-gray-300 mb-4">Urgency Breakdown</h3>
+          <h3 className="text-sm font-medium dark:text-gray-300 text-gray-600 mb-4">Urgency Breakdown</h3>
           {urgData.length > 0 ? (
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={urgData} barSize={40}>
@@ -744,7 +1092,7 @@ function DashboardPage() {
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-[220px] flex items-center justify-center text-gray-600 text-sm">No data yet</div>
+            <div className="h-[220px] flex items-center justify-center dark:text-gray-600 text-gray-400 text-sm">No data yet</div>
           )}
         </motion.div>
 
@@ -753,9 +1101,9 @@ function DashboardPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="bg-[#131825] border border-white/5 rounded-xl p-5"
+          className="dark:bg-[#131825] bg-white border dark:border-white/5 border-gray-200 rounded-xl p-5"
         >
-          <h3 className="text-sm font-medium text-gray-300 mb-4">Last 24 Hours</h3>
+          <h3 className="text-sm font-medium dark:text-gray-300 text-gray-600 mb-4">Last 24 Hours</h3>
           {timelineData.length > 0 ? (
             <ResponsiveContainer width="100%" height={220}>
               <AreaChart data={timelineData}>
@@ -773,7 +1121,7 @@ function DashboardPage() {
               </AreaChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-[220px] flex items-center justify-center text-gray-600 text-sm">No predictions yet</div>
+            <div className="h-[220px] flex items-center justify-center dark:text-gray-600 text-gray-400 text-sm">No predictions yet</div>
           )}
         </motion.div>
       </div>
@@ -785,9 +1133,9 @@ function DashboardPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7 }}
-          className="bg-[#131825] border border-white/5 rounded-xl p-5"
+          className="dark:bg-[#131825] bg-white border dark:border-white/5 border-gray-200 rounded-xl p-5"
         >
-          <h3 className="text-sm font-medium text-gray-300 mb-4">Model Performance</h3>
+          <h3 className="text-sm font-medium dark:text-gray-300 text-gray-600 mb-4">Model Performance</h3>
           <div className="space-y-3">
             {[
               { label: 'TF-IDF + SVM — Category F1', score: 99.69, color: '#6366f1' },
@@ -796,10 +1144,10 @@ function DashboardPage() {
             ].map((m, i) => (
               <div key={i}>
                 <div className="flex items-center justify-between text-xs mb-1">
-                  <span className="text-gray-400">{m.label}</span>
-                  <span className="text-white font-medium">{m.note || `F1: ${m.score.toFixed(2)}%`}</span>
+                  <span className="dark:text-gray-400 text-gray-500">{m.label}</span>
+                  <span className="dark:text-white text-gray-900 font-medium">{m.note || `F1: ${m.score.toFixed(2)}%`}</span>
                 </div>
-                <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                <div className="h-2 dark:bg-white/5 bg-gray-200 rounded-full overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${m.score}%` }}
@@ -818,28 +1166,28 @@ function DashboardPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8 }}
-          className="bg-[#131825] border border-white/5 rounded-xl p-5"
+          className="dark:bg-[#131825] bg-white border dark:border-white/5 border-gray-200 rounded-xl p-5"
         >
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-medium text-gray-300">Retrain History</h3>
-            <RefreshCw size={14} className="text-gray-500" />
+            <h3 className="text-sm font-medium dark:text-gray-300 text-gray-600">Retrain History</h3>
+            <RefreshCw size={14} className="dark:text-gray-500 text-gray-400" />
           </div>
           {retrainLog.length === 0 ? (
-            <div className="h-32 flex items-center justify-center text-gray-600 text-sm">
+            <div className="h-32 flex items-center justify-center dark:text-gray-600 text-gray-400 text-sm">
               No retrains yet
             </div>
           ) : (
             <div className="space-y-2 max-h-[220px] overflow-y-auto">
               {retrainLog.slice(0, 5).map((entry, i) => (
-                <div key={i} className="p-3 rounded-lg bg-white/5 border border-white/5">
+                <div key={i} className="p-3 rounded-lg dark:bg-white/5 bg-gray-100 border dark:border-white/5 border-gray-200">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="w-6 h-6 rounded bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
                         <Check size={10} className="text-white" />
                       </div>
                       <div>
-                        <p className="text-xs text-white font-medium">v{entry.model_version || i + 1}</p>
-                        <p className="text-[10px] text-gray-500">
+                        <p className="text-xs dark:text-white text-gray-900 font-medium">v{entry.model_version || i + 1}</p>
+                        <p className="text-[10px] dark:text-gray-500 text-gray-400">
                           {entry.corrections_count} corrections
                         </p>
                       </div>
@@ -851,7 +1199,7 @@ function DashboardPage() {
                             {((entry.accuracy_after - entry.accuracy_before) * 100) > 0 ? '+' : ''}
                             {((entry.accuracy_after - entry.accuracy_before) * 100).toFixed(1)}%
                           </p>
-                          <p className="text-[10px] text-gray-500">
+                          <p className="text-[10px] dark:text-gray-500 text-gray-400">
                             {(entry.accuracy_after * 100).toFixed(1)}%
                           </p>
                         </>
@@ -861,7 +1209,7 @@ function DashboardPage() {
                     </div>
                   </div>
                   {entry.timestamp && (
-                    <p className="text-[10px] text-gray-600 mt-1 ml-8">
+                    <p className="text-[10px] dark:text-gray-600 text-gray-400 mt-1 ml-8">
                       {new Date(entry.timestamp).toLocaleString()}
                     </p>
                   )}
@@ -877,10 +1225,10 @@ function DashboardPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.9 }}
-        className="bg-[#131825] border border-white/5 rounded-xl p-5"
+        className="dark:bg-[#131825] bg-white border dark:border-white/5 border-gray-200 rounded-xl p-5"
       >
-        <h3 className="text-sm font-medium text-gray-300 mb-4">Quick Actions</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <h3 className="text-sm font-medium dark:text-gray-300 text-gray-600 mb-4">Quick Actions</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
           {[
             { label: 'Classify Complaint', icon: MessageSquareWarning, to: '/classify', color: 'from-cyan-500 to-blue-500' },
             { label: 'Batch Process', icon: Layers, to: '/batch', color: 'from-violet-500 to-purple-500' },
@@ -890,16 +1238,60 @@ function DashboardPage() {
             <NavLink
               key={i}
               to={a.to}
-              className="flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 transition-all duration-200 group"
+              className="flex items-center gap-3 p-3 rounded-lg dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 border dark:border-white/5 border-gray-200 dark:hover:border-white/10 hover:border-gray-300 transition-all duration-200 group"
             >
               <div className={`w-9 h-9 rounded-lg bg-gradient-to-br ${a.color} flex items-center justify-center`}>
                 <a.icon size={16} className="text-white" />
               </div>
-              <span className="text-sm text-gray-300 group-hover:text-white transition">{a.label}</span>
+              <span className="text-sm dark:text-gray-300 text-gray-600 group-hover:dark:text-white group-hover:text-gray-900 transition">{a.label}</span>
             </NavLink>
           ))}
+          <button
+            onClick={() => window.open(`${API}/export/report`, '_blank')}
+            className="flex items-center gap-3 p-3 rounded-lg dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 border dark:border-white/5 border-gray-200 dark:hover:border-white/10 hover:border-gray-300 transition-all duration-200 group"
+          >
+            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
+              <FileText size={16} className="text-white" />
+            </div>
+            <span className="text-sm dark:text-gray-300 text-gray-600 group-hover:dark:text-white group-hover:text-gray-900 transition">Export Report</span>
+          </button>
         </div>
       </motion.div>
+
+      {/* Smart Suggestions */}
+      {suggestions && suggestions.suggestions && suggestions.suggestions.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.0 }}
+        >
+          <h3 className="text-sm font-medium text-gray-300 mb-3">Smart Suggestions</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {suggestions.suggestions.slice(0, 4).map((s, i) => (
+              <div key={i} className={`rounded-xl p-4 border transition-all hover:border-white/10 ${
+                s.type === 'warning' ? 'bg-amber-500/5 border-amber-500/10' :
+                s.type === 'action' ? 'bg-violet-500/5 border-violet-500/10' :
+                'bg-[#131825] border-white/5'
+              }`}>
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-white">{s.title}</p>
+                    <p className="text-xs text-gray-400 mt-1">{s.description}</p>
+                  </div>
+                  {s.action && (
+                    <button
+                      onClick={() => navigate(s.action)}
+                      className="ml-3 px-3 py-1 text-xs bg-violet-600 text-white rounded-lg hover:bg-violet-500 transition-colors whitespace-nowrap"
+                    >
+                      {s.action_label}
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      )}
     </div>
   )
 }
@@ -967,18 +1359,18 @@ function ClassifyPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-[#131825] border border-white/5 rounded-xl p-5"
+            className="dark:bg-[#131825] bg-white border dark:border-white/5 border-gray-200 rounded-xl p-5"
           >
-            <h3 className="text-sm font-medium text-gray-300 mb-3">Enter Complaint</h3>
+            <h3 className="text-sm font-medium dark:text-gray-300 text-gray-600 mb-3">Enter Complaint</h3>
             <textarea
               value={text}
               onChange={e => setText(e.target.value)}
               placeholder="Type a Hinglish complaint... e.g., Mera order abhi tak nahi aaya!"
-              className="w-full h-32 bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-500 outline-none focus:border-cyan-500/50 resize-none transition"
+              className="w-full h-32 dark:bg-white/5 bg-gray-50 dark:border-white/10 border-gray-200 rounded-lg px-4 py-3 text-sm dark:text-white text-gray-900 placeholder-gray-500 outline-none focus:border-cyan-500/50 resize-none transition"
               onKeyDown={e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) handleClassify() }}
             />
             <div className="flex items-center justify-between mt-3">
-              <span className="text-xs text-gray-600">Ctrl+Enter to classify</span>
+              <span className="text-xs dark:text-gray-600 text-gray-400">Ctrl+Enter to classify</span>
               <button
                 onClick={() => handleClassify()}
                 disabled={loading || !text.trim()}
@@ -997,10 +1389,10 @@ function ClassifyPage() {
                 initial={{ opacity: 0, y: 20, height: 0 }}
                 animate={{ opacity: 1, y: 0, height: 'auto' }}
                 exit={{ opacity: 0, y: -10, height: 0 }}
-                className="bg-[#131825] border border-white/5 rounded-xl p-5 overflow-hidden"
+                className="dark:bg-[#131825] bg-white border dark:border-white/5 border-gray-200 rounded-xl p-5 overflow-hidden"
               >
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-medium text-gray-300">Result</h3>
+                  <h3 className="text-sm font-medium dark:text-gray-300 text-gray-600">Result</h3>
                   {result.needs_review && (
                     <span className="flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
                       <AlertTriangle size={12} /> Needs Review
@@ -1009,23 +1401,23 @@ function ClassifyPage() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div className="p-4 rounded-lg bg-white/5">
-                    <p className="text-xs text-gray-500 mb-1">Category</p>
-                    <p className="text-lg font-bold text-white">{CAT_SHORT[result.category] || result.category}</p>
-                    <p className="text-xs text-gray-400 mt-1">{result.category}</p>
-                    <div className="mt-2 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                  <div className="p-4 rounded-lg dark:bg-white/5 bg-gray-100">
+                    <p className="text-xs dark:text-gray-500 text-gray-400 mb-1">Category</p>
+                    <p className="text-lg font-bold dark:text-white text-gray-900">{CAT_SHORT[result.category] || result.category}</p>
+                    <p className="text-xs dark:text-gray-400 text-gray-500 mt-1">{result.category}</p>
+                    <div className="mt-2 h-1.5 dark:bg-white/5 bg-gray-200 rounded-full overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${result.category_confidence * 100}%` }}
                         className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-blue-500"
                       />
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">{(result.category_confidence * 100).toFixed(1)}% confidence</p>
+                    <p className="text-xs dark:text-gray-500 text-gray-400 mt-1">{(result.category_confidence * 100).toFixed(1)}% confidence</p>
                   </div>
-                  <div className="p-4 rounded-lg bg-white/5">
-                    <p className="text-xs text-gray-500 mb-1">Urgency</p>
+                  <div className="p-4 rounded-lg dark:bg-white/5 bg-gray-100">
+                    <p className="text-xs dark:text-gray-500 text-gray-400 mb-1">Urgency</p>
                     <p className="text-lg font-bold" style={{ color: URGENCY_COLORS[result.urgency] }}>{result.urgency}</p>
-                    <div className="mt-2 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                    <div className="mt-2 h-1.5 dark:bg-white/5 bg-gray-200 rounded-full overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${result.urgency_confidence * 100}%` }}
@@ -1033,20 +1425,20 @@ function ClassifyPage() {
                         style={{ background: URGENCY_COLORS[result.urgency] }}
                       />
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">{(result.urgency_confidence * 100).toFixed(1)}% confidence</p>
+                    <p className="text-xs dark:text-gray-500 text-gray-400 mt-1">{(result.urgency_confidence * 100).toFixed(1)}% confidence</p>
                   </div>
                 </div>
 
                 {/* Probability Bars */}
                 <div className="space-y-2">
-                  <p className="text-xs text-gray-500 uppercase tracking-wider">Category Probabilities</p>
+                  <p className="text-xs dark:text-gray-500 text-gray-400 uppercase tracking-wider">Category Probabilities</p>
                   {Object.entries(result.category_probabilities || {})
                     .sort((a, b) => b[1] - a[1])
                     .slice(0, 5)
                     .map(([cat, prob], i) => (
                       <div key={cat} className="flex items-center gap-3">
-                        <span className="text-xs text-gray-400 w-20 truncate">{CAT_SHORT[cat] || cat}</span>
-                        <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                        <span className="text-xs dark:text-gray-400 text-gray-500 w-20 truncate">{CAT_SHORT[cat] || cat}</span>
+                        <div className="flex-1 h-1.5 dark:bg-white/5 bg-gray-200 rounded-full overflow-hidden">
                           <motion.div
                             initial={{ width: 0 }}
                             animate={{ width: `${prob * 100}%` }}
@@ -1055,7 +1447,7 @@ function ClassifyPage() {
                             style={{ background: COLORS[i] }}
                           />
                         </div>
-                        <span className="text-xs text-gray-500 w-10 text-right">{(prob * 100).toFixed(1)}%</span>
+                        <span className="text-xs dark:text-gray-500 text-gray-400 w-10 text-right">{(prob * 100).toFixed(1)}%</span>
                       </div>
                     ))}
                 </div>
@@ -1082,19 +1474,19 @@ function ClassifyPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-[#131825] border border-white/5 rounded-xl p-5"
+            className="dark:bg-[#131825] bg-white border dark:border-white/5 border-gray-200 rounded-xl p-5"
           >
-            <h3 className="text-sm font-medium text-gray-300 mb-3">Quick Samples</h3>
+            <h3 className="text-sm font-medium dark:text-gray-300 text-gray-600 mb-3">Quick Samples</h3>
             <div className="space-y-2 max-h-[300px] overflow-y-auto">
               {samples.map((s, i) => (
                 <button
                   key={i}
                   onClick={() => { setText(s.text); handleClassify(s.text) }}
-                  className="w-full text-left p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 transition-all duration-200"
+                  className="w-full text-left p-3 rounded-lg dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 border dark:border-white/5 border-gray-200 dark:hover:border-white/10 hover:border-gray-300 transition-all duration-200"
                 >
-                  <p className="text-xs text-gray-300 line-clamp-2">{s.text}</p>
+                  <p className="text-xs dark:text-gray-300 text-gray-600 line-clamp-2">{s.text}</p>
                   <div className="flex items-center gap-2 mt-1.5">
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-gray-400">{CAT_SHORT[s.cat]}</span>
+                    <span className="text-[10px] px-1.5 py-0.5 rounded dark:bg-white/10 bg-gray-200 dark:text-gray-400 text-gray-500">{CAT_SHORT[s.cat]}</span>
                     <span className="text-[10px]" style={{ color: URGENCY_COLORS[s.urg] }}>{s.urg}</span>
                   </div>
                 </button>
@@ -1107,18 +1499,18 @@ function ClassifyPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-[#131825] border border-white/5 rounded-xl p-5"
+            className="dark:bg-[#131825] bg-white border dark:border-white/5 border-gray-200 rounded-xl p-5"
           >
-            <h3 className="text-sm font-medium text-gray-300 mb-3">Recent</h3>
+            <h3 className="text-sm font-medium dark:text-gray-300 text-gray-600 mb-3">Recent</h3>
             {history.length === 0 ? (
-              <p className="text-xs text-gray-600 text-center py-4">No predictions yet</p>
+              <p className="text-xs dark:text-gray-600 text-gray-400 text-center py-4">No predictions yet</p>
             ) : (
               <div className="space-y-2">
                 {history.slice(0, 4).map((p, i) => (
-                  <div key={i} className="p-2.5 rounded-lg bg-white/5 border border-white/5">
-                    <p className="text-xs text-gray-300 truncate">{p.text}</p>
+                  <div key={i} className="p-2.5 rounded-lg dark:bg-white/5 bg-gray-100 border dark:border-white/5 border-gray-200">
+                    <p className="text-xs dark:text-gray-300 text-gray-600 truncate">{p.text}</p>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-gray-400">{CAT_SHORT[p.predicted_category] || p.predicted_category}</span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded dark:bg-white/10 bg-gray-200 dark:text-gray-400 text-gray-500">{CAT_SHORT[p.predicted_category] || p.predicted_category}</span>
                       <span className="text-[10px]" style={{ color: URGENCY_COLORS[p.predicted_urgency] }}>{p.predicted_urgency}</span>
                     </div>
                   </div>
@@ -1219,41 +1611,41 @@ function BatchPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-[#131825] border border-white/5 rounded-xl p-5"
+          className="dark:bg-[#131825] bg-white border dark:border-white/5 border-gray-200 rounded-xl p-5"
         >
-          <h3 className="text-sm font-medium text-gray-300 mb-4">Upload Data</h3>
+          <h3 className="text-sm font-medium dark:text-gray-300 text-gray-600 mb-4">Upload Data</h3>
 
           {/* File Upload */}
           <div
             onClick={() => fileRef.current?.click()}
-            className="border-2 border-dashed border-white/10 rounded-lg p-8 text-center cursor-pointer hover:border-cyan-500/30 hover:bg-white/[0.02] transition-all duration-300"
+            className="border-2 border-dashed dark:border-white/10 border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-cyan-500/30 hover:bg-white/[0.02] transition-all duration-300"
           >
             <input ref={fileRef} type="file" accept=".csv,.txt" onChange={handleFileUpload} className="hidden" />
-            <Upload size={24} className="mx-auto text-gray-600 mb-2" />
-            <p className="text-sm text-gray-400">Drop CSV file or click to upload</p>
-            <p className="text-xs text-gray-600 mt-1">One complaint per line or first column of CSV</p>
+            <Upload size={24} className="mx-auto dark:text-gray-600 text-gray-400 mb-2" />
+            <p className="text-sm dark:text-gray-400 text-gray-500">Drop CSV file or click to upload</p>
+            <p className="text-xs dark:text-gray-600 text-gray-400 mt-1">One complaint per line or first column of CSV</p>
           </div>
 
           {csvData.length > 0 && (
-            <div className="mt-4 p-3 rounded-lg bg-white/5">
-              <p className="text-xs text-gray-400">{csvData.length} complaints loaded</p>
-              <p className="text-xs text-gray-600 mt-1 truncate">{csvData[0]}...</p>
+            <div className="mt-4 p-3 rounded-lg dark:bg-white/5 bg-gray-100">
+              <p className="text-xs dark:text-gray-400 text-gray-500">{csvData.length} complaints loaded</p>
+              <p className="text-xs dark:text-gray-600 text-gray-400 mt-1 truncate">{csvData[0]}...</p>
             </div>
           )}
 
           {/* Or paste text */}
           <div className="mt-4">
-            <p className="text-xs text-gray-500 mb-2">Or paste complaints (one per line):</p>
+            <p className="text-xs dark:text-gray-500 text-gray-400 mb-2">Or paste complaints (one per line):</p>
             <textarea
               value={textInput}
               onChange={e => setTextInput(e.target.value)}
               placeholder={"Mera order nahi aaya\nRefund do\nWrong product aaya"}
-              className="w-full h-24 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none focus:border-cyan-500/50 resize-none transition"
+              className="w-full h-24 dark:bg-white/5 bg-gray-50 dark:border-white/10 border-gray-200 rounded-lg px-3 py-2 text-sm dark:text-white text-gray-900 placeholder-gray-500 outline-none focus:border-cyan-500/50 resize-none transition"
             />
             <button
               onClick={handleTextUpload}
               disabled={!textInput.trim()}
-              className="mt-2 px-4 py-1.5 rounded-lg bg-white/10 text-sm text-gray-300 hover:bg-white/15 transition disabled:opacity-50"
+              className="mt-2 px-4 py-1.5 rounded-lg dark:bg-white/10 bg-gray-200 text-sm dark:text-gray-300 text-gray-600 dark:hover:bg-white/15 hover:bg-gray-300 transition disabled:opacity-50"
             >
               Load Text
             </button>
@@ -1270,7 +1662,7 @@ function BatchPage() {
           </button>
 
           {processing && (
-            <div className="mt-3 h-1.5 bg-white/5 rounded-full overflow-hidden">
+            <div className="mt-3 h-1.5 dark:bg-white/5 bg-gray-200 rounded-full overflow-hidden">
               <motion.div
                 animate={{ width: `${progress}%` }}
                 className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-blue-500"
@@ -1284,18 +1676,18 @@ function BatchPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-[#131825] border border-white/5 rounded-xl p-5"
+          className="dark:bg-[#131825] bg-white border dark:border-white/5 border-gray-200 rounded-xl p-5"
         >
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-medium text-gray-300">
-              Results {results.length > 0 && <span className="text-gray-500">({results.length})</span>}
+            <h3 className="text-sm font-medium dark:text-gray-300 text-gray-600">
+              Results {results.length > 0 && <span className="dark:text-gray-500 text-gray-400">({results.length})</span>}
             </h3>
             {results.length > 0 && (
               <div className="flex items-center gap-2">
-                <button onClick={() => exportResults('csv')} className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-gray-400 transition">
+                <button onClick={() => exportResults('csv')} className="flex items-center gap-1 px-3 py-1.5 rounded-lg dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 text-xs dark:text-gray-400 text-gray-500 transition">
                   <Download size={12} /> CSV
                 </button>
-                <button onClick={() => exportResults('json')} className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-gray-400 transition">
+                <button onClick={() => exportResults('json')} className="flex items-center gap-1 px-3 py-1.5 rounded-lg dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 text-xs dark:text-gray-400 text-gray-500 transition">
                   <Download size={12} /> JSON
                 </button>
               </div>
@@ -1303,7 +1695,7 @@ function BatchPage() {
           </div>
 
           {results.length === 0 ? (
-            <div className="h-64 flex items-center justify-center text-gray-600 text-sm">
+            <div className="h-64 flex items-center justify-center dark:text-gray-600 text-gray-400 text-sm">
               Upload data and click Classify
             </div>
           ) : (
@@ -1314,13 +1706,13 @@ function BatchPage() {
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.02 }}
-                  className="p-3 rounded-lg bg-white/5 border border-white/5"
+                  className="p-3 rounded-lg dark:bg-white/5 bg-gray-100 border dark:border-white/5 border-gray-200"
                 >
-                  <p className="text-xs text-gray-300 truncate">{r.text}</p>
+                  <p className="text-xs dark:text-gray-300 text-gray-600 truncate">{r.text}</p>
                   <div className="flex items-center gap-3 mt-1.5">
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-gray-400">{CAT_SHORT[r.category] || r.category}</span>
+                    <span className="text-[10px] px-1.5 py-0.5 rounded dark:bg-white/10 bg-gray-200 dark:text-gray-400 text-gray-500">{CAT_SHORT[r.category] || r.category}</span>
                     <span className="text-[10px]" style={{ color: URGENCY_COLORS[r.urgency] }}>{r.urgency}</span>
-                    <span className="text-[10px] text-gray-600">{(r.category_confidence * 100).toFixed(0)}%</span>
+                    <span className="text-[10px] dark:text-gray-600 text-gray-400">{(r.category_confidence * 100).toFixed(0)}%</span>
                     {r.needs_review && <AlertTriangle size={10} className="text-amber-400" />}
                   </div>
                 </motion.div>
@@ -1372,23 +1764,23 @@ function HistoryPage() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-[#131825] border border-white/5 rounded-xl p-4"
+        className="dark:bg-[#131825] bg-white border dark:border-white/5 border-gray-200 rounded-xl p-4"
       >
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
-            <Filter size={14} className="text-gray-500" />
-            <span className="text-xs text-gray-500">Filters:</span>
+            <Filter size={14} className="dark:text-gray-500 text-gray-400" />
+            <span className="text-xs dark:text-gray-500 text-gray-400">Filters:</span>
           </div>
           <input
             value={filter.search}
             onChange={e => { setFilter(f => ({ ...f, search: e.target.value })); setPage(0) }}
             placeholder="Search text..."
-            className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs text-white placeholder-gray-500 outline-none focus:border-cyan-500/50 w-48"
+            className="px-3 py-1.5 dark:bg-white/5 bg-gray-50 dark:border-white/10 border-gray-200 rounded-lg text-xs dark:text-white text-gray-900 placeholder-gray-500 outline-none focus:border-cyan-500/50 w-48"
           />
           <select
             value={filter.category}
             onChange={e => { setFilter(f => ({ ...f, category: e.target.value })); setPage(0) }}
-            className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs text-white outline-none"
+            className="px-3 py-1.5 dark:bg-white/5 bg-gray-50 dark:border-white/10 border-gray-200 rounded-lg text-xs dark:text-white text-gray-900 outline-none"
           >
             <option value="">All Categories</option>
             {CATEGORIES.map(c => <option key={c} value={c}>{CAT_SHORT[c]}</option>)}
@@ -1396,7 +1788,7 @@ function HistoryPage() {
           <select
             value={filter.urgency}
             onChange={e => { setFilter(f => ({ ...f, urgency: e.target.value })); setPage(0) }}
-            className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs text-white outline-none"
+            className="px-3 py-1.5 dark:bg-white/5 bg-gray-50 dark:border-white/10 border-gray-200 rounded-lg text-xs dark:text-white text-gray-900 outline-none"
           >
             <option value="">All Urgency</option>
             <option value="High">High</option>
@@ -1410,10 +1802,10 @@ function HistoryPage() {
               onChange={e => { setFilter(f => ({ ...f, correctedOnly: e.target.checked })); setPage(0) }}
               className="w-3.5 h-3.5 rounded border-white/20 bg-white/5 text-cyan-500 focus:ring-cyan-500/50 focus:ring-offset-0"
             />
-            <span className="text-xs text-gray-400">Corrected only</span>
+            <span className="text-xs dark:text-gray-400 text-gray-500">Corrected only</span>
           </label>
           <div className="flex-1" />
-          <button onClick={exportAll} className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-gray-400 transition">
+          <button onClick={exportAll} className="flex items-center gap-1 px-3 py-1.5 rounded-lg dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 text-xs dark:text-gray-400 text-gray-500 transition">
             <Download size={12} /> Export CSV
           </button>
         </div>
@@ -1424,38 +1816,38 @@ function HistoryPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="bg-[#131825] border border-white/5 rounded-xl overflow-hidden"
+        className="dark:bg-[#131825] bg-white border dark:border-white/5 border-gray-200 rounded-xl overflow-hidden"
       >
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-white/5">
-                <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">Text</th>
-                <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">Category</th>
-                <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">Urgency</th>
-                <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">Confidence</th>
-                <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">Status</th>
-                <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">Time</th>
+              <tr className="border-b dark:border-white/5 border-gray-200">
+                <th className="text-left px-4 py-3 text-xs dark:text-gray-500 text-gray-400 font-medium">Text</th>
+                <th className="text-left px-4 py-3 text-xs dark:text-gray-500 text-gray-400 font-medium">Category</th>
+                <th className="text-left px-4 py-3 text-xs dark:text-gray-500 text-gray-400 font-medium">Urgency</th>
+                <th className="text-left px-4 py-3 text-xs dark:text-gray-500 text-gray-400 font-medium">Confidence</th>
+                <th className="text-left px-4 py-3 text-xs dark:text-gray-500 text-gray-400 font-medium">Status</th>
+                <th className="text-left px-4 py-3 text-xs dark:text-gray-500 text-gray-400 font-medium">Time</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-600">Loading...</td></tr>
+                <tr><td colSpan={6} className="px-4 py-8"><TableSkeleton rows={5} cols={6} /></td></tr>
               ) : data.predictions.length === 0 ? (
-                <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-600">No predictions found</td></tr>
+                <tr><td colSpan={6} className="px-4 py-8 text-center dark:text-gray-600 text-gray-400">No predictions found</td></tr>
               ) : (
                 data.predictions.map((p, i) => {
                   const isCorrected = p.is_corrected || p.was_corrected || (p.corrections && p.corrections.length > 0)
                   return (
-                    <tr key={i} className="border-b border-white/5 hover:bg-white/[0.02] transition">
-                      <td className="px-4 py-3 text-xs text-gray-300 max-w-xs truncate">{p.text}</td>
+                    <tr key={i} className="border-b dark:border-white/5 border-gray-200 dark:hover:bg-white/[0.02] hover:bg-gray-50 transition">
+                      <td className="px-4 py-3 text-xs dark:text-gray-300 text-gray-600 max-w-xs truncate">{p.text}</td>
                       <td className="px-4 py-3">
-                        <span className="text-[10px] px-2 py-1 rounded-full bg-white/10 text-gray-400">{CAT_SHORT[p.predicted_category] || p.predicted_category}</span>
+                        <span className="text-[10px] px-2 py-1 rounded-full dark:bg-white/10 bg-gray-100 dark:text-gray-400 text-gray-500">{CAT_SHORT[p.predicted_category] || p.predicted_category}</span>
                       </td>
                       <td className="px-4 py-3">
                         <span className="text-xs font-medium" style={{ color: URGENCY_COLORS[p.predicted_urgency] }}>{p.predicted_urgency}</span>
                       </td>
-                      <td className="px-4 py-3 text-xs text-gray-400">{(p.confidence_category * 100).toFixed(1)}%</td>
+                      <td className="px-4 py-3 text-xs dark:text-gray-400 text-gray-500">{(p.confidence_category * 100).toFixed(1)}%</td>
                       <td className="px-4 py-3">
                         {isCorrected ? (
                           <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/20">
@@ -1469,7 +1861,7 @@ function HistoryPage() {
                           </span>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-xs text-gray-600">{p.timestamp ? new Date(p.timestamp).toLocaleString() : '-'}</td>
+                      <td className="px-4 py-3 text-xs dark:text-gray-600 text-gray-400">{p.timestamp ? new Date(p.timestamp).toLocaleString() : '-'}</td>
                     </tr>
                   )
                 })
@@ -1480,18 +1872,18 @@ function HistoryPage() {
 
         {/* Pagination */}
         {data.total > limit && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-white/5">
-            <span className="text-xs text-gray-600">Showing {page * limit + 1}-{Math.min((page + 1) * limit, data.total)} of {data.total}</span>
+          <div className="flex items-center justify-between px-4 py-3 border-t dark:border-white/5 border-gray-200">
+            <span className="text-xs dark:text-gray-600 text-gray-400">Showing {page * limit + 1}-{Math.min((page + 1) * limit, data.total)} of {data.total}</span>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setPage(p => Math.max(0, p - 1))}
                 disabled={page === 0}
-                className="px-3 py-1 rounded bg-white/5 text-xs text-gray-400 hover:bg-white/10 disabled:opacity-30 transition"
+                className="px-3 py-1 rounded dark:bg-white/5 bg-gray-100 text-xs dark:text-gray-400 text-gray-500 dark:hover:bg-white/10 hover:bg-gray-200 disabled:opacity-30 transition"
               >Prev</button>
               <button
                 onClick={() => setPage(p => p + 1)}
                 disabled={(page + 1) * limit >= data.total}
-                className="px-3 py-1 rounded bg-white/5 text-xs text-gray-400 hover:bg-white/10 disabled:opacity-30 transition"
+                className="px-3 py-1 rounded dark:bg-white/5 bg-gray-100 text-xs dark:text-gray-400 text-gray-500 dark:hover:bg-white/10 hover:bg-gray-200 disabled:opacity-30 transition"
               >Next</button>
             </div>
           </div>
@@ -1529,7 +1921,13 @@ function AnalyticsPage() {
     getTimeline(timeRange).then(setTimeline).catch(() => {})
   }, [timeRange])
 
-  if (loading) return <LoadingState />
+  if (loading) return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {Array.from({ length: 3 }).map((_, i) => <ChartSkeleton key={i} />)}
+      </div>
+    </div>
+  )
 
   return (
     <div className="space-y-6">
@@ -1538,11 +1936,11 @@ function AnalyticsPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="lg:col-span-2 bg-[#131825] border border-white/5 rounded-xl p-5"
+          className="lg:col-span-2 dark:bg-[#131825] bg-white border dark:border-white/5 border-gray-200 rounded-xl p-5"
         >
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-medium text-gray-300">Confidence Distribution</h3>
-            <span className="text-xs text-gray-500">Avg: {((confData?.overall_avg || 0) * 100).toFixed(1)}%</span>
+            <h3 className="text-sm font-medium dark:text-gray-300 text-gray-600">Confidence Distribution</h3>
+            <span className="text-xs dark:text-gray-500 text-gray-400">Avg: {((confData?.overall_avg || 0) * 100).toFixed(1)}%</span>
           </div>
           {confData?.distribution?.length > 0 ? (
             <ResponsiveContainer width="100%" height={250}>
@@ -1555,7 +1953,7 @@ function AnalyticsPage() {
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-[250px] flex items-center justify-center text-gray-600 text-sm">No data yet</div>
+            <div className="h-[250px] flex items-center justify-center dark:text-gray-600 text-gray-400 text-sm">No data yet</div>
           )}
         </motion.div>
 
@@ -1564,9 +1962,9 @@ function AnalyticsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-[#131825] border border-white/5 rounded-xl p-5"
+          className="dark:bg-[#131825] bg-white border dark:border-white/5 border-gray-200 rounded-xl p-5"
         >
-          <h3 className="text-sm font-medium text-gray-300 mb-4">Avg Confidence by Category</h3>
+          <h3 className="text-sm font-medium dark:text-gray-300 text-gray-600 mb-4">Avg Confidence by Category</h3>
           {confData?.category_avg?.length > 0 ? (
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={confData.category_avg} layout="vertical" barSize={16}>
@@ -1580,7 +1978,7 @@ function AnalyticsPage() {
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-[250px] flex items-center justify-center text-gray-600 text-sm">No data yet</div>
+            <div className="h-[250px] flex items-center justify-center dark:text-gray-600 text-gray-400 text-sm">No data yet</div>
           )}
         </motion.div>
       </div>
@@ -1591,14 +1989,14 @@ function AnalyticsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-[#131825] border border-white/5 rounded-xl p-5"
+          className="dark:bg-[#131825] bg-white border dark:border-white/5 border-gray-200 rounded-xl p-5"
         >
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-medium text-gray-300">Top Words</h3>
+            <h3 className="text-sm font-medium dark:text-gray-300 text-gray-600">Top Words</h3>
             <select
               value={wordCat}
               onChange={e => setWordCat(e.target.value)}
-              className="px-2 py-1 bg-white/5 border border-white/10 rounded text-xs text-white outline-none"
+              className="px-2 py-1 dark:bg-white/5 bg-gray-100 dark:border-white/10 border-gray-200 rounded text-xs dark:text-white text-gray-900 outline-none"
             >
               <option value="">All</option>
               {CATEGORIES.map(c => <option key={c} value={c}>{CAT_SHORT[c]}</option>)}
@@ -1615,7 +2013,7 @@ function AnalyticsPage() {
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-[250px] flex items-center justify-center text-gray-600 text-sm">No word data yet</div>
+            <div className="h-[250px] flex items-center justify-center dark:text-gray-600 text-gray-400 text-sm">No word data yet</div>
           )}
         </motion.div>
 
@@ -1623,14 +2021,14 @@ function AnalyticsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-[#131825] border border-white/5 rounded-xl p-5"
+          className="dark:bg-[#131825] bg-white border dark:border-white/5 border-gray-200 rounded-xl p-5"
         >
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-medium text-gray-300">Prediction Timeline</h3>
+            <h3 className="text-sm font-medium dark:text-gray-300 text-gray-600">Prediction Timeline</h3>
             <select
               value={timeRange}
               onChange={e => setTimeRange(Number(e.target.value))}
-              className="px-2 py-1 bg-white/5 border border-white/10 rounded text-xs text-white outline-none"
+              className="px-2 py-1 dark:bg-white/5 bg-gray-100 dark:border-white/10 border-gray-200 rounded text-xs dark:text-white text-gray-900 outline-none"
             >
               <option value={6}>6 hours</option>
               <option value={24}>24 hours</option>
@@ -1659,7 +2057,7 @@ function AnalyticsPage() {
               </AreaChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-[250px] flex items-center justify-center text-gray-600 text-sm">No timeline data yet</div>
+            <div className="h-[250px] flex items-center justify-center dark:text-gray-600 text-gray-400 text-sm">No timeline data yet</div>
           )}
         </motion.div>
       </div>
@@ -1669,9 +2067,9 @@ function AnalyticsPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="bg-[#131825] border border-white/5 rounded-xl p-5"
+        className="dark:bg-[#131825] bg-white border dark:border-white/5 border-gray-200 rounded-xl p-5"
       >
-        <h3 className="text-sm font-medium text-gray-300 mb-4">Insights</h3>
+        <h3 className="text-sm font-medium dark:text-gray-300 text-gray-600 mb-4">Insights</h3>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             { label: 'Review Rate', value: `${((patterns?.review_rate || 0) * 100).toFixed(1)}%`, sub: `${patterns?.needs_review_count || 0} flagged`, icon: Eye, color: 'text-amber-400' },
@@ -1679,10 +2077,10 @@ function AnalyticsPage() {
             { label: 'Avg Text Length', value: `${patterns?.avg_text_length || 0}`, sub: 'characters', icon: FileText, color: 'text-cyan-400' },
             { label: 'Total Predictions', value: patterns?.total_predictions || 0, sub: 'all time', icon: Activity, color: 'text-emerald-400' },
           ].map((item, i) => (
-            <div key={i} className="p-4 rounded-lg bg-white/5">
+            <div key={i} className="p-4 rounded-lg dark:bg-white/5 bg-gray-100">
               <item.icon size={16} className={item.color} />
-              <p className="text-xl font-bold text-white mt-2">{item.value}</p>
-              <p className="text-xs text-gray-500">{item.sub}</p>
+              <p className="text-xl font-bold dark:text-white text-gray-900 mt-2">{item.value}</p>
+              <p className="text-xs dark:text-gray-500 text-gray-400">{item.sub}</p>
             </div>
           ))}
         </div>
@@ -1747,15 +2145,15 @@ function AIAssistantPage() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-[#131825] border border-white/5 rounded-xl p-5"
+        className="dark:bg-[#131825] bg-white border dark:border-white/5 border-gray-200 rounded-xl p-5"
       >
         <div className="flex items-center gap-3 mb-4">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center">
             <Bot size={16} className="text-white" />
           </div>
           <div>
-            <h3 className="text-sm font-medium text-gray-300">AI Complaint Assistant</h3>
-            <p className="text-[10px] text-gray-500">Powered by Groq</p>
+            <h3 className="text-sm font-medium dark:text-gray-300 text-gray-600">AI Complaint Assistant</h3>
+            <p className="text-[10px] dark:text-gray-500 text-gray-400">Powered by Groq</p>
           </div>
         </div>
 
@@ -1763,16 +2161,16 @@ function AIAssistantPage() {
           value={text}
           onChange={e => setText(e.target.value)}
           placeholder="Paste a customer complaint to get resolution steps or draft a response..."
-          className="w-full h-32 bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-500 outline-none focus:border-pink-500/50 resize-none transition"
+          className="w-full h-32 dark:bg-white/5 bg-gray-50 dark:border-white/10 border-gray-200 rounded-lg px-4 py-3 text-sm dark:text-white text-gray-900 placeholder-gray-500 outline-none focus:border-pink-500/50 resize-none transition"
         />
 
         <div className="grid grid-cols-2 gap-3 mt-3">
           <div>
-            <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Category (optional)</label>
+            <label className="text-[10px] dark:text-gray-500 text-gray-400 uppercase tracking-wider block mb-1">Category (optional)</label>
             <select
               value={category}
               onChange={e => setCategory(e.target.value)}
-              className="w-full px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs text-white outline-none focus:border-pink-500/50"
+              className="w-full px-3 py-1.5 dark:bg-white/5 bg-gray-50 dark:border-white/10 border-gray-200 rounded-lg text-xs dark:text-white text-gray-900 outline-none focus:border-pink-500/50"
             >
               <option value="">Auto-detect</option>
               {CATEGORIES.map(c => (
@@ -1781,11 +2179,11 @@ function AIAssistantPage() {
             </select>
           </div>
           <div>
-            <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Urgency (optional)</label>
+            <label className="text-[10px] dark:text-gray-500 text-gray-400 uppercase tracking-wider block mb-1">Urgency (optional)</label>
             <select
               value={urgency}
               onChange={e => setUrgency(e.target.value)}
-              className="w-full px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs text-white outline-none focus:border-pink-500/50"
+              className="w-full px-3 py-1.5 dark:bg-white/5 bg-gray-50 dark:border-white/10 border-gray-200 rounded-lg text-xs dark:text-white text-gray-900 outline-none focus:border-pink-500/50"
             >
               <option value="">Auto-detect</option>
               <option value="High">High</option>
@@ -1822,17 +2220,17 @@ function AIAssistantPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-[#131825] border border-white/5 rounded-xl p-5"
+          className="dark:bg-[#131825] bg-white border dark:border-white/5 border-gray-200 rounded-xl p-5"
         >
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <CornerDownLeft size={14} className="text-pink-400" />
-              <h3 className="text-sm font-medium text-gray-300">Resolution Steps</h3>
+              <h3 className="text-sm font-medium dark:text-gray-300 text-gray-600">Resolution Steps</h3>
             </div>
             {resolveResult?.suggestions && (
               <button
                 onClick={() => copyToClipboard(resolveResult.suggestions)}
-                className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-gray-400 transition"
+                className="flex items-center gap-1 px-3 py-1.5 rounded-lg dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 text-xs dark:text-gray-400 text-gray-500 transition"
               >
                 <Copy size={12} /> Copy
               </button>
@@ -1846,12 +2244,12 @@ function AIAssistantPage() {
           )}
 
           {!resolving && resolveResult?.suggestions && (
-            <div className="p-4 rounded-lg bg-white/5 border border-white/10">
-              <p className="text-sm text-gray-300 whitespace-pre-wrap leading-relaxed">
+            <div className="p-4 rounded-lg dark:bg-white/5 bg-gray-100 border dark:border-white/10 border-gray-200">
+              <p className="text-sm dark:text-gray-300 text-gray-600 whitespace-pre-wrap leading-relaxed">
                 {resolveResult.suggestions}
               </p>
               {resolveResult.model && (
-                <p className="text-[10px] text-gray-600 mt-3 pt-2 border-t border-white/5">
+                <p className="text-[10px] dark:text-gray-600 text-gray-400 mt-3 pt-2 border-t dark:border-white/5 border-gray-200">
                   Model: {resolveResult.model}
                 </p>
               )}
@@ -1859,7 +2257,7 @@ function AIAssistantPage() {
           )}
 
           {!resolving && !resolveResult && (
-            <div className="h-48 flex items-center justify-center text-gray-600 text-sm">
+            <div className="h-48 flex items-center justify-center dark:text-gray-600 text-gray-400 text-sm">
               Enter a complaint and click "Get Resolution Steps"
             </div>
           )}
@@ -1870,17 +2268,17 @@ function AIAssistantPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-[#131825] border border-white/5 rounded-xl p-5"
+          className="dark:bg-[#131825] bg-white border dark:border-white/5 border-gray-200 rounded-xl p-5"
         >
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <FileText size={14} className="text-violet-400" />
-              <h3 className="text-sm font-medium text-gray-300">Draft Response</h3>
+              <h3 className="text-sm font-medium dark:text-gray-300 text-gray-600">Draft Response</h3>
             </div>
             {draftResult?.draft && (
               <button
                 onClick={() => copyToClipboard(draftResult.draft)}
-                className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-gray-400 transition"
+                className="flex items-center gap-1 px-3 py-1.5 rounded-lg dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 text-xs dark:text-gray-400 text-gray-500 transition"
               >
                 <Copy size={12} /> Copy
               </button>
@@ -1894,12 +2292,12 @@ function AIAssistantPage() {
           )}
 
           {!drafting && draftResult?.draft && (
-            <div className="p-4 rounded-lg bg-white/5 border border-white/10">
-              <p className="text-sm text-gray-300 whitespace-pre-wrap leading-relaxed">
+            <div className="p-4 rounded-lg dark:bg-white/5 bg-gray-100 border dark:border-white/10 border-gray-200">
+              <p className="text-sm dark:text-gray-300 text-gray-600 whitespace-pre-wrap leading-relaxed">
                 {draftResult.draft}
               </p>
               {draftResult.model && (
-                <p className="text-[10px] text-gray-600 mt-3 pt-2 border-t border-white/5">
+                <p className="text-[10px] dark:text-gray-600 text-gray-400 mt-3 pt-2 border-t dark:border-white/5 border-gray-200">
                   Model: {draftResult.model}
                 </p>
               )}
@@ -1907,7 +2305,7 @@ function AIAssistantPage() {
           )}
 
           {!drafting && !draftResult && (
-            <div className="h-48 flex items-center justify-center text-gray-600 text-sm">
+            <div className="h-48 flex items-center justify-center dark:text-gray-600 text-gray-400 text-sm">
               Enter a complaint and click "Draft Response"
             </div>
           )}
@@ -1916,7 +2314,7 @@ function AIAssistantPage() {
 
       {/* Powered by Groq Badge */}
       <div className="flex justify-center">
-        <span className="text-[10px] text-gray-600 flex items-center gap-1.5">
+        <span className="text-[10px] dark:text-gray-600 text-gray-400 flex items-center gap-1.5">
           <Sparkles size={10} />
           Powered by Groq AI
         </span>
@@ -1952,7 +2350,7 @@ function ReviewQueuePage() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-[#131825] border border-white/5 rounded-xl p-4"
+        className="dark:bg-[#131825] bg-white border dark:border-white/5 border-gray-200 rounded-xl p-4"
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -1960,15 +2358,15 @@ function ReviewQueuePage() {
               <ClipboardList size={16} className="text-white" />
             </div>
             <div>
-              <h3 className="text-sm font-medium text-gray-300">Review Queue</h3>
-              <p className="text-[10px] text-gray-500">Low confidence predictions needing manual review</p>
+              <h3 className="text-sm font-medium dark:text-gray-300 text-gray-600">Review Queue</h3>
+              <p className="text-[10px] dark:text-gray-500 text-gray-400">Low confidence predictions needing manual review</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-xs text-gray-500">{count} items</span>
+            <span className="text-xs dark:text-gray-500 text-gray-400">{count} items</span>
             <button
               onClick={loadQueue}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-gray-400 transition"
+              className="flex items-center gap-1 px-3 py-1.5 rounded-lg dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 text-xs dark:text-gray-400 text-gray-500 transition"
             >
               <RefreshCw size={12} /> Refresh
             </button>
@@ -1978,17 +2376,17 @@ function ReviewQueuePage() {
 
       {/* Items */}
       {loading ? (
-        <LoadingState />
+        <TableSkeleton rows={3} cols={4} />
       ) : items.length === 0 ? (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-[#131825] border border-white/5 rounded-xl p-12"
+          className="dark:bg-[#131825] bg-white border dark:border-white/5 border-gray-200 rounded-xl p-12"
         >
           <div className="text-center">
             <CheckCircle2 size={40} className="mx-auto text-emerald-400 mb-3" />
-            <h3 className="text-sm font-medium text-gray-300 mb-1">All Clear!</h3>
-            <p className="text-xs text-gray-500">No low-confidence predictions to review.</p>
+            <h3 className="text-sm font-medium dark:text-gray-300 text-gray-600 mb-1">All Clear!</h3>
+            <p className="text-xs dark:text-gray-500 text-gray-400">No low-confidence predictions to review.</p>
           </div>
         </motion.div>
       ) : (
@@ -1999,7 +2397,7 @@ function ReviewQueuePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
-              className="bg-[#131825] border border-white/5 rounded-xl p-5"
+              className="dark:bg-[#131825] bg-white border dark:border-white/5 border-gray-200 rounded-xl p-5"
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-2">
@@ -2007,19 +2405,19 @@ function ReviewQueuePage() {
                   <span className="text-xs text-amber-400 font-medium">Low Confidence</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] px-2 py-0.5 rounded bg-white/10 text-gray-400">
+                  <span className="text-[10px] px-2 py-0.5 rounded dark:bg-white/10 bg-gray-100 dark:text-gray-400 text-gray-500">
                     {CAT_SHORT[item.predicted_category] || item.predicted_category}
                   </span>
                   <span className="text-[10px]" style={{ color: URGENCY_COLORS[item.predicted_urgency] }}>
                     {item.predicted_urgency}
                   </span>
-                  <span className="text-[10px] text-gray-500">
+                  <span className="text-[10px] dark:text-gray-500 text-gray-400">
                     {((item.confidence_category || 0) * 100).toFixed(1)}%
                   </span>
                 </div>
               </div>
 
-              <p className="text-sm text-gray-300 mb-3">{item.text}</p>
+              <p className="text-sm dark:text-gray-300 text-gray-600 mb-3">{item.text}</p>
 
               <FeedbackPanel
                 predictionId={item.id}
@@ -2104,16 +2502,16 @@ function PlaygroundPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-[#131825] border border-white/5 rounded-xl p-4"
+          className="dark:bg-[#131825] bg-white border dark:border-white/5 border-gray-200 rounded-xl p-4"
         >
-          <h3 className="text-xs text-gray-500 uppercase tracking-wider mb-3">Endpoints</h3>
+          <h3 className="text-xs dark:text-gray-500 text-gray-400 uppercase tracking-wider mb-3">Endpoints</h3>
           <div className="space-y-1 max-h-[600px] overflow-y-auto">
             {endpoints.map((ep, i) => (
               <button
                 key={i}
                 onClick={() => selectEndpoint(ep)}
                 className={`w-full text-left px-3 py-2 rounded-lg text-xs transition ${
-                  endpoint === ep.path ? 'bg-white/10 text-white' : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                  endpoint === ep.path ? 'dark:bg-white/10 bg-gray-100 dark:text-white text-gray-900' : 'dark:text-gray-400 text-gray-500 dark:hover:bg-white/5 hover:bg-gray-100 dark:hover:text-white hover:text-gray-900'
                 }`}
               >
                 <span className={`font-mono ${ep.method === 'GET' ? 'text-emerald-400' : 'text-amber-400'}`}>{ep.method}</span>
@@ -2131,10 +2529,10 @@ function PlaygroundPage() {
           className="lg:col-span-3 space-y-4"
         >
           {/* Request */}
-          <div className="bg-[#131825] border border-white/5 rounded-xl p-4">
+          <div className="dark:bg-[#131825] bg-white border dark:border-white/5 border-gray-200 rounded-xl p-4">
             <div className="flex items-center gap-3 mb-3">
               <span className={`px-2 py-1 rounded text-xs font-mono ${method === 'GET' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'}`}>{method}</span>
-              <span className="text-sm text-gray-300 font-mono">{API}{endpoint}</span>
+              <span className="text-sm dark:text-gray-300 text-gray-600 font-mono">{API}{endpoint}</span>
               <div className="flex-1" />
               <button
                 onClick={sendRequest}
@@ -2149,7 +2547,7 @@ function PlaygroundPage() {
               <textarea
                 value={body}
                 onChange={e => setBody(e.target.value)}
-                className="w-full h-32 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-gray-300 font-mono outline-none focus:border-cyan-500/50 resize-none"
+                className="w-full h-32 dark:bg-white/5 bg-gray-50 dark:border-white/10 border-gray-200 rounded-lg px-3 py-2 text-xs dark:text-gray-300 text-gray-600 font-mono outline-none focus:border-cyan-500/50 resize-none"
                 placeholder="Request body (JSON)"
               />
             )}
@@ -2160,20 +2558,251 @@ function PlaygroundPage() {
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-[#131825] border border-white/5 rounded-xl p-4"
+              className="dark:bg-[#131825] bg-white border dark:border-white/5 border-gray-200 rounded-xl p-4"
             >
               <div className="flex items-center gap-3 mb-3">
                 <span className={`px-2 py-1 rounded text-xs font-mono ${response.status === 200 ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}`}>
                   {response.status || 'ERR'}
                 </span>
-                <span className="text-xs text-gray-500">{response.time}ms</span>
+                <span className="text-xs dark:text-gray-500 text-gray-400">{response.time}ms</span>
               </div>
-              <pre className="bg-white/5 rounded-lg p-3 text-xs text-gray-300 overflow-x-auto max-h-[400px] overflow-y-auto font-mono">
+              <pre className="dark:bg-white/5 bg-gray-50 rounded-lg p-3 text-xs dark:text-gray-300 text-gray-600 overflow-x-auto max-h-[400px] overflow-y-auto font-mono">
                 {JSON.stringify(response.data, null, 2)}
               </pre>
             </motion.div>
           )}
         </motion.div>
+      </div>
+    </div>
+  )
+}
+
+// ============================================================================
+// PAGE: MODEL COMPARISON
+// ============================================================================
+
+function ComparePage() {
+  const [text, setText] = useState('')
+  const [result, setResult] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const { theme } = useTheme()
+
+  const handleCompare = async () => {
+    if (!text.trim()) return
+    setLoading(true)
+    try {
+      const data = await apiFetch('/predict/compare', { method: 'POST', body: JSON.stringify({ text }) })
+      setResult(data)
+    } catch (err) {
+      addToast('Comparison failed: ' + err.message, 'error')
+    }
+    setLoading(false)
+  }
+
+  const modelNames = {
+    tfidf_svm: { label: 'TF-IDF + SVM', color: 'from-violet-500 to-purple-500' },
+    tfidf_lr: { label: 'TF-IDF + LR', color: 'from-cyan-500 to-blue-500' },
+    ensemble: { label: 'Combined Ensemble', color: 'from-emerald-500 to-teal-500' },
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center">
+          <Layers size={20} className="text-white" />
+        </div>
+        <div>
+          <h1 className="text-xl font-bold text-white">Model Comparison</h1>
+          <p className="text-sm text-gray-500">Compare predictions across all 3 models side-by-side</p>
+        </div>
+      </div>
+
+      <div className="bg-[#131825] border border-white/5 rounded-xl p-5">
+        <textarea
+          value={text}
+          onChange={e => setText(e.target.value)}
+          placeholder="Enter a complaint to compare model predictions..."
+          className={`w-full h-24 p-4 rounded-lg border resize-none focus:outline-none focus:ring-2 focus:ring-violet-500/50 ${
+            theme === 'dark' ? 'bg-white/5 border-white/10 text-white placeholder-gray-500' : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400'
+          }`}
+          onKeyDown={e => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') handleCompare() }}
+        />
+        <div className="mt-3 flex items-center justify-between">
+          <span className="text-xs text-gray-500">Ctrl+Enter to compare</span>
+          <button
+            onClick={handleCompare}
+            disabled={loading || !text.trim()}
+            className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-500 disabled:opacity-50 transition-colors"
+          >
+            {loading ? <Loader2 size={16} className="animate-spin" /> : <Layers size={16} />}
+            {loading ? 'Comparing...' : 'Compare Models'}
+          </button>
+        </div>
+      </div>
+
+      {result && (
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+          <div className={`rounded-xl p-4 border ${
+            result.consensus.category_agreement && result.consensus.urgency_agreement
+              ? 'bg-emerald-500/10 border-emerald-500/20'
+              : 'bg-amber-500/10 border-amber-500/20'
+          }`}>
+            <div className="flex items-center gap-2">
+              {result.consensus.category_agreement && result.consensus.urgency_agreement ? (
+                <CheckCircle2 size={20} className="text-emerald-400" />
+              ) : (
+                <AlertTriangle size={20} className="text-amber-400" />
+              )}
+              <div>
+                <p className={`font-medium ${result.consensus.category_agreement && result.consensus.urgency_agreement ? 'text-emerald-400' : 'text-amber-400'}`}>
+                  {result.consensus.category_agreement && result.consensus.urgency_agreement ? 'All Models Agree' : 'Models Disagree'}
+                </p>
+                <p className="text-xs text-gray-400">
+                  Inference time: {result.inference_time_ms}ms
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {Object.entries(result.models).map(([key, model]) => {
+              const info = modelNames[key] || { label: key, color: 'from-gray-500 to-gray-600' }
+              if (model.error) return (
+                <div key={key} className="bg-[#131825] border border-red-500/20 rounded-xl p-5">
+                  <p className="text-red-400 font-medium">{info.label}</p>
+                  <p className="text-sm text-gray-500 mt-1">{model.error}</p>
+                </div>
+              )
+              return (
+                <div key={key} className="bg-[#131825] border border-white/5 rounded-xl p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${info.color}`} />
+                    <p className="text-sm font-medium text-white">{info.label}</p>
+                  </div>
+                  <div className="space-y-2">
+                    <div>
+                      <p className="text-xs text-gray-500">Category</p>
+                      <p className="text-lg font-bold text-white">{model.category?.replace(/_/g, ' ')}</p>
+                      <div className="mt-1 h-2 bg-white/5 rounded-full overflow-hidden">
+                        <div className="h-full bg-violet-500 rounded-full" style={{ width: `${(model.category_confidence || 0) * 100}%` }} />
+                      </div>
+                      <p className="text-xs text-gray-500 mt-0.5">{(model.category_confidence * 100).toFixed(1)}%</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Urgency</p>
+                      <div className="flex items-center gap-2">
+                        <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                          model.urgency === 'High' ? 'bg-red-500/20 text-red-400' :
+                          model.urgency === 'Medium' ? 'bg-amber-500/20 text-amber-400' :
+                          'bg-cyan-500/20 text-cyan-400'
+                        }`}>{model.urgency}</span>
+                        <span className="text-xs text-gray-500">{(model.urgency_confidence * 100).toFixed(1)}%</span>
+                      </div>
+                    </div>
+                  </div>
+                  {model.category_probabilities && Object.keys(model.category_probabilities).length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-white/5">
+                      <p className="text-xs text-gray-500 mb-1">Top categories</p>
+                      {Object.entries(model.category_probabilities)
+                        .sort(([,a],[,b]) => b - a)
+                        .slice(0, 3)
+                        .map(([cat, prob]) => (
+                          <div key={cat} className="flex items-center justify-between text-xs py-0.5">
+                            <span className="text-gray-400">{cat.replace(/_/g, ' ')}</span>
+                            <span className="text-gray-500">{(prob * 100).toFixed(1)}%</span>
+                          </div>
+                        ))
+                      }
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </motion.div>
+      )}
+    </div>
+  )
+}
+
+// ============================================================================
+// PAGE: SETTINGS
+// ============================================================================
+
+function SettingsPage() {
+  const { branding, setBranding } = useBranding()
+  const [name, setName] = useState(branding.companyName)
+  const [color, setColor] = useState(branding.accentColor)
+  const { addToast } = useToast()
+  const { theme } = useTheme()
+
+  const handleSave = () => {
+    setBranding({ companyName: name, accentColor: color })
+    addToast('Settings saved!', 'success')
+  }
+
+  const colorOptions = [
+    { name: 'Indigo', value: '#6366f1' },
+    { name: 'Violet', value: '#8b5cf6' },
+    { name: 'Cyan', value: '#06b6d4' },
+    { name: 'Emerald', value: '#10b981' },
+    { name: 'Rose', value: '#f43f5e' },
+    { name: 'Amber', value: '#f59e0b' },
+  ]
+
+  return (
+    <div className="max-w-2xl space-y-6">
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-gray-500 to-gray-600 flex items-center justify-center">
+          <Settings size={20} className="text-white" />
+        </div>
+        <div>
+          <h1 className="text-xl font-bold text-white">Settings</h1>
+          <p className="text-sm text-gray-500">Customize your experience</p>
+        </div>
+      </div>
+
+      <div className="bg-[#131825] border border-white/5 rounded-xl p-6 space-y-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Company Name</label>
+          <input
+            type="text"
+            value={name}
+            onChange={e => setName(e.target.value)}
+            className={`w-full px-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 focus:ring-violet-500/50 ${
+              theme === 'dark' ? 'bg-white/5 border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'
+            }`}
+            placeholder="Your company name"
+          />
+          <p className="text-xs text-gray-500 mt-1">Displayed in the sidebar header</p>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Accent Color</label>
+          <div className="flex gap-3">
+            {colorOptions.map(c => (
+              <button
+                key={c.value}
+                onClick={() => setColor(c.value)}
+                className={`w-10 h-10 rounded-full border-2 transition-all ${
+                  color === c.value ? 'border-white scale-110' : 'border-transparent hover:scale-105'
+                }`}
+                style={{ background: c.value }}
+                title={c.name}
+              />
+            ))}
+          </div>
+          <p className="text-xs text-gray-500 mt-2">Current: {colorOptions.find(c => c.value === color)?.name || 'Custom'}</p>
+        </div>
+
+        <div className="pt-4 border-t border-white/5 flex justify-end">
+          <button
+            onClick={handleSave}
+            className="px-6 py-2.5 bg-violet-600 text-white rounded-lg hover:bg-violet-500 transition-colors font-medium"
+          >
+            Save Settings
+          </button>
+        </div>
       </div>
     </div>
   )
@@ -2186,18 +2815,26 @@ function PlaygroundPage() {
 export default function App() {
   return (
     <BrowserRouter>
-      <ToastProvider>
-        <Routes>
-          <Route path="/" element={<Layout><DashboardPage /></Layout>} />
-          <Route path="/classify" element={<Layout><ClassifyPage /></Layout>} />
-          <Route path="/batch" element={<Layout><BatchPage /></Layout>} />
-          <Route path="/history" element={<Layout><HistoryPage /></Layout>} />
-          <Route path="/analytics" element={<Layout><AnalyticsPage /></Layout>} />
-          <Route path="/ai" element={<Layout><AIAssistantPage /></Layout>} />
-          <Route path="/review" element={<Layout><ReviewQueuePage /></Layout>} />
-          <Route path="/playground" element={<Layout><PlaygroundPage /></Layout>} />
-        </Routes>
-      </ToastProvider>
+      <ThemeProvider>
+        <BrandingProvider>
+          <ToastProvider>
+            <Routes>
+              <Route element={<Layout />}>
+                <Route path="/" element={<ErrorBoundary><DashboardPage /></ErrorBoundary>} />
+                <Route path="/classify" element={<ErrorBoundary><ClassifyPage /></ErrorBoundary>} />
+                <Route path="/batch" element={<ErrorBoundary><BatchPage /></ErrorBoundary>} />
+                <Route path="/history" element={<ErrorBoundary><HistoryPage /></ErrorBoundary>} />
+                <Route path="/analytics" element={<ErrorBoundary><AnalyticsPage /></ErrorBoundary>} />
+                <Route path="/ai" element={<ErrorBoundary><AIAssistantPage /></ErrorBoundary>} />
+                <Route path="/review" element={<ErrorBoundary><ReviewQueuePage /></ErrorBoundary>} />
+                <Route path="/playground" element={<ErrorBoundary><PlaygroundPage /></ErrorBoundary>} />
+                <Route path="/compare" element={<ErrorBoundary><ComparePage /></ErrorBoundary>} />
+                <Route path="/settings" element={<ErrorBoundary><SettingsPage /></ErrorBoundary>} />
+              </Route>
+            </Routes>
+          </ToastProvider>
+        </BrandingProvider>
+      </ThemeProvider>
     </BrowserRouter>
   )
 }

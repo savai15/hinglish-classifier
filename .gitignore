@@ -1,35 +1,15 @@
-# Python
 __pycache__/
 *.pyc
 *.pyo
-*.pyd
-.Python
-env/
-venv/
-.venv/
+.pytest_cache/
 *.egg-info/
 dist/
 build/
-
-# Jupyter
-.ipynb_checkpoints/
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS
-Thumbs.db
-.DS_Store
-Desktop.ini
-
-# Models (large files - optional, remove if you want to track them)
-# models/*.pkl
-
-# Reports (generated - optional, remove if you want to track them)
-# reports/*.png
-
-# Data processed (generated)
-data/processed/*.csv
+.env
+*.db
+frontend/node_modules/
+frontend/dist/
+frontend/screenshot_dark.png
+logo.png
+.mypy_cache/
+.ruff_cache/

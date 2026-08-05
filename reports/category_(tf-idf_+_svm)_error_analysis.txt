@@ -2,102 +2,107 @@
   ERROR ANALYSIS REPORT: Category (TF-IDF + SVM)
 ============================================================
 
-  Total samples: 151
-  Misclassified: 12
-  Error rate: 7.9%
-  Accuracy: 0.9205
+  Total samples: 4500
+  Misclassified: 14
+  Error rate: 0.3%
+  Accuracy: 0.9969
 
 ============================================================
   MOST CONFUSED CLASS PAIRS
 ============================================================
-  Order_Status -> Account_Technical: 2 cases
-  Delivery_Issue -> Wrong_Damaged_Product: 2 cases
-  Returns_Refunds -> Order_Status: 1 cases
-  Delivery_Issue -> Order_Status: 1 cases
-  Payment_Invoice -> Order_Status: 1 cases
-  Delivery_Issue -> Account_Technical: 1 cases
-  Returns_Refunds -> Payment_Invoice: 1 cases
-  Wrong_Damaged_Product -> Returns_Refunds: 1 cases
-  Order_Status -> Payment_Invoice: 1 cases
-  Order_Status -> Delivery_Issue: 1 cases
+  Pricing_Discount -> Payment_Invoice: 8 cases
+  Payment_Invoice -> Pricing_Discount: 6 cases
 
 ============================================================
   PER-CLASS ERROR RATES
 ============================================================
-  Account_Technical              0/25 errors (0.0%)
-  Delivery_Issue                 4/25 errors (16.0%)
-  Order_Status                   4/25 errors (16.0%)
-  Payment_Invoice                1/26 errors (3.8%)
-  Returns_Refunds                2/25 errors (8.0%)
-  Wrong_Damaged_Product          1/25 errors (4.0%)
+  Account_Technical              0/500 errors (0.0%)
+  Customer_Service               0/500 errors (0.0%)
+  Delivery_Issue                 0/500 errors (0.0%)
+  Order_Status                   0/500 errors (0.0%)
+  Payment_Invoice                6/500 errors (1.2%)
+  Pricing_Discount               8/500 errors (1.6%)
+  Product_Quality                0/500 errors (0.0%)
+  Returns_Refunds                0/500 errors (0.0%)
+  Wrong_Damaged_Product          0/500 errors (0.0%)
 
 ============================================================
   TEXT LENGTH ANALYSIS
 ============================================================
-  short_le6            75 samples, error rate: 3.3%
-  medium_7_12          70 samples, error rate: 4.0%
-  long_gt12            6 samples, error rate: 0.7%
+  short_le6            4 samples, error rate: 0.0%
+  medium_7_12          633 samples, error rate: 0.0%
+  long_gt12            3863 samples, error rate: 0.3%
 
 ============================================================
   ALL MISCLASSIFIED SAMPLES
 ============================================================
 
-  [18]
-    Text: expected date app new date show nahin rahi
-    True: Order_Status
-    Pred: Account_Technical
+  [386]
+    Text: madam coupon flat50 apply discount nahin mila delivery charges already pay kar chuka hu kitna time lagta usually normal MULTIPLEQUESTIONS
+    True: Pricing_Discount
+    Pred: Payment_Invoice
 
-  [23]
-    Text: exchange item dispatch hoga MULTIPLEQUESTIONS
-    True: Returns_Refunds
-    Pred: Order_Status
+  [714]
+    Text: hey coupon flat50 apply discount nahin mila isse acha local dukaan enough enough EXCLAMATIONHIGH
+    True: Pricing_Discount
+    Pred: Payment_Invoice
 
-  [29]
-    Text: attempt miss hogya next attempt hoga
-    True: Delivery_Issue
-    Pred: Wrong_Damaged_Product
-
-  [37]
-    Text: package scratch aaya immediately refund karo URGENTCAPS EXCLAMATION URGENTKEYWORD
-    True: Delivery_Issue
-    Pred: Wrong_Damaged_Product
-
-  [44]
-    Text: delivery halted expected date cross gayi
-    True: Delivery_Issue
-    Pred: Order_Status
-
-  [50]
-    Text: billing address edit kar sakta hu order baad
+  [2572]
+    Text: dear concerned team writing raise complaint regarding recent order coupon first10 apply discount nahin mila delivery charges already pay kar chuka hu maine screenshot bhej proof sath order id amount agar jaldi resolve nahin national consumer helpline complaint karunga request take immediate action update resolution URGENTCAPS EXCLAMATION URGENTKEYWORD TIMEPRESSURE
     True: Payment_Invoice
-    Pred: Order_Status
+    Pred: Pricing_Discount
 
-  [71]
-    Text: agent address nahin mil raha bol raha jabki address bilkul correct
-    True: Delivery_Issue
-    Pred: Account_Technical
+  [2778]
+    Text: bhai coupon first10 apply discount nahin mila packing bahut kharab consumer protection act complaint darj karwaunga bardaash nahin hoga EXCLAMATION
+    True: Payment_Invoice
+    Pred: Pricing_Discount
 
-  [76]
-    Text: pickup agent invoice dena hota
-    True: Returns_Refunds
+  [2800]
+    Text: sir coupon festive30 apply discount nahin mila itna wait karaya URGENTCAPS EXCLAMATIONHIGH TIMEPRESSURE
+    True: Pricing_Discount
     Pred: Payment_Invoice
 
-  [77]
-    Text: app bol raha delivered soon package dusre state URGENTKEYWORD
-    True: Order_Status
-    Pred: Account_Technical
-
-  [80]
-    Text: refund liye documents chahiye
-    True: Wrong_Damaged_Product
-    Pred: Returns_Refunds
-
-  [102]
-    Text: teen baar contact kiya exact stats nahin mila foran senior team bhejo URGENTCAPS ESCALATION
-    True: Order_Status
+  [3038]
+    Text: coupon flat50 apply discount nahin mila order id od25571360830802549 amount umeed jaldi resolve hoga URGENTCAPS EXCLAMATION URGENTKEYWORD
+    True: Pricing_Discount
     Pred: Payment_Invoice
 
-  [146]
-    Text: prepaid package missing loss horha escalate immediatly ESCALATION MEDIUMAMOUNT
-    True: Order_Status
-    Pred: Delivery_Issue
+  [3243]
+    Text: madam coupon flat50 apply discount nahin mila mujhe liye chutti leni padi office please isko priority le lo
+    True: Pricing_Discount
+    Pred: Payment_Invoice
+
+  [3804]
+    Text: yaar coupon festive0 apply discount nahin milaa order number share kar chuka hu already one proper explanation nahin baare one email tak nahin mila please jaldi karo please help karo EXCLAMATION URGENTKEYWORD
+    True: Payment_Invoice
+    Pred: Pricing_Discount
+
+  [3886]
+    Text: deaar team coupon flat50 apply discount nahin mila maine screenshot bhej proof sath pehli baar nahin sath order id od61068071441925471 amount district consumer commission case daalna padega wapas chahiye URGENTCAPS EXCLAMATIONHIGH HIGHAMOUNT
+    True: Pricing_Discount
+    Pred: Payment_Invoice
+
+  [3992]
+    Text: sir coupno save20 appy kiiya disocunt nahin mila option milega
+    True: Pricing_Discount
+    Pred: Payment_Invoice
+
+  [4135]
+    Text: coupon welcome100 apply discount nahin mila proper explanation nahin order id od64082588590446208 amount paise udd gaye URGENTCAPS EXCLAMATION
+    True: Payment_Invoice
+    Pred: Pricing_Discount
+
+  [4179]
+    Text: coupon save20 apply discount nahin mila tak wait karu please look into TIMEPRESSURE
+    True: Payment_Invoice
+    Pred: Pricing_Discount
+
+  [4180]
+    Text: bhai coupon welcome100 apply discount nahin mila pehli baar nahin sath agar jaldi resovle nahin nationl consumer helpline complaint karunga EXCLAMATION URGENTKEYWORD
+    True: Payment_Invoice
+    Pred: Pricing_Discount
+
+  [4286]
+    Text: dekho coupon festive30 apply discount anhi mila customer care bata chuka hu baare invoice attach kar raha hu reference liye order id od84674407237020402 amount please pakka karo tak hoga please madad karo URGENTCAPS MEDIUMAMOUNT
+    True: Pricing_Discount
+    Pred: Payment_Invoice

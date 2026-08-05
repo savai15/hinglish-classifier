@@ -1,17 +1,20 @@
+import sys
+import io
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
+
 """
-Hinglish E-Commerce Complaint Classifier - Main Pipeline (Enhanced v3)
+Hinglish E-Commerce Complaint Classifier - Main Pipeline (v1.0)
 =====================================================================
 End-to-end pipeline for training, evaluating, and testing
 Hinglish complaint classification models.
 
-Enhancements in v3:
-- Data augmentation (360 -> 1002 samples)
-- 5-fold cross-validation
-- Enhanced preprocessing with urgency cue detection
-- Hyperparameter tuning with RandomizedSearchCV
-- Ensemble model combining best models
-- Comprehensive error analysis
-- Confidence thresholding
+v1.0 features:
+- 9 complaint categories
+- 30K training dataset
+- MuRIL fine-tuning
+- Active learning system
+- FastAPI REST API
 
 Run this script to train all models and generate results.
 """
@@ -83,23 +86,19 @@ from src.error_analysis import analyze_errors, compare_error_rates
 
 def main():
     print("=" * 70)
-    print("  HINGLISH E-COMMERCE COMPLAINT CLASSIFIER (Enhanced v3)")
-    print("  Augmented Data + Ensemble + CV + Tuning + Error Analysis")
+    print("  HINGLISH E-COMMERCE COMPLAINT CLASSIFIER (v1.0)")
+    print("  9 Categories + MuRIL + Ensemble + Active Learning + API")
     print("=" * 70)
 
     # ========================================================================
-    # STEP 1: Load Data (Augmented)
+    # STEP 1: Load Data
     # ========================================================================
-    print("\n[1/9] Loading augmented dataset...")
-    csv_path = os.path.join(PROJECT_ROOT, "data", "raw", "hinglish_complaints_augmented.csv")
+    print("\n[1/9] Loading 30K dataset...")
+    csv_path = os.path.join(PROJECT_ROOT, "data", "raw", "hinglish_complaints_30k.csv")
     if not os.path.exists(csv_path):
-        print("  Augmented dataset not found. Generating...")
-        from src.augment import augment_dataset
-        df_original = load_data(os.path.join(PROJECT_ROOT, "data", "raw", "hinglish_ecommerce_complaints_360_spelling_variants.csv"))
-        df = augment_dataset(df_original, target_per_class=167)
-        df.to_csv(csv_path, index=False)
-    else:
-        df = load_data(csv_path)
+        csv_path = os.path.join(PROJECT_ROOT, "data", "raw", "hinglish_complaints_augmented.csv")
+        print(f"  30K dataset not found, falling back to: {csv_path}")
+    df = load_data(csv_path)
 
     stats = get_data_stats(df)
     print(f"\n  Dataset Statistics:")

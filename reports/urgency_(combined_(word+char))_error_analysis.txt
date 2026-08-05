@@ -1,0 +1,41 @@
+============================================================
+  ERROR ANALYSIS REPORT: Urgency (Combined (Word+Char))
+============================================================
+
+  Total samples: 4500
+  Misclassified: 2
+  Error rate: 0.0%
+  Accuracy: 0.9996
+
+============================================================
+  MOST CONFUSED CLASS PAIRS
+============================================================
+  Medium -> Low: 2 cases
+
+============================================================
+  PER-CLASS ERROR RATES
+============================================================
+  High                           0/1477 errors (0.0%)
+  Low                            0/1540 errors (0.0%)
+  Medium                         2/1483 errors (0.1%)
+
+============================================================
+  TEXT LENGTH ANALYSIS
+============================================================
+  short_le6            4 samples, error rate: 0.0%
+  medium_7_12          633 samples, error rate: 0.0%
+  long_gt12            3863 samples, error rate: 0.0%
+
+============================================================
+  ALL MISCLASSIFIED SAMPLES
+============================================================
+
+  [2710]
+    Text: dear team order partial deliver item missing box baare email tak nahin mila jaankari krpiya EXCLAMATION
+    True: Medium
+    Pred: Low
+
+  [3546]
+    Text: order canncel karna chaahta hu opion nahin mil raah update plase
+    True: Medium
+    Pred: Low

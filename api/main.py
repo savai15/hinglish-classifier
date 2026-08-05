@@ -538,6 +538,128 @@ def get_low_confidence(limit: int = 20):
     }
 
 
+# ============================================================================
+# RETRAIN HISTORY
+# ============================================================================
+
+@app.get("/retrain/history")
+def get_retrain_history():
+    if not db:
+        raise HTTPException(status_code=503, detail="Database not initialized")
+    import sqlite3
+    conn = sqlite3.connect(db.db_path)
+    rows = conn.execute("""
+        SELECT id, corrections_count, model_version, accuracy_before, accuracy_after, timestamp
+        FROM retrain_log ORDER BY timestamp DESC LIMIT 20
+    """).fetchall()
+    conn.close()
+    return {
+        "history": [
+            {"id": r[0], "corrections_count": r[1], "model_version": r[2],
+             "accuracy_before": r[3], "accuracy_after": r[4], "timestamp": r[5]}
+            for r in rows
+        ]
+    }
+
+
+@app.get("/retrain/status")
+def get_retrain_status():
+    retrain_mgr = RetrainManager()
+    should_retrain, correction_count = retrain_mgr.should_retrain()
+    return {
+        "corrections_total": correction_count,
+        "threshold": 20,
+        "should_retrain": should_retrain,
+        "remaining": max(0, 20 - correction_count),
+    }
+
+
+# ============================================================================
+# AI ASSISTANT (Groq)
+# ============================================================================
+
+class AIRequest(BaseModel):
+    text: str
+    category: Optional[str] = None
+    urgency: Optional[str] = None
+
+
+@app.post("/ai/resolve")
+def ai_resolve(request: AIRequest):
+    api_key = os.environ.get("GROQ_API_KEY", "")
+    if not api_key:
+        raise HTTPException(status_code=503, detail="GROQ_API_KEY not set. Set it as environment variable.")
+
+    import requests as req
+
+    cat_info = f"Category: {request.category}. " if request.category else ""
+    urg_info = f"Urgency: {request.urgency}. " if request.urgency else ""
+
+    prompt = f"""You are an e-commerce customer support expert. Analyze this complaint and provide resolution steps.
+
+Complaint: "{request.text}"
+{cat_info}{urg_info}
+
+Provide exactly 3 actionable resolution steps numbered 1-2-3. Be specific and practical. Keep each step under 30 words. Write in English."""
+
+    try:
+        resp = req.post(
+            "https://api.groq.com/openai/v1/chat/completions",
+            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+            json={"model": "llama-3.3-70b-versatile", "messages": [{"role": "user", "content": prompt}],
+                  "temperature": 0.3, "max_tokens": 300},
+            timeout=15,
+        )
+        if resp.status_code != 200:
+            raise HTTPException(status_code=502, detail=f"Groq API error: {resp.text}")
+        data = resp.json()
+        content = data["choices"][0]["message"]["content"].strip()
+        return {"suggestions": content, "model": data.get("model", "llama-3.3-70b-versatile")}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"AI request failed: {str(e)}")
+
+
+@app.post("/ai/draft-response")
+def ai_draft_response(request: AIRequest):
+    api_key = os.environ.get("GROQ_API_KEY", "")
+    if not api_key:
+        raise HTTPException(status_code=503, detail="GROQ_API_KEY not set. Set it as environment variable.")
+
+    import requests as req
+
+    cat_info = f"Complaint category: {request.category}. " if request.category else ""
+    urg_info = f"Urgency level: {request.urgency}. " if request.urgency else ""
+
+    prompt = f"""You are a professional customer service representative for an Indian e-commerce company.
+Write a polite, empathetic response to this customer complaint. Write in English.
+The response should acknowledge the issue, apologize, and explain next steps.
+
+Customer complaint: "{request.text}"
+{cat_info}{urg_info}
+
+Write a professional 3-4 sentence response. Be warm but professional."""
+
+    try:
+        resp = req.post(
+            "https://api.groq.com/openai/v1/chat/completions",
+            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+            json={"model": "llama-3.3-70b-versatile", "messages": [{"role": "user", "content": prompt}],
+                  "temperature": 0.5, "max_tokens": 300},
+            timeout=15,
+        )
+        if resp.status_code != 200:
+            raise HTTPException(status_code=502, detail=f"Groq API error: {resp.text}")
+        data = resp.json()
+        content = data["choices"][0]["message"]["content"].strip()
+        return {"draft": content, "model": data.get("model", "llama-3.3-70b-versatile")}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"AI request failed: {str(e)}")
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)

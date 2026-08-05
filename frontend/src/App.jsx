@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, createContext, useContext } from 'react'
 import { BrowserRouter, Routes, Route, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -15,6 +15,8 @@ import {
   ArrowDownRight, TrendingUp, Database, Brain, Gauge,
   FileText, Filter, RefreshCw, Eye, EyeOff, X, Menu,
   Keyboard, Sparkles, Target, Activity, PieChart as PieChartIcon,
+  ThumbsUp, ThumbsDown, Bot, ClipboardList, Check, SquareX,
+  Loader2, CornerDownLeft,
 } from 'lucide-react'
 
 const API = '/api'
@@ -24,6 +26,70 @@ const CAT_SHORT = {
   Account_Technical: 'Account', Customer_Service: 'Support', Delivery_Issue: 'Delivery',
   Order_Status: 'Order', Payment_Invoice: 'Payment', Pricing_Discount: 'Pricing',
   Product_Quality: 'Quality', Returns_Refunds: 'Returns', Wrong_Damaged_Product: 'Damaged',
+}
+const CATEGORIES = Object.keys(CAT_SHORT)
+const RETRAIN_THRESHOLD = 20
+
+// ============================================================================
+// TOAST SYSTEM
+// ============================================================================
+
+const ToastContext = createContext()
+
+let toastId = 0
+
+export function ToastProvider({ children }) {
+  const [toasts, setToasts] = useState([])
+
+  const addToast = useCallback((message, type = 'info', duration = 4000) => {
+    const id = ++toastId
+    setToasts(prev => [...prev, { id, message, type }])
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id))
+    }, duration)
+  }, [])
+
+  const removeToast = useCallback((id) => {
+    setToasts(prev => prev.filter(t => t.id !== id))
+  }, [])
+
+  return (
+    <ToastContext.Provider value={{ addToast }}>
+      {children}
+      <div className="fixed top-4 right-4 z-[100] flex flex-col gap-2 pointer-events-none max-w-sm">
+        <AnimatePresence>
+          {toasts.map(t => (
+            <motion.div
+              key={t.id}
+              initial={{ opacity: 0, x: 80, scale: 0.95 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: 80, scale: 0.95 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+              className={`pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl border shadow-2xl backdrop-blur-sm ${
+                t.type === 'success'
+                  ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300'
+                  : t.type === 'error'
+                  ? 'bg-red-500/10 border-red-500/20 text-red-300'
+                  : 'bg-cyan-500/10 border-cyan-500/20 text-cyan-300'
+              }`}
+            >
+              {t.type === 'success' && <CheckCircle2 size={16} className="flex-shrink-0" />}
+              {t.type === 'error' && <AlertTriangle size={16} className="flex-shrink-0" />}
+              {t.type === 'info' && <Bell size={16} className="flex-shrink-0" />}
+              <p className="text-sm flex-1">{t.message}</p>
+              <button onClick={() => removeToast(t.id)} className="flex-shrink-0 opacity-60 hover:opacity-100">
+                <X size={14} />
+              </button>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+    </ToastContext.Provider>
+  )
+}
+
+function useToast() {
+  return useContext(ToastContext)
 }
 
 // ============================================================================
@@ -58,6 +124,22 @@ async function getWordFrequency(cat) { return apiFetch(`/analytics/word-frequenc
 async function getConfidence() { return apiFetch('/analytics/confidence') }
 async function getPatterns() { return apiFetch('/analytics/patterns') }
 async function getCategories() { return apiFetch('/categories') }
+async function getRetrainStatus() { return apiFetch('/retrain/status') }
+async function getRetrainHistory() { return apiFetch('/retrain/history') }
+async function triggerRetrain() { return apiFetch('/retrain', { method: 'POST' }) }
+async function getLowConfidence() { return apiFetch('/low-confidence') }
+
+async function submitFeedback(payload) {
+  return apiFetch('/feedback', { method: 'POST', body: JSON.stringify(payload) })
+}
+
+async function aiResolve(text, category, urgency) {
+  return apiFetch('/ai/resolve', { method: 'POST', body: JSON.stringify({ text, category, urgency }) })
+}
+
+async function aiDraftResponse(text, category, urgency) {
+  return apiFetch('/ai/draft-response', { method: 'POST', body: JSON.stringify({ text, category, urgency }) })
+}
 
 // ============================================================================
 // ANIMATED NUMBER
@@ -85,6 +167,223 @@ function AnimNum({ value, duration = 800 }) {
 }
 
 // ============================================================================
+// SHARED COMPONENTS
+// ============================================================================
+
+function LoadingState() {
+  return (
+    <div className="flex items-center justify-center h-64">
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-8 h-8 border-2 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin" />
+        <p className="text-sm text-gray-500">Loading...</p>
+      </div>
+    </div>
+  )
+}
+
+function FeedbackPanel({ predictionId, text, predictedCategory, predictedUrgency, onFeedbackSubmitted }) {
+  const { addToast } = useToast()
+  const [status, setStatus] = useState(null)
+  const [correctedCategory, setCorrectedCategory] = useState('')
+  const [correctedUrgency, setCorrectedUrgency] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+
+  if (status === 'submitted') {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mt-4 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-2"
+      >
+        <CheckCircle2 size={16} className="text-emerald-400" />
+        <span className="text-sm text-emerald-300">Feedback recorded. Thank you!</span>
+      </motion.div>
+    )
+  }
+
+  async function handleSubmit(isCorrect) {
+    if (!predictionId) {
+      addToast('No prediction ID available', 'error')
+      return
+    }
+
+    if (!isCorrect && !correctedCategory && !correctedUrgency) {
+      addToast('Please select corrections', 'error')
+      return
+    }
+
+    setSubmitting(true)
+    try {
+      const payload = {
+        prediction_id: predictionId,
+        is_correct_category: isCorrect || !!correctedCategory ? false : true,
+        is_correct_urgency: isCorrect || !!correctedUrgency ? false : true,
+      }
+      if (!isCorrect && correctedCategory) payload.corrected_category = correctedCategory
+      if (!isCorrect && correctedUrgency) payload.corrected_urgency = correctedUrgency
+      if (isCorrect) {
+        payload.is_correct_category = true
+        payload.is_correct_urgency = true
+      }
+      const res = await submitFeedback(payload)
+      setStatus('submitted')
+      addToast(
+        res.should_retrain
+          ? 'Feedback recorded. Retrain threshold reached!'
+          : `Feedback recorded. ${res.corrections_total}/${RETRAIN_THRESHOLD} corrections.`,
+        'success'
+      )
+      if (onFeedbackSubmitted) onFeedbackSubmitted(res)
+    } catch {
+      addToast('Failed to submit feedback', 'error')
+    }
+    setSubmitting(false)
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="mt-4 p-4 rounded-lg bg-white/5 border border-white/10"
+    >
+      <p className="text-xs text-gray-400 mb-3">Was this classification correct?</p>
+      <div className="flex items-center gap-3 mb-3">
+        <button
+          onClick={() => handleSubmit(true)}
+          disabled={submitting}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm hover:bg-emerald-500/20 transition disabled:opacity-50"
+        >
+          <ThumbsUp size={14} />
+          Correct
+        </button>
+        <button
+          onClick={() => setStatus('incorrect')}
+          disabled={submitting}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm hover:bg-red-500/20 transition disabled:opacity-50"
+        >
+          <ThumbsDown size={14} />
+          Incorrect
+        </button>
+      </div>
+
+      {status === 'incorrect' && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          className="space-y-3 mt-3 pt-3 border-t border-white/5"
+        >
+          <p className="text-xs text-gray-500">Provide corrections:</p>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Correct Category</label>
+              <select
+                value={correctedCategory}
+                onChange={e => setCorrectedCategory(e.target.value)}
+                className="w-full px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs text-white outline-none focus:border-cyan-500/50"
+              >
+                <option value="">Keep: {CAT_SHORT[predictedCategory]}</option>
+                {CATEGORIES.map(c => (
+                  <option key={c} value={c}>{CAT_SHORT[c]}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Correct Urgency</label>
+              <select
+                value={correctedUrgency}
+                onChange={e => setCorrectedUrgency(e.target.value)}
+                className="w-full px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs text-white outline-none focus:border-cyan-500/50"
+              >
+                <option value="">Keep: {predictedUrgency}</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+              </select>
+            </div>
+          </div>
+          <button
+            onClick={() => handleSubmit(false)}
+            disabled={submitting}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-violet-500 to-purple-500 text-white text-sm font-medium disabled:opacity-50 hover:shadow-lg hover:shadow-violet-500/20 transition-all duration-300"
+          >
+            {submitting ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />}
+            Submit Correction
+          </button>
+        </motion.div>
+      )}
+    </motion.div>
+  )
+}
+
+function RetrainBanner({ correctionsTotal, onRetrain }) {
+  const { addToast } = useToast()
+  const [retraining, setRetraining] = useState(false)
+  const [result, setResult] = useState(null)
+
+  if (correctionsTotal < RETRAIN_THRESHOLD && !result) return null
+
+  async function handleRetrain() {
+    setRetraining(true)
+    try {
+      const res = await triggerRetrain()
+      setResult(res)
+      addToast(`Retrain complete! Accuracy: ${(res.accuracy * 100).toFixed(1)}%`, 'success')
+      if (onRetrain) onRetrain(res)
+    } catch {
+      addToast('Retrain failed. Try again later.', 'error')
+    }
+    setRetraining(false)
+  }
+
+  if (result) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="p-4 rounded-xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20"
+      >
+        <div className="flex items-center gap-3">
+          <CheckCircle2 size={20} className="text-emerald-400" />
+          <div className="flex-1">
+            <p className="text-sm font-medium text-emerald-300">Model Retrained Successfully</p>
+            <p className="text-xs text-emerald-400/70">Accuracy: {(result.accuracy * 100).toFixed(1)}%</p>
+          </div>
+          <button onClick={() => setResult(null)} className="text-emerald-400/50 hover:text-emerald-400">
+            <X size={14} />
+          </button>
+        </div>
+      </motion.div>
+    )
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="p-4 rounded-xl bg-gradient-to-r from-violet-500/10 to-purple-500/10 border border-violet-500/20"
+    >
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center">
+          <RefreshCw size={18} className="text-white" />
+        </div>
+        <div className="flex-1">
+          <p className="text-sm font-medium text-violet-300">Model Retrain Ready</p>
+          <p className="text-xs text-violet-400/70">{correctionsTotal} corrections collected — retrain to improve accuracy</p>
+        </div>
+        <button
+          onClick={handleRetrain}
+          disabled={retraining}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-violet-500 to-purple-500 text-white text-sm font-medium disabled:opacity-50 hover:shadow-lg hover:shadow-violet-500/20 transition-all duration-300"
+        >
+          {retraining ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
+          {retraining ? 'Retraining...' : 'Retrain Now'}
+        </button>
+      </div>
+    </motion.div>
+  )
+}
+
+// ============================================================================
 // LAYOUT
 // ============================================================================
 
@@ -94,6 +393,7 @@ function Layout({ children }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState([])
   const [searching, setSearching] = useState(false)
+  const [retrainStatus, setRetrainStatus] = useState(null)
   const searchRef = useRef(null)
   const navigate = useNavigate()
   const location = useLocation()
@@ -127,14 +427,22 @@ function Layout({ children }) {
     return () => clearTimeout(timer)
   }, [searchQuery, searchOpen])
 
+  useEffect(() => {
+    getRetrainStatus().then(setRetrainStatus).catch(() => {})
+  }, [location.pathname])
+
   const nav = [
     { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
     { to: '/classify', icon: MessageSquareWarning, label: 'Classify' },
     { to: '/batch', icon: Layers, label: 'Batch' },
     { to: '/history', icon: History, label: 'History' },
     { to: '/analytics', icon: BarChart3, label: 'Analytics' },
+    { to: '/ai', icon: Bot, label: 'AI Assistant' },
+    { to: '/review', icon: ClipboardList, label: 'Review Queue' },
     { to: '/playground', icon: Code2, label: 'API' },
   ]
+
+  const shouldShowRetrainBadge = retrainStatus && retrainStatus.should_retrain
 
   return (
     <div className="flex h-screen bg-[#0a0e1a] text-gray-200 overflow-hidden">
@@ -159,6 +467,26 @@ function Layout({ children }) {
           )}
         </div>
 
+        {/* Retrain Available Banner */}
+        {!collapsed && shouldShowRetrainBadge && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            className="px-3 pt-2"
+          >
+            <NavLink
+              to="/classify"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-violet-500/10 border border-violet-500/20 text-violet-300 text-xs hover:bg-violet-500/20 transition"
+            >
+              <RefreshCw size={12} />
+              <span className="truncate">Retrain Available</span>
+              <span className="ml-auto bg-violet-500/20 text-violet-300 text-[10px] px-1.5 py-0.5 rounded-full font-medium">
+                {retrainStatus.corrections_total}
+              </span>
+            </NavLink>
+          </motion.div>
+        )}
+
         <nav className="flex-1 py-3 px-2 space-y-0.5">
           {nav.map(item => (
             <NavLink
@@ -166,7 +494,7 @@ function Layout({ children }) {
               to={item.to}
               end={item.to === '/'}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 group ${
+                `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 group relative ${
                   isActive
                     ? 'bg-white/10 text-white'
                     : 'text-gray-400 hover:text-white hover:bg-white/5'
@@ -175,11 +503,23 @@ function Layout({ children }) {
             >
               <item.icon size={18} className="flex-shrink-0" />
               {!collapsed && <span className="truncate">{item.label}</span>}
+              {collapsed && item.to === '/review' && retrainStatus && retrainStatus.remaining !== undefined && retrainStatus.remaining > 0 && (
+                <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-amber-400" />
+              )}
             </NavLink>
           ))}
         </nav>
 
-        <div className="p-2 border-t border-white/5">
+        {/* Sidebar Footer */}
+        <div className="p-2 border-t border-white/5 space-y-1">
+          {!collapsed && retrainStatus && (
+            <div className="px-3 py-2 rounded-lg bg-white/5 text-xs text-gray-500 flex items-center justify-between">
+              <span>Corrections</span>
+              <span className="text-gray-400 font-medium">
+                {retrainStatus.corrections_total}/{retrainStatus.threshold || RETRAIN_THRESHOLD}
+              </span>
+            </div>
+          )}
           <button
             onClick={() => setCollapsed(!collapsed)}
             className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-gray-500 hover:text-white hover:bg-white/5 transition text-sm"
@@ -284,11 +624,12 @@ function DashboardPage() {
   const [patterns, setPatterns] = useState(null)
   const [timeline, setTimeline] = useState(null)
   const [categories, setCategories] = useState(null)
+  const [retrainHistory, setRetrainHistory] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    Promise.all([getStats(), getPatterns(), getTimeline(24), getCategories()])
-      .then(([s, p, t, c]) => { setStats(s); setPatterns(p); setTimeline(t); setCategories(c) })
+    Promise.all([getStats(), getPatterns(), getTimeline(24), getCategories(), getRetrainHistory()])
+      .then(([s, p, t, c, r]) => { setStats(s); setPatterns(p); setTimeline(t); setCategories(c); setRetrainHistory(r) })
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [])
@@ -308,6 +649,8 @@ function DashboardPage() {
     predictions: t.count,
     confidence: Math.round((t.avg_confidence || 0) * 100),
   })) || []
+
+  const retrainLog = retrainHistory?.history || []
 
   return (
     <div className="space-y-6">
@@ -470,35 +813,93 @@ function DashboardPage() {
           </div>
         </motion.div>
 
-        {/* Quick Actions */}
+        {/* Retrain History */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8 }}
           className="bg-[#131825] border border-white/5 rounded-xl p-5"
         >
-          <h3 className="text-sm font-medium text-gray-300 mb-4">Quick Actions</h3>
-          <div className="grid grid-cols-2 gap-3">
-            {[
-              { label: 'Classify Complaint', icon: MessageSquareWarning, to: '/classify', color: 'from-cyan-500 to-blue-500' },
-              { label: 'Batch Process', icon: Layers, to: '/batch', color: 'from-violet-500 to-purple-500' },
-              { label: 'View Analytics', icon: BarChart3, to: '/analytics', color: 'from-emerald-500 to-teal-500' },
-              { label: 'Test API', icon: Code2, to: '/playground', color: 'from-amber-500 to-orange-500' },
-            ].map((a, i) => (
-              <NavLink
-                key={i}
-                to={a.to}
-                className="flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 transition-all duration-200 group"
-              >
-                <div className={`w-9 h-9 rounded-lg bg-gradient-to-br ${a.color} flex items-center justify-center`}>
-                  <a.icon size={16} className="text-white" />
-                </div>
-                <span className="text-sm text-gray-300 group-hover:text-white transition">{a.label}</span>
-              </NavLink>
-            ))}
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-medium text-gray-300">Retrain History</h3>
+            <RefreshCw size={14} className="text-gray-500" />
           </div>
+          {retrainLog.length === 0 ? (
+            <div className="h-32 flex items-center justify-center text-gray-600 text-sm">
+              No retrains yet
+            </div>
+          ) : (
+            <div className="space-y-2 max-h-[220px] overflow-y-auto">
+              {retrainLog.slice(0, 5).map((entry, i) => (
+                <div key={i} className="p-3 rounded-lg bg-white/5 border border-white/5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
+                        <Check size={10} className="text-white" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-white font-medium">v{entry.model_version || i + 1}</p>
+                        <p className="text-[10px] text-gray-500">
+                          {entry.corrections_count} corrections
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      {entry.accuracy_before != null && entry.accuracy_after != null ? (
+                        <>
+                          <p className="text-xs text-emerald-400 font-medium">
+                            {((entry.accuracy_after - entry.accuracy_before) * 100) > 0 ? '+' : ''}
+                            {((entry.accuracy_after - entry.accuracy_before) * 100).toFixed(1)}%
+                          </p>
+                          <p className="text-[10px] text-gray-500">
+                            {(entry.accuracy_after * 100).toFixed(1)}%
+                          </p>
+                        </>
+                      ) : entry.accuracy != null ? (
+                        <p className="text-xs text-emerald-400 font-medium">{(entry.accuracy * 100).toFixed(1)}%</p>
+                      ) : null}
+                    </div>
+                  </div>
+                  {entry.timestamp && (
+                    <p className="text-[10px] text-gray-600 mt-1 ml-8">
+                      {new Date(entry.timestamp).toLocaleString()}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </motion.div>
       </div>
+
+      {/* Quick Actions Row */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.9 }}
+        className="bg-[#131825] border border-white/5 rounded-xl p-5"
+      >
+        <h3 className="text-sm font-medium text-gray-300 mb-4">Quick Actions</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {[
+            { label: 'Classify Complaint', icon: MessageSquareWarning, to: '/classify', color: 'from-cyan-500 to-blue-500' },
+            { label: 'Batch Process', icon: Layers, to: '/batch', color: 'from-violet-500 to-purple-500' },
+            { label: 'AI Assistant', icon: Bot, to: '/ai', color: 'from-pink-500 to-rose-500' },
+            { label: 'Review Queue', icon: ClipboardList, to: '/review', color: 'from-amber-500 to-orange-500' },
+          ].map((a, i) => (
+            <NavLink
+              key={i}
+              to={a.to}
+              className="flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 transition-all duration-200 group"
+            >
+              <div className={`w-9 h-9 rounded-lg bg-gradient-to-br ${a.color} flex items-center justify-center`}>
+                <a.icon size={16} className="text-white" />
+              </div>
+              <span className="text-sm text-gray-300 group-hover:text-white transition">{a.label}</span>
+            </NavLink>
+          ))}
+        </div>
+      </motion.div>
     </div>
   )
 }
@@ -512,6 +913,7 @@ function ClassifyPage() {
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
   const [history, setHistory] = useState([])
+  const [retrainStatus, setRetrainStatus] = useState(null)
   const [samples] = useState([
     { text: 'Mera order abhi tak nahi aaya, 3 din ho gaye!', cat: 'Delivery_Issue', urg: 'High' },
     { text: 'Refund kab milega? Paisa wapas karo turant', cat: 'Returns_Refunds', urg: 'High' },
@@ -524,9 +926,15 @@ function ClassifyPage() {
     { text: 'Delivery boy rude tha, manager se baat karo', cat: 'Delivery_Issue', urg: 'Medium' },
   ])
 
-  useEffect(() => {
+  const loadRecent = useCallback(() => {
     getHistory({ limit: 5 }).then(d => setHistory(d.predictions || [])).catch(() => {})
-  }, [result])
+  }, [])
+
+  useEffect(() => { loadRecent() }, [result, loadRecent])
+
+  useEffect(() => {
+    getRetrainStatus().then(setRetrainStatus).catch(() => {})
+  }, [retrainStatus])
 
   async function handleClassify(complaintText) {
     const t = complaintText || text
@@ -542,6 +950,17 @@ function ClassifyPage() {
 
   return (
     <div className="space-y-6">
+      {/* Retrain Banner */}
+      {retrainStatus && retrainStatus.should_retrain && (
+        <RetrainBanner
+          correctionsTotal={retrainStatus.corrections_total}
+          onRetrain={() => {
+            loadRecent()
+            getRetrainStatus().then(setRetrainStatus).catch(() => {})
+          }}
+        />
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         {/* Input Column */}
         <div className="lg:col-span-3 space-y-4">
@@ -640,6 +1059,18 @@ function ClassifyPage() {
                       </div>
                     ))}
                 </div>
+
+                {/* Feedback Panel */}
+                <FeedbackPanel
+                  predictionId={result.id}
+                  text={result.text || text}
+                  predictedCategory={result.category}
+                  predictedUrgency={result.urgency}
+                  onFeedbackSubmitted={(res) => {
+                    setRetrainStatus(prev => prev ? { ...prev, corrections_total: res.corrections_total, should_retrain: res.should_retrain } : prev)
+                    loadRecent()
+                  }}
+                />
               </motion.div>
             )}
           </AnimatePresence>
@@ -903,14 +1334,14 @@ function BatchPage() {
 }
 
 // ============================================================================
-// PAGE: HISTORY
+// PAGE: HISTORY (with correction status + corrected-only filter)
 // ============================================================================
 
 function HistoryPage() {
   const [data, setData] = useState({ predictions: [], total: 0 })
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(0)
-  const [filter, setFilter] = useState({ category: '', urgency: '', search: '' })
+  const [filter, setFilter] = useState({ category: '', urgency: '', search: '', correctedOnly: false })
   const limit = 20
 
   const loadHistory = useCallback(async () => {
@@ -920,6 +1351,7 @@ function HistoryPage() {
       if (filter.category) params.category = filter.category
       if (filter.urgency) params.urgency = filter.urgency
       if (filter.search) params.search = filter.search
+      if (filter.correctedOnly) params.corrected_only = 'true'
       const d = await getHistory(params)
       setData(d)
     } catch {}
@@ -929,7 +1361,9 @@ function HistoryPage() {
   useEffect(() => { loadHistory() }, [loadHistory])
 
   function exportAll() {
-    window.open(`${API}/export/csv${filter.category ? `?category=${filter.category}` : ''}`, '_blank')
+    const params = new URLSearchParams()
+    if (filter.category) params.set('category', filter.category)
+    window.open(`${API}/export/csv?${params.toString()}`, '_blank')
   }
 
   return (
@@ -957,7 +1391,7 @@ function HistoryPage() {
             className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs text-white outline-none"
           >
             <option value="">All Categories</option>
-            {Object.keys(CAT_SHORT).map(c => <option key={c} value={c}>{CAT_SHORT[c]}</option>)}
+            {CATEGORIES.map(c => <option key={c} value={c}>{CAT_SHORT[c]}</option>)}
           </select>
           <select
             value={filter.urgency}
@@ -969,6 +1403,15 @@ function HistoryPage() {
             <option value="Medium">Medium</option>
             <option value="Low">Low</option>
           </select>
+          <label className="flex items-center gap-2 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={filter.correctedOnly}
+              onChange={e => { setFilter(f => ({ ...f, correctedOnly: e.target.checked })); setPage(0) }}
+              className="w-3.5 h-3.5 rounded border-white/20 bg-white/5 text-cyan-500 focus:ring-cyan-500/50 focus:ring-offset-0"
+            />
+            <span className="text-xs text-gray-400">Corrected only</span>
+          </label>
           <div className="flex-1" />
           <button onClick={exportAll} className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-gray-400 transition">
             <Download size={12} /> Export CSV
@@ -991,28 +1434,45 @@ function HistoryPage() {
                 <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">Category</th>
                 <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">Urgency</th>
                 <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">Confidence</th>
+                <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">Status</th>
                 <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">Time</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={5} className="px-4 py-8 text-center text-gray-600">Loading...</td></tr>
+                <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-600">Loading...</td></tr>
               ) : data.predictions.length === 0 ? (
-                <tr><td colSpan={5} className="px-4 py-8 text-center text-gray-600">No predictions found</td></tr>
+                <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-600">No predictions found</td></tr>
               ) : (
-                data.predictions.map((p, i) => (
-                  <tr key={i} className="border-b border-white/5 hover:bg-white/[0.02] transition">
-                    <td className="px-4 py-3 text-xs text-gray-300 max-w-xs truncate">{p.text}</td>
-                    <td className="px-4 py-3">
-                      <span className="text-[10px] px-2 py-1 rounded-full bg-white/10 text-gray-400">{CAT_SHORT[p.predicted_category] || p.predicted_category}</span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className="text-xs font-medium" style={{ color: URGENCY_COLORS[p.predicted_urgency] }}>{p.predicted_urgency}</span>
-                    </td>
-                    <td className="px-4 py-3 text-xs text-gray-400">{(p.confidence_category * 100).toFixed(1)}%</td>
-                    <td className="px-4 py-3 text-xs text-gray-600">{p.timestamp ? new Date(p.timestamp).toLocaleString() : '-'}</td>
-                  </tr>
-                ))
+                data.predictions.map((p, i) => {
+                  const isCorrected = p.is_corrected || p.was_corrected || (p.corrections && p.corrections.length > 0)
+                  return (
+                    <tr key={i} className="border-b border-white/5 hover:bg-white/[0.02] transition">
+                      <td className="px-4 py-3 text-xs text-gray-300 max-w-xs truncate">{p.text}</td>
+                      <td className="px-4 py-3">
+                        <span className="text-[10px] px-2 py-1 rounded-full bg-white/10 text-gray-400">{CAT_SHORT[p.predicted_category] || p.predicted_category}</span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="text-xs font-medium" style={{ color: URGENCY_COLORS[p.predicted_urgency] }}>{p.predicted_urgency}</span>
+                      </td>
+                      <td className="px-4 py-3 text-xs text-gray-400">{(p.confidence_category * 100).toFixed(1)}%</td>
+                      <td className="px-4 py-3">
+                        {isCorrected ? (
+                          <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/20">
+                            <SquareX size={10} />
+                            Corrected
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                            <Check size={10} />
+                            Correct
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-xs text-gray-600">{p.timestamp ? new Date(p.timestamp).toLocaleString() : '-'}</td>
+                    </tr>
+                  )
+                })
               )}
             </tbody>
           </table>
@@ -1141,7 +1601,7 @@ function AnalyticsPage() {
               className="px-2 py-1 bg-white/5 border border-white/10 rounded text-xs text-white outline-none"
             >
               <option value="">All</option>
-              {Object.keys(CAT_SHORT).map(c => <option key={c} value={c}>{CAT_SHORT[c]}</option>)}
+              {CATEGORIES.map(c => <option key={c} value={c}>{CAT_SHORT[c]}</option>)}
             </select>
           </div>
           {wordData?.words?.length > 0 ? (
@@ -1232,6 +1692,351 @@ function AnalyticsPage() {
 }
 
 // ============================================================================
+// PAGE: AI ASSISTANT
+// ============================================================================
+
+function AIAssistantPage() {
+  const { addToast } = useToast()
+  const [text, setText] = useState('')
+  const [category, setCategory] = useState('')
+  const [urgency, setUrgency] = useState('')
+  const [resolveResult, setResolveResult] = useState(null)
+  const [draftResult, setDraftResult] = useState(null)
+  const [resolving, setResolving] = useState(false)
+  const [drafting, setDrafting] = useState(false)
+
+  async function handleResolve() {
+    if (!text.trim()) return
+    setResolving(true)
+    setResolveResult(null)
+    try {
+      const res = await aiResolve(text, category || undefined, urgency || undefined)
+      setResolveResult(res)
+      addToast('Resolution steps generated', 'success')
+    } catch {
+      addToast('Failed to generate resolution steps', 'error')
+    }
+    setResolving(false)
+  }
+
+  async function handleDraft() {
+    if (!text.trim()) return
+    setDrafting(true)
+    setDraftResult(null)
+    try {
+      const res = await aiDraftResponse(text, category || undefined, urgency || undefined)
+      setDraftResult(res)
+      addToast('Response draft generated', 'success')
+    } catch {
+      addToast('Failed to generate response draft', 'error')
+    }
+    setDrafting(false)
+  }
+
+  function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+      addToast('Copied to clipboard', 'success')
+    }).catch(() => {
+      addToast('Failed to copy', 'error')
+    })
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Input */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-[#131825] border border-white/5 rounded-xl p-5"
+      >
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center">
+            <Bot size={16} className="text-white" />
+          </div>
+          <div>
+            <h3 className="text-sm font-medium text-gray-300">AI Complaint Assistant</h3>
+            <p className="text-[10px] text-gray-500">Powered by Groq</p>
+          </div>
+        </div>
+
+        <textarea
+          value={text}
+          onChange={e => setText(e.target.value)}
+          placeholder="Paste a customer complaint to get resolution steps or draft a response..."
+          className="w-full h-32 bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-500 outline-none focus:border-pink-500/50 resize-none transition"
+        />
+
+        <div className="grid grid-cols-2 gap-3 mt-3">
+          <div>
+            <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Category (optional)</label>
+            <select
+              value={category}
+              onChange={e => setCategory(e.target.value)}
+              className="w-full px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs text-white outline-none focus:border-pink-500/50"
+            >
+              <option value="">Auto-detect</option>
+              {CATEGORIES.map(c => (
+                <option key={c} value={c}>{CAT_SHORT[c]}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Urgency (optional)</label>
+            <select
+              value={urgency}
+              onChange={e => setUrgency(e.target.value)}
+              className="w-full px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs text-white outline-none focus:border-pink-500/50"
+            >
+              <option value="">Auto-detect</option>
+              <option value="High">High</option>
+              <option value="Medium">Medium</option>
+              <option value="Low">Low</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 mt-4">
+          <button
+            onClick={handleResolve}
+            disabled={resolving || !text.trim()}
+            className="flex items-center gap-2 px-5 py-2 rounded-lg bg-gradient-to-r from-pink-500 to-rose-500 text-white text-sm font-medium disabled:opacity-50 hover:shadow-lg hover:shadow-pink-500/20 transition-all duration-300"
+          >
+            {resolving ? <Loader2 size={14} className="animate-spin" /> : <CornerDownLeft size={14} />}
+            {resolving ? 'Generating...' : 'Get Resolution Steps'}
+          </button>
+          <button
+            onClick={handleDraft}
+            disabled={drafting || !text.trim()}
+            className="flex items-center gap-2 px-5 py-2 rounded-lg bg-gradient-to-r from-violet-500 to-purple-500 text-white text-sm font-medium disabled:opacity-50 hover:shadow-lg hover:shadow-violet-500/20 transition-all duration-300"
+          >
+            {drafting ? <Loader2 size={14} className="animate-spin" /> : <FileText size={14} />}
+            {drafting ? 'Generating...' : 'Draft Response'}
+          </button>
+        </div>
+      </motion.div>
+
+      {/* Results */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Resolution Steps */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-[#131825] border border-white/5 rounded-xl p-5"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <CornerDownLeft size={14} className="text-pink-400" />
+              <h3 className="text-sm font-medium text-gray-300">Resolution Steps</h3>
+            </div>
+            {resolveResult?.suggestions && (
+              <button
+                onClick={() => copyToClipboard(resolveResult.suggestions)}
+                className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-gray-400 transition"
+              >
+                <Copy size={12} /> Copy
+              </button>
+            )}
+          </div>
+
+          {resolving && (
+            <div className="flex items-center justify-center h-48">
+              <Loader2 size={24} className="text-pink-400 animate-spin" />
+            </div>
+          )}
+
+          {!resolving && resolveResult?.suggestions && (
+            <div className="p-4 rounded-lg bg-white/5 border border-white/10">
+              <p className="text-sm text-gray-300 whitespace-pre-wrap leading-relaxed">
+                {resolveResult.suggestions}
+              </p>
+              {resolveResult.model && (
+                <p className="text-[10px] text-gray-600 mt-3 pt-2 border-t border-white/5">
+                  Model: {resolveResult.model}
+                </p>
+              )}
+            </div>
+          )}
+
+          {!resolving && !resolveResult && (
+            <div className="h-48 flex items-center justify-center text-gray-600 text-sm">
+              Enter a complaint and click "Get Resolution Steps"
+            </div>
+          )}
+        </motion.div>
+
+        {/* Draft Response */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="bg-[#131825] border border-white/5 rounded-xl p-5"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <FileText size={14} className="text-violet-400" />
+              <h3 className="text-sm font-medium text-gray-300">Draft Response</h3>
+            </div>
+            {draftResult?.draft && (
+              <button
+                onClick={() => copyToClipboard(draftResult.draft)}
+                className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-gray-400 transition"
+              >
+                <Copy size={12} /> Copy
+              </button>
+            )}
+          </div>
+
+          {drafting && (
+            <div className="flex items-center justify-center h-48">
+              <Loader2 size={24} className="text-violet-400 animate-spin" />
+            </div>
+          )}
+
+          {!drafting && draftResult?.draft && (
+            <div className="p-4 rounded-lg bg-white/5 border border-white/10">
+              <p className="text-sm text-gray-300 whitespace-pre-wrap leading-relaxed">
+                {draftResult.draft}
+              </p>
+              {draftResult.model && (
+                <p className="text-[10px] text-gray-600 mt-3 pt-2 border-t border-white/5">
+                  Model: {draftResult.model}
+                </p>
+              )}
+            </div>
+          )}
+
+          {!drafting && !draftResult && (
+            <div className="h-48 flex items-center justify-center text-gray-600 text-sm">
+              Enter a complaint and click "Draft Response"
+            </div>
+          )}
+        </motion.div>
+      </div>
+
+      {/* Powered by Groq Badge */}
+      <div className="flex justify-center">
+        <span className="text-[10px] text-gray-600 flex items-center gap-1.5">
+          <Sparkles size={10} />
+          Powered by Groq AI
+        </span>
+      </div>
+    </div>
+  )
+}
+
+// ============================================================================
+// PAGE: REVIEW QUEUE
+// ============================================================================
+
+function ReviewQueuePage() {
+  const [items, setItems] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [count, setCount] = useState(0)
+
+  useEffect(() => {
+    loadQueue()
+  }, [])
+
+  function loadQueue() {
+    setLoading(true)
+    getLowConfidence()
+      .then(d => { setItems(d.predictions || []); setCount(d.count || 0) })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-[#131825] border border-white/5 rounded-xl p-4"
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center">
+              <ClipboardList size={16} className="text-white" />
+            </div>
+            <div>
+              <h3 className="text-sm font-medium text-gray-300">Review Queue</h3>
+              <p className="text-[10px] text-gray-500">Low confidence predictions needing manual review</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-gray-500">{count} items</span>
+            <button
+              onClick={loadQueue}
+              className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-gray-400 transition"
+            >
+              <RefreshCw size={12} /> Refresh
+            </button>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Items */}
+      {loading ? (
+        <LoadingState />
+      ) : items.length === 0 ? (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-[#131825] border border-white/5 rounded-xl p-12"
+        >
+          <div className="text-center">
+            <CheckCircle2 size={40} className="mx-auto text-emerald-400 mb-3" />
+            <h3 className="text-sm font-medium text-gray-300 mb-1">All Clear!</h3>
+            <p className="text-xs text-gray-500">No low-confidence predictions to review.</p>
+          </div>
+        </motion.div>
+      ) : (
+        <div className="space-y-3">
+          {items.map((item, i) => (
+            <motion.div
+              key={item.id || i}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05 }}
+              className="bg-[#131825] border border-white/5 rounded-xl p-5"
+            >
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle size={14} className="text-amber-400" />
+                  <span className="text-xs text-amber-400 font-medium">Low Confidence</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-white/10 text-gray-400">
+                    {CAT_SHORT[item.predicted_category] || item.predicted_category}
+                  </span>
+                  <span className="text-[10px]" style={{ color: URGENCY_COLORS[item.predicted_urgency] }}>
+                    {item.predicted_urgency}
+                  </span>
+                  <span className="text-[10px] text-gray-500">
+                    {((item.confidence_category || 0) * 100).toFixed(1)}%
+                  </span>
+                </div>
+              </div>
+
+              <p className="text-sm text-gray-300 mb-3">{item.text}</p>
+
+              <FeedbackPanel
+                predictionId={item.id}
+                text={item.text}
+                predictedCategory={item.predicted_category}
+                predictedUrgency={item.predicted_urgency}
+                onFeedbackSubmitted={() => loadQueue()}
+              />
+            </motion.div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ============================================================================
 // PAGE: API PLAYGROUND
 // ============================================================================
 
@@ -1253,6 +2058,13 @@ function PlaygroundPage() {
     { path: '/analytics/confidence', method: 'GET', label: 'Confidence Dist' },
     { path: '/analytics/patterns', method: 'GET', label: 'Patterns' },
     { path: '/categories', method: 'GET', label: 'Categories' },
+    { path: '/feedback', method: 'POST', label: 'Submit Feedback', body: '{"prediction_id": 1, "is_correct_category": true, "is_correct_urgency": true}' },
+    { path: '/retrain', method: 'POST', label: 'Trigger Retrain' },
+    { path: '/retrain/status', method: 'GET', label: 'Retrain Status' },
+    { path: '/retrain/history', method: 'GET', label: 'Retrain History' },
+    { path: '/low-confidence', method: 'GET', label: 'Low Confidence' },
+    { path: '/ai/resolve', method: 'POST', label: 'AI Resolve', body: '{"text": "Mera order nahi aaya"}' },
+    { path: '/ai/draft-response', method: 'POST', label: 'AI Draft Response', body: '{"text": "Mera order nahi aaya"}' },
     { path: '/health', method: 'GET', label: 'Health Check' },
   ]
 
@@ -1295,7 +2107,7 @@ function PlaygroundPage() {
           className="bg-[#131825] border border-white/5 rounded-xl p-4"
         >
           <h3 className="text-xs text-gray-500 uppercase tracking-wider mb-3">Endpoints</h3>
-          <div className="space-y-1">
+          <div className="space-y-1 max-h-[600px] overflow-y-auto">
             {endpoints.map((ep, i) => (
               <button
                 key={i}
@@ -1368,35 +2180,24 @@ function PlaygroundPage() {
 }
 
 // ============================================================================
-// SHARED
-// ============================================================================
-
-function LoadingState() {
-  return (
-    <div className="flex items-center justify-center h-64">
-      <div className="flex flex-col items-center gap-3">
-        <div className="w-8 h-8 border-2 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin" />
-        <p className="text-sm text-gray-500">Loading...</p>
-      </div>
-    </div>
-  )
-}
-
-// ============================================================================
 // APP
 // ============================================================================
 
 export default function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Layout><DashboardPage /></Layout>} />
-        <Route path="/classify" element={<Layout><ClassifyPage /></Layout>} />
-        <Route path="/batch" element={<Layout><BatchPage /></Layout>} />
-        <Route path="/history" element={<Layout><HistoryPage /></Layout>} />
-        <Route path="/analytics" element={<Layout><AnalyticsPage /></Layout>} />
-        <Route path="/playground" element={<Layout><PlaygroundPage /></Layout>} />
-      </Routes>
+      <ToastProvider>
+        <Routes>
+          <Route path="/" element={<Layout><DashboardPage /></Layout>} />
+          <Route path="/classify" element={<Layout><ClassifyPage /></Layout>} />
+          <Route path="/batch" element={<Layout><BatchPage /></Layout>} />
+          <Route path="/history" element={<Layout><HistoryPage /></Layout>} />
+          <Route path="/analytics" element={<Layout><AnalyticsPage /></Layout>} />
+          <Route path="/ai" element={<Layout><AIAssistantPage /></Layout>} />
+          <Route path="/review" element={<Layout><ReviewQueuePage /></Layout>} />
+          <Route path="/playground" element={<Layout><PlaygroundPage /></Layout>} />
+        </Routes>
+      </ToastProvider>
     </BrowserRouter>
   )
 }

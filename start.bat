@@ -50,7 +50,7 @@ cd ..
 echo        Done!
 echo.
 
-:: Step 5: Kill old processes
+:: Step 5: Kill old servers
 echo [5/6] Cleaning up old processes...
 taskkill /f /fi "WINDOWTITLE eq Backend*" >nul 2>&1
 taskkill /f /fi "WINDOWTITLE eq Frontend*" >nul 2>&1
@@ -62,12 +62,10 @@ echo.
 echo [6/6] Starting servers...
 echo.
 
-set "PROJECT_DIR=%~dp0"
-
 echo        Starting backend on port 8000...
-start "Backend" /min cmd /c "cd /d "%PROJECT_DIR%" && python -m uvicorn api.main:app --reload --port 8000"
+start "Backend" /min python -m uvicorn api.main:app --reload --port 8000
 
-echo        Waiting for backend...
+echo        Waiting for backend to start...
 :waitbe
 timeout /t 2 /nobreak >nul
 curl -s http://localhost:8000/health >nul 2>&1
@@ -76,9 +74,9 @@ echo        Backend ready!
 echo.
 
 echo        Starting frontend on port 5173...
-start "Frontend" /min cmd /c "cd /d "%PROJECT_DIR%frontend" && npm run dev"
+start "Frontend" /min cmd /c "cd frontend && npm run dev"
 
-echo        Waiting for frontend...
+echo        Waiting for frontend to start...
 :waitfe
 timeout /t 2 /nobreak >nul
 curl -s http://localhost:5173 >nul 2>&1
@@ -87,7 +85,7 @@ echo        Frontend ready!
 echo.
 
 echo ================================================
-echo   All done! Browser opening...
+echo   All done! Opening browser...
 echo.
 echo   Frontend:  http://localhost:5173
 echo   Backend:   http://localhost:8000

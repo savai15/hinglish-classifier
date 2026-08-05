@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef, createContext, useContext } from 'react'
-import { BrowserRouter, Routes, Route, NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, NavLink, Outlet, useNavigate, useLocation, useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import Papa from 'papaparse'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, LineChart, Line, Area, AreaChart,
@@ -163,6 +164,9 @@ function KeyboardShortcutsModal({ open, onClose }) {
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm"
         onClick={onClose}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Keyboard shortcuts"
       >
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: -10 }}
@@ -176,9 +180,9 @@ function KeyboardShortcutsModal({ open, onClose }) {
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
               <Keyboard size={20} className="text-violet-400" />
-              <h2 className="text-lg font-bold text-white">Keyboard Shortcuts</h2>
+              <h2 className="text-lg font-bold dark:text-white text-gray-900">Keyboard Shortcuts</h2>
             </div>
-            <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/10 text-gray-400">
+            <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/10 text-gray-400" aria-label="Close shortcuts modal">
               <X size={18} />
             </button>
           </div>
@@ -352,7 +356,7 @@ export function ToastProvider({ children }) {
               {t.type === 'error' && <AlertTriangle size={16} className="flex-shrink-0" />}
               {t.type === 'info' && <Bell size={16} className="flex-shrink-0" />}
               <p className="text-sm flex-1">{t.message}</p>
-              <button onClick={() => removeToast(t.id)} className="flex-shrink-0 opacity-60 hover:opacity-100">
+              <button onClick={() => removeToast(t.id)} className="flex-shrink-0 opacity-60 hover:opacity-100" aria-label="Dismiss notification">
                 <X size={14} />
               </button>
             </motion.div>
@@ -437,7 +441,7 @@ function AnimNum({ value, duration = 800, decimals = 0 }) {
     }
     ref.current = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(ref.current)
-  }, [value])
+  }, [value, duration, decimals])
   return <span>{display.toLocaleString(undefined, decimals > 0 ? { minimumFractionDigits: decimals, maximumFractionDigits: decimals } : {})}</span>
 }
 
@@ -664,6 +668,7 @@ function RetrainBanner({ correctionsTotal, onRetrain }) {
 
 function Layout() {
   const [collapsed, setCollapsed] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState([])
@@ -772,7 +777,9 @@ function Layout() {
       {/* Sidebar */}
       <motion.aside
         animate={{ width: collapsed ? 64 : 220 }}
-        className="flex-shrink-0 dark:bg-[#0d1220] bg-white border-r dark:border-white/5 border-gray-200 flex flex-col z-20"
+        className={`flex-shrink-0 dark:bg-[#0d1220] bg-white border-r dark:border-white/5 border-gray-200 flex flex-col z-20 ${
+          mobileOpen ? 'fixed inset-y-0 left-0' : 'hidden lg:flex'
+        }`}
       >
         <div className="h-14 flex items-center px-4 border-b dark:border-white/5 border-gray-200">
           {!collapsed && (
@@ -857,6 +864,13 @@ function Layout() {
         {/* Top Bar */}
         <header className="h-14 flex items-center justify-between px-6 border-b dark:border-white/5 border-gray-200 dark:bg-[#0d1220]/80 bg-white/80 backdrop-blur-sm z-10">
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => { setCollapsed(!collapsed); setMobileOpen(!mobileOpen) }}
+              className="lg:hidden p-2 rounded-lg dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 transition dark:text-gray-400 text-gray-500"
+              aria-label="Toggle menu"
+            >
+              <Menu size={18} />
+            </button>
             <h1 className="text-sm font-medium dark:text-gray-300 text-gray-600">
               {nav.find(n => n.to === location.pathname)?.label || 'Hinglish Complaint Classifier'}
             </h1>
@@ -866,6 +880,7 @@ function Layout() {
             <button
               onClick={toggleTheme}
               className="p-2 rounded-lg dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 transition-colors dark:text-gray-400 text-gray-500 dark:hover:text-white hover:text-gray-900"
+              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
             >
               {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
             </button>
@@ -926,7 +941,7 @@ function Layout() {
                   <button
                     key={i}
                     className="w-full text-left px-4 py-3 dark:hover:bg-white/5 hover:bg-gray-100 transition border-b dark:border-white/5 border-gray-200 last:border-0"
-                    onClick={() => { setSearchOpen(false); navigate('/history') }}
+                    onClick={() => { setSearchOpen(false); navigate(`/history?search=${encodeURIComponent(p.text?.slice(0, 50) || '')}`) }}
                   >
                     <p className="text-sm dark:text-white text-gray-900 truncate">{p.text}</p>
                     <div className="flex items-center gap-2 mt-1">
@@ -1247,7 +1262,7 @@ function DashboardPage() {
             </NavLink>
           ))}
           <button
-            onClick={() => window.open(`${API}/export/report`, '_blank')}
+            onClick={() => window.open(`${API}/export/report`, '_blank', 'noopener,noreferrer')}
             className="flex items-center gap-3 p-3 rounded-lg dark:bg-white/5 bg-gray-100 dark:hover:bg-white/10 hover:bg-gray-200 border dark:border-white/5 border-gray-200 dark:hover:border-white/10 hover:border-gray-300 transition-all duration-200 group"
           >
             <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
@@ -1306,6 +1321,7 @@ function ClassifyPage() {
   const [loading, setLoading] = useState(false)
   const [history, setHistory] = useState([])
   const [retrainStatus, setRetrainStatus] = useState(null)
+  const { addToast } = useToast()
   const [samples] = useState([
     { text: 'Mera order abhi tak nahi aaya, 3 din ho gaye!', cat: 'Delivery_Issue', urg: 'High' },
     { text: 'Refund kab milega? Paisa wapas karo turant', cat: 'Returns_Refunds', urg: 'High' },
@@ -1326,7 +1342,7 @@ function ClassifyPage() {
 
   useEffect(() => {
     getRetrainStatus().then(setRetrainStatus).catch(() => {})
-  }, [retrainStatus])
+  }, [])
 
   async function handleClassify(complaintText) {
     const t = complaintText || text
@@ -1336,7 +1352,7 @@ function ClassifyPage() {
       const r = await predict(t)
       setResult(r)
       if (!complaintText) setText('')
-    } catch { alert('Classification failed. Is the backend running?') }
+    } catch { addToast('Classification failed. Is the backend running?', 'error') }
     setLoading(false)
   }
 
@@ -1536,20 +1552,29 @@ function BatchPage() {
   const [progress, setProgress] = useState(0)
   const [textInput, setTextInput] = useState('')
   const fileRef = useRef(null)
+  const { addToast } = useToast()
 
   function handleFileUpload(e) {
     const f = e.target.files[0]
     if (!f) return
+    if (f.size > 5 * 1024 * 1024) {
+      addToast('File too large. Max 5MB.', 'error')
+      return
+    }
     setFile(f)
     const reader = new FileReader()
     reader.onload = (ev) => {
       const text = ev.target.result
-      const lines = text.split('\n').filter(l => l.trim())
-      const parsed = lines.map(l => {
-        const parts = l.split(',')
-        return parts[0]?.replace(/"/g, '').trim()
-      }).filter(t => t && t !== 'text')
+      const result = Papa.parse(text, { header: true, skipEmptyLines: true })
+      const rows = result.data
+      if (rows.length === 0) {
+        addToast('No data found in CSV', 'error')
+        return
+      }
+      const textCol = Object.keys(rows[0]).find(k => k.toLowerCase().includes('text')) || Object.keys(rows[0])[0]
+      const parsed = rows.map(r => r[textCol]?.trim()).filter(Boolean)
       setCsvData(parsed)
+      addToast(`Loaded ${parsed.length} complaints from CSV`, 'success')
     }
     reader.readAsText(f)
   }
@@ -1575,7 +1600,7 @@ function BatchPage() {
         setResults([...allResults])
         setProgress(Math.round(((i + batch.length) / csvData.length) * 100))
       } catch {
-        alert('Batch processing failed')
+        addToast('Batch processing failed', 'error')
         break
       }
     }
@@ -1730,10 +1755,16 @@ function BatchPage() {
 // ============================================================================
 
 function HistoryPage() {
+  const [searchParams, setSearchParams] = useSearchParams()
   const [data, setData] = useState({ predictions: [], total: 0 })
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(0)
-  const [filter, setFilter] = useState({ category: '', urgency: '', search: '', correctedOnly: false })
+  const [filter, setFilter] = useState({
+    category: searchParams.get('category') || '',
+    urgency: searchParams.get('urgency') || '',
+    search: searchParams.get('search') || '',
+    correctedOnly: searchParams.get('corrected_only') === 'true',
+  })
   const limit = 20
 
   const loadHistory = useCallback(async () => {
@@ -1755,7 +1786,21 @@ function HistoryPage() {
   function exportAll() {
     const params = new URLSearchParams()
     if (filter.category) params.set('category', filter.category)
-    window.open(`${API}/export/csv?${params.toString()}`, '_blank')
+    window.open(`${API}/export/csv?${params.toString()}`, '_blank', 'noopener,noreferrer')
+  }
+
+  function updateFilter(updates) {
+    setFilter(f => {
+      const newFilter = { ...f, ...updates }
+      const params = new URLSearchParams()
+      if (newFilter.category) params.set('category', newFilter.category)
+      if (newFilter.urgency) params.set('urgency', newFilter.urgency)
+      if (newFilter.search) params.set('search', newFilter.search)
+      if (newFilter.correctedOnly) params.set('corrected_only', 'true')
+      setSearchParams(params, { replace: true })
+      setPage(0)
+      return newFilter
+    })
   }
 
   return (
@@ -1773,22 +1818,25 @@ function HistoryPage() {
           </div>
           <input
             value={filter.search}
-            onChange={e => { setFilter(f => ({ ...f, search: e.target.value })); setPage(0) }}
+            onChange={e => updateFilter({ search: e.target.value })}
             placeholder="Search text..."
-            className="px-3 py-1.5 dark:bg-white/5 bg-gray-50 dark:border-white/10 border-gray-200 rounded-lg text-xs dark:text-white text-gray-900 placeholder-gray-500 outline-none focus:border-cyan-500/50 w-48"
+            aria-label="Search predictions"
+            className="px-3 py-1.5 dark:bg-white/5 bg-gray-50 dark:border-white/10 border-gray-200 rounded-lg text-xs dark:text-white text-gray-900 placeholder-gray-500 focus:border-cyan-500/50 w-48"
           />
           <select
             value={filter.category}
-            onChange={e => { setFilter(f => ({ ...f, category: e.target.value })); setPage(0) }}
-            className="px-3 py-1.5 dark:bg-white/5 bg-gray-50 dark:border-white/10 border-gray-200 rounded-lg text-xs dark:text-white text-gray-900 outline-none"
+            onChange={e => updateFilter({ category: e.target.value })}
+            aria-label="Filter by category"
+            className="px-3 py-1.5 dark:bg-white/5 bg-gray-50 dark:border-white/10 border-gray-200 rounded-lg text-xs dark:text-white text-gray-900"
           >
             <option value="">All Categories</option>
             {CATEGORIES.map(c => <option key={c} value={c}>{CAT_SHORT[c]}</option>)}
           </select>
           <select
             value={filter.urgency}
-            onChange={e => { setFilter(f => ({ ...f, urgency: e.target.value })); setPage(0) }}
-            className="px-3 py-1.5 dark:bg-white/5 bg-gray-50 dark:border-white/10 border-gray-200 rounded-lg text-xs dark:text-white text-gray-900 outline-none"
+            onChange={e => updateFilter({ urgency: e.target.value })}
+            aria-label="Filter by urgency"
+            className="px-3 py-1.5 dark:bg-white/5 bg-gray-50 dark:border-white/10 border-gray-200 rounded-lg text-xs dark:text-white text-gray-900"
           >
             <option value="">All Urgency</option>
             <option value="High">High</option>
@@ -1799,7 +1847,7 @@ function HistoryPage() {
             <input
               type="checkbox"
               checked={filter.correctedOnly}
-              onChange={e => { setFilter(f => ({ ...f, correctedOnly: e.target.checked })); setPage(0) }}
+              onChange={e => updateFilter({ correctedOnly: e.target.checked })}
               className="w-3.5 h-3.5 rounded border-white/20 bg-white/5 text-cyan-500 focus:ring-cyan-500/50 focus:ring-offset-0"
             />
             <span className="text-xs dark:text-gray-400 text-gray-500">Corrected only</span>
@@ -1820,14 +1868,15 @@ function HistoryPage() {
       >
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
+            <caption className="sr-only">Prediction History</caption>
             <thead>
               <tr className="border-b dark:border-white/5 border-gray-200">
-                <th className="text-left px-4 py-3 text-xs dark:text-gray-500 text-gray-400 font-medium">Text</th>
-                <th className="text-left px-4 py-3 text-xs dark:text-gray-500 text-gray-400 font-medium">Category</th>
-                <th className="text-left px-4 py-3 text-xs dark:text-gray-500 text-gray-400 font-medium">Urgency</th>
-                <th className="text-left px-4 py-3 text-xs dark:text-gray-500 text-gray-400 font-medium">Confidence</th>
-                <th className="text-left px-4 py-3 text-xs dark:text-gray-500 text-gray-400 font-medium">Status</th>
-                <th className="text-left px-4 py-3 text-xs dark:text-gray-500 text-gray-400 font-medium">Time</th>
+                <th scope="col" className="text-left px-4 py-3 text-xs dark:text-gray-500 text-gray-400 font-medium">Text</th>
+                <th scope="col" className="text-left px-4 py-3 text-xs dark:text-gray-500 text-gray-400 font-medium">Category</th>
+                <th scope="col" className="text-left px-4 py-3 text-xs dark:text-gray-500 text-gray-400 font-medium">Urgency</th>
+                <th scope="col" className="text-left px-4 py-3 text-xs dark:text-gray-500 text-gray-400 font-medium">Confidence</th>
+                <th scope="col" className="text-left px-4 py-3 text-xs dark:text-gray-500 text-gray-400 font-medium">Status</th>
+                <th scope="col" className="text-left px-4 py-3 text-xs dark:text-gray-500 text-gray-400 font-medium">Time</th>
               </tr>
             </thead>
             <tbody>
@@ -2586,6 +2635,7 @@ function ComparePage() {
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
   const { theme } = useTheme()
+  const { addToast } = useToast()
 
   const handleCompare = async () => {
     if (!text.trim()) return

@@ -9,6 +9,7 @@ import csv
 import json
 import uuid
 import time
+import html
 import logging
 import sqlite3
 from pathlib import Path
@@ -18,7 +19,7 @@ from collections import Counter
 PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi import FastAPI, HTTPException, Query, Request, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse, HTMLResponse
 from pydantic import BaseModel, Field
@@ -30,6 +31,7 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
 import numpy as np
+import requests as http_requests
 from src.active_learning import ComplaintPredictor, ComplaintDB, RetrainManager
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -37,18 +39,63 @@ logger = logging.getLogger(__name__)
 
 predictor = None
 db = None
+compare_models = {}
 
 CATEGORIES = ["Account_Technical", "Customer_Service", "Delivery_Issue", "Order_Status", "Payment_Invoice", "Pricing_Discount", "Product_Quality", "Returns_Refunds", "Wrong_Damaged_Product"]
 URGENCY_LEVELS = ["High", "Medium", "Low"]
 
 
+def groq_request_with_retry(payload, api_key, max_retries=3):
+    """Make Groq API request with exponential backoff retry."""
+    for attempt in range(max_retries):
+        try:
+            resp = http_requests.post(
+                "https://api.groq.com/openai/v1/chat/completions",
+                headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+                json=payload,
+                timeout=15,
+            )
+            if resp.status_code == 429:
+                import time as _time
+                _time.sleep(2 ** attempt)
+                continue
+            return resp
+        except http_requests.exceptions.RequestException:
+            if attempt < max_retries - 1:
+                import time as _time
+                _time.sleep(2 ** attempt)
+            else:
+                raise
+    return resp
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global predictor, db
+    global predictor, db, compare_models
     logger.info("Loading models...")
     predictor = ComplaintPredictor(use_muril=False)
     predictor.load_models()
     db = ComplaintDB()
+
+    # Pre-load individual models for /predict/compare endpoint
+    from src.models import load_model
+    MODEL_DIR = Path(__file__).parent.parent / "models"
+    compare_models = {}
+    models_config = {
+        'tfidf_svm': {'cat': MODEL_DIR / 'category_tf-idf__svm.pkl', 'urg': MODEL_DIR / 'urgency_tf-idf__svm.pkl', 'label': 'TF-IDF + SVM'},
+        'tfidf_lr': {'cat': MODEL_DIR / 'category_tf-idf__lr.pkl', 'urg': MODEL_DIR / 'urgency_tf-idf__lr.pkl', 'label': 'TF-IDF + LR'},
+        'ensemble': {'cat': MODEL_DIR / 'category_ensemble.pkl', 'urg': MODEL_DIR / 'urgency_ensemble.pkl', 'label': 'Combined Ensemble'},
+    }
+    for name, config in models_config.items():
+        try:
+            compare_models[name] = {
+                'label': config['label'],
+                'cat_model': load_model(config['cat']),
+                'urg_model': load_model(config['urg']),
+            }
+        except Exception as e:
+            logger.warning(f"Failed to load compare model {name}: {e}")
+
     logger.info("Models loaded! API ready.")
     yield
     logger.info("Shutting down...")
@@ -67,9 +114,9 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173"],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
 )
 
@@ -232,36 +279,14 @@ async def compare_predictions(request: Request, req: PredictionRequest):
     if not predictor:
         raise HTTPException(status_code=503, detail="Models not loaded")
 
-    import time
-    from src.models import load_model
-
     start = time.time()
     cleaned = predictor.sklearn_preprocessor.preprocess(req.text)
 
-    MODEL_DIR = Path(__file__).parent.parent / "models"
-    models_config = {
-        'tfidf_svm': {
-            'cat': MODEL_DIR / 'category_tf-idf__svm.pkl',
-            'urg': MODEL_DIR / 'urgency_tf-idf__svm.pkl',
-            'label': 'TF-IDF + SVM',
-        },
-        'tfidf_lr': {
-            'cat': MODEL_DIR / 'category_tf-idf__lr.pkl',
-            'urg': MODEL_DIR / 'urgency_tf-idf__lr.pkl',
-            'label': 'TF-IDF + LR',
-        },
-        'ensemble': {
-            'cat': MODEL_DIR / 'category_ensemble.pkl',
-            'urg': MODEL_DIR / 'urgency_ensemble.pkl',
-            'label': 'Combined Ensemble',
-        },
-    }
-
     results = {}
-    for name, config in models_config.items():
+    for name, model_info in compare_models.items():
         try:
-            cat_model = load_model(config['cat'])
-            urg_model = load_model(config['urg'])
+            cat_model = model_info['cat_model']
+            urg_model = model_info['urg_model']
 
             cat_pred, cat_conf, cat_probs_dict = None, 0.0, {}
             if hasattr(cat_model, 'predict_proba'):
@@ -286,7 +311,7 @@ async def compare_predictions(request: Request, req: PredictionRequest):
                 urg_conf = 1.0
 
             results[name] = {
-                "label": config['label'],
+                "label": model_info['label'],
                 "category": cat_pred,
                 "category_confidence": round(cat_conf, 4),
                 "category_probabilities": cat_probs_dict,
@@ -295,7 +320,7 @@ async def compare_predictions(request: Request, req: PredictionRequest):
                 "urgency_probabilities": urg_probs_dict,
             }
         except Exception as e:
-            results[name] = {"label": config.get('label', name), "error": str(e)}
+            results[name] = {"label": model_info.get('label', name), "error": str(e)}
 
     cat_predictions = [r.get('category') for r in results.values() if r.get('category')]
     urg_predictions = [r.get('urgency') for r in results.values() if r.get('urgency')]
@@ -712,6 +737,7 @@ def export_csv(
                predicted_urgency, confidence_urgency, timestamp
         FROM predictions {where}
         ORDER BY timestamp DESC
+        LIMIT 10000
     """, params).fetchall()
     conn.close()
 
@@ -760,6 +786,7 @@ def export_json(
                predicted_urgency, confidence_urgency, timestamp
         FROM predictions {where}
         ORDER BY timestamp DESC
+        LIMIT 10000
     """, conn, params=params)
     conn.close()
 
@@ -804,10 +831,10 @@ async def export_report():
 
     conn.close()
 
-    # Build HTML
-    cat_rows = "".join(f"<tr><td>{c}</td><td>{n}</td><td>{round(n/max(total,1)*100, 1)}%</td></tr>" for c, n in cat_dist)
-    urg_rows = "".join(f"<tr><td>{u}</td><td>{n}</td><td>{round(n/max(total,1)*100, 1)}%</td></tr>" for u, n in urg_dist)
-    pred_rows = "".join(f"<tr><td>{text[:80]}{'...' if len(text)>80 else ''}</td><td>{cat}</td><td>{urg}</td><td>{round(conf*100, 1)}%</td><td>{ts}</td></tr>" for text, cat, urg, conf, ts in recent)
+    # Build HTML (escape all user-sourced values to prevent XSS)
+    cat_rows = "".join(f"<tr><td>{html.escape(str(c))}</td><td>{n}</td><td>{round(n/max(total,1)*100, 1)}%</td></tr>" for c, n in cat_dist)
+    urg_rows = "".join(f"<tr><td>{html.escape(str(u))}</td><td>{n}</td><td>{round(n/max(total,1)*100, 1)}%</td></tr>" for u, n in urg_dist)
+    pred_rows = "".join(f"<tr><td>{html.escape(text[:80])}{'...' if len(text)>80 else ''}</td><td>{html.escape(str(cat))}</td><td>{html.escape(str(urg))}</td><td>{round(conf*100, 1)}%</td><td>{html.escape(str(ts))}</td></tr>" for text, cat, urg, conf, ts in recent)
 
     html = f"""<!DOCTYPE html>
 <html>
@@ -897,7 +924,7 @@ def submit_feedback(body: CorrectionRequest, request: Request):
 
 @app.post("/retrain")
 @limiter.limit("5/hour")
-def trigger_retrain(request: Request):
+def trigger_retrain(request: Request, background_tasks: BackgroundTasks):
     retrain_mgr = RetrainManager()
     should_retrain, correction_count = retrain_mgr.should_retrain()
     if not should_retrain:
@@ -906,16 +933,18 @@ def trigger_retrain(request: Request):
             "message": f"Not enough corrections yet ({correction_count}/{20}). Need {20 - correction_count} more.",
         }
 
-    try:
-        accuracy = retrain_mgr.retrain_sklearn()
-        return {
-            "status": "success",
-            "accuracy": accuracy,
-            "corrections_used": correction_count,
-            "message": f"Retraining complete! Accuracy: {accuracy:.4f}",
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Retraining failed: {str(e)}")
+    def do_retrain():
+        try:
+            retrain_mgr.retrain_sklearn()
+            logger.info("Background retrain completed successfully")
+        except Exception as e:
+            logger.error(f"Background retrain failed: {e}")
+
+    background_tasks.add_task(do_retrain)
+    return {
+        "status": "started",
+        "message": f"Retraining started in background with {correction_count} corrections.",
+    }
 
 
 @app.get("/low-confidence")
@@ -987,26 +1016,29 @@ def ai_resolve(body: AIRequest, request: Request):
     if not api_key:
         raise HTTPException(status_code=503, detail="GROQ_API_KEY not set. Set it as environment variable.")
 
-    import requests as http_requests
-
     cat_info = f"Category: {body.category}. " if body.category else ""
     urg_info = f"Urgency: {body.urgency}. " if body.urgency else ""
 
+    safe_text = body.text.replace('"', "'").replace('\n', ' ')[:2000]
+    safe_cat = body.category.replace('"', "'") if body.category else ""
+    safe_urg = body.urgency.replace('"', "'") if body.urgency else ""
+
     prompt = f"""You are an e-commerce customer support expert. Analyze this complaint and provide resolution steps.
 
-Complaint: "{body.text}"
-{cat_info}{urg_info}
+<user_complaint>
+{safe_text}
+</user_complaint>
+
+<Category>{safe_cat}</Category>
+<Urgency>{safe_urg}</Urgency>
 
 Provide exactly 3 actionable resolution steps numbered 1-2-3. Be specific and practical. Keep each step under 30 words. Write in English."""
 
+    payload = {"model": "llama-3.3-70b-versatile", "messages": [{"role": "user", "content": prompt}],
+               "temperature": 0.3, "max_tokens": 300}
+
     try:
-        resp = http_requests.post(
-            "https://api.groq.com/openai/v1/chat/completions",
-            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
-            json={"model": "llama-3.3-70b-versatile", "messages": [{"role": "user", "content": prompt}],
-                  "temperature": 0.3, "max_tokens": 300},
-            timeout=15,
-        )
+        resp = groq_request_with_retry(payload, api_key)
         if resp.status_code != 200:
             raise HTTPException(status_code=502, detail=f"Groq API error: {resp.text}")
         data = resp.json()
@@ -1025,28 +1057,28 @@ def ai_draft_response(body: AIRequest, request: Request):
     if not api_key:
         raise HTTPException(status_code=503, detail="GROQ_API_KEY not set. Set it as environment variable.")
 
-    import requests as http_requests
-
-    cat_info = f"Complaint category: {body.category}. " if body.category else ""
-    urg_info = f"Urgency level: {body.urgency}. " if body.urgency else ""
+    safe_text = body.text.replace('"', "'").replace('\n', ' ')[:2000]
+    safe_cat = body.category.replace('"', "'") if body.category else ""
+    safe_urg = body.urgency.replace('"', "'") if body.urgency else ""
 
     prompt = f"""You are a professional customer service representative for an Indian e-commerce company.
 Write a polite, empathetic response to this customer complaint. Write in English.
 The response should acknowledge the issue, apologize, and explain next steps.
 
-Customer complaint: "{body.text}"
-{cat_info}{urg_info}
+<customer_complaint>
+{safe_text}
+</customer_complaint>
+
+<Category>{safe_cat}</Category>
+<Urgency>{safe_urg}</Urgency>
 
 Write a professional 3-4 sentence response. Be warm but professional."""
 
+    payload = {"model": "llama-3.3-70b-versatile", "messages": [{"role": "user", "content": prompt}],
+               "temperature": 0.5, "max_tokens": 300}
+
     try:
-        resp = http_requests.post(
-            "https://api.groq.com/openai/v1/chat/completions",
-            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
-            json={"model": "llama-3.3-70b-versatile", "messages": [{"role": "user", "content": prompt}],
-                  "temperature": 0.5, "max_tokens": 300},
-            timeout=15,
-        )
+        resp = groq_request_with_retry(payload, api_key)
         if resp.status_code != 200:
             raise HTTPException(status_code=502, detail=f"Groq API error: {resp.text}")
         data = resp.json()

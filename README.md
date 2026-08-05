@@ -59,7 +59,7 @@ Without the key, the AI Assistant page shows an error. All other features (class
 - Category distribution donut chart
 - Urgency breakdown bar chart
 - 24-hour prediction timeline
-- Model performance bars (99.7% category, 99.96% urgency)
+- Model performance bars (Category F1=0.9969, Urgency F1=0.9996)
 - Retrain history timeline
 - Quick action buttons
 
@@ -144,7 +144,7 @@ Without the key, the AI Assistant page shows an error. All other features (class
 
 - **Frontend:** React 19, Tailwind CSS 3, Recharts, Framer Motion, React Router
 - **Backend:** FastAPI, scikit-learn, SQLite, Groq (AI)
-- **Models:** TF-IDF + SVM (99.7% F1), Combined Ensemble (99.96% F1)
+- **Models:** TF-IDF + SVM Category F1=0.9969, Combined Urgency F1=0.9996
 - **Dataset:** 30K synthetic Hinglish complaints, 9 categories, realistic typos
 
 ## Project Structure

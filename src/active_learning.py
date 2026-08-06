@@ -367,10 +367,12 @@ class ComplaintPredictor:
 
         print("  Models loaded!")
 
-    def predict(self, text, session_id=None):
+    def predict(self, text, session_id=None, model="auto"):
         cleaned = self.sklearn_preprocessor.preprocess(text)
 
-        if self.use_muril and self.muril_cat:
+        use_muril = (model == "muril") or (model == "auto" and self.use_muril and self.muril_cat)
+
+        if use_muril:
             cat_result = self.muril_cat.predict([text], "category")[0]
             urg_result = self.muril_urg.predict([text], "urgency")[0]
             source = "muril"

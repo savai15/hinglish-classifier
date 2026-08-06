@@ -384,8 +384,8 @@ async function apiFetch(path, opts = {}) {
   return res.json()
 }
 
-async function predict(text) {
-  return apiFetch('/predict', { method: 'POST', body: JSON.stringify({ text }) })
+async function predict(text, model = 'auto') {
+  return apiFetch('/predict', { method: 'POST', body: JSON.stringify({ text, model }) })
 }
 
 async function predictBatch(texts) {
@@ -1322,6 +1322,7 @@ function ClassifyPage() {
   const [loading, setLoading] = useState(false)
   const [history, setHistory] = useState([])
   const [retrainStatus, setRetrainStatus] = useState(null)
+  const [model, setModel] = useState('auto')
   const { addToast } = useToast()
   const [samples] = useState([
     { text: 'Mera order abhi tak nahi aaya, 3 din ho gaye!', cat: 'Delivery_Issue', urg: 'High' },
@@ -1350,7 +1351,7 @@ function ClassifyPage() {
     if (!t.trim()) return
     setLoading(true)
     try {
-      const r = await predict(t)
+      const r = await predict(t, model)
       setResult(r)
       if (!complaintText) setText('')
     } catch { addToast('Classification failed. Is the backend running?', 'error') }
@@ -1379,6 +1380,24 @@ function ClassifyPage() {
             className="dark:bg-[#131825] bg-white border dark:border-white/5 border-gray-200 rounded-xl p-5"
           >
             <h3 className="text-sm font-medium dark:text-gray-300 text-gray-600 mb-3">Enter Complaint</h3>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-xs dark:text-gray-500 text-gray-400">Model:</span>
+              {['auto', 'muril', 'sklearn'].map(m => (
+                <button
+                  key={m}
+                  onClick={() => setModel(m)}
+                  className={`px-3 py-1 rounded-full text-xs font-medium transition ${
+                    model === m
+                      ? m === 'muril' ? 'bg-violet-500/20 text-violet-400 border border-violet-500/30'
+                        : m === 'sklearn' ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
+                        : 'bg-white/10 text-white border border-white/20'
+                      : 'dark:bg-white/5 bg-gray-100 dark:text-gray-500 text-gray-400 border border-transparent dark:hover:bg-white/10 hover:bg-gray-200'
+                  }`}
+                >
+                  {m === 'auto' ? 'Auto' : m === 'muril' ? 'MuRIL (GPU)' : 'Sklearn (Local)'}
+                </button>
+              ))}
+            </div>
             <textarea
               value={text}
               onChange={e => setText(e.target.value)}

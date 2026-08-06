@@ -40,6 +40,7 @@ logger = logging.getLogger(__name__)
 predictor = None
 db = None
 compare_models = {}
+muril_trainer_instance = None
 
 CATEGORIES = ["Account_Technical", "Customer_Service", "Delivery_Issue", "Order_Status", "Payment_Invoice", "Pricing_Discount", "Product_Quality", "Returns_Refunds", "Wrong_Damaged_Product"]
 URGENCY_LEVELS = ["High", "Medium", "Low"]
@@ -71,7 +72,7 @@ def groq_request_with_retry(payload, api_key, max_retries=3):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global predictor, db, compare_models
+    global predictor, db, compare_models, muril_trainer_instance
     logger.info("Loading models...")
     predictor = ComplaintPredictor(use_muril=True)
     predictor.load_models()
@@ -161,11 +162,13 @@ async def log_requests(request: Request, call_next):
 class PredictionRequest(BaseModel):
     text: str = Field(..., min_length=1, max_length=5000, description="Complaint text to classify")
     session_id: Optional[str] = None
+    model: Optional[str] = Field(default="auto", description="Model to use: 'auto', 'muril', or 'sklearn'")
 
 
 class BatchPredictionRequest(BaseModel):
     texts: List[str] = Field(..., min_length=1, max_length=100, description="List of complaints to classify")
     session_id: Optional[str] = None
+    model: Optional[str] = Field(default="auto", description="Model to use: 'auto', 'muril', or 'sklearn'")
 
 
 class CorrectionRequest(BaseModel):
@@ -270,7 +273,7 @@ def get_categories():
 def predict(body: PredictionRequest, request: Request):
     if not predictor:
         raise HTTPException(status_code=503, detail="Models not loaded")
-    result = predictor.predict(body.text, session_id=body.session_id)
+    result = predictor.predict(body.text, session_id=body.session_id, model=body.model)
     return result
 
 
@@ -281,7 +284,7 @@ def predict_batch(body: BatchPredictionRequest, request: Request):
         raise HTTPException(status_code=503, detail="Models not loaded")
     results = []
     for text in body.texts:
-        result = predictor.predict(text, session_id=body.session_id)
+        result = predictor.predict(text, session_id=body.session_id, model=body.model)
         results.append(result)
     return {"predictions": results, "count": len(results)}
 

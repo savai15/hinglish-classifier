@@ -21,3 +21,5 @@ frontend/README.md
 reports/
 data/processed/
 app_streamlit_backup.py
+models/muril_classifier/
+test_muril.py

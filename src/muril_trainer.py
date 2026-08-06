@@ -132,12 +132,12 @@ class MurilTrainer:
 
     def prepare_data(self, df, task="category"):
         if task == "category":
-            labels = df["category"].map(CATEGORY_MAP).values
+            labels = df["category"].map(CATEGORY_MAP).to_numpy()
         else:
-            labels = df["urgency"].map(URGENCY_MAP).values
+            labels = df["urgency"].map(URGENCY_MAP).to_numpy()
 
         X_train, X_test, y_train, y_test = train_test_split(
-            df["text"].values, labels,
+            df["text"].to_numpy(), labels,
             test_size=0.15,
             random_state=RANDOM_STATE,
             stratify=labels,
@@ -186,7 +186,7 @@ class MurilTrainer:
             greater_is_better=True,
             warmup_steps=500,
             logging_steps=100,
-            fp16=False,
+            fp16=True,
             dataloader_num_workers=0,
             report_to="none",
             seed=RANDOM_STATE,
@@ -273,6 +273,7 @@ class MurilTrainer:
             "max_length": MAX_LENGTH,
             "category_map": CATEGORY_MAP,
             "urgency_map": URGENCY_MAP,
+            "task": "urgency" if self.num_labels == 3 else "category",
             "created_at": datetime.now().isoformat(),
         }
         with open(output_dir / "model_meta.json", "w") as f:

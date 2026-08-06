@@ -1482,6 +1482,7 @@ function ClassifyPage() {
 
                 {/* Feedback Panel */}
                 <FeedbackPanel
+                  key={result.id}
                   predictionId={result.id}
                   text={result.text || text}
                   predictedCategory={result.category}

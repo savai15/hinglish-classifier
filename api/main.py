@@ -73,7 +73,7 @@ def groq_request_with_retry(payload, api_key, max_retries=3):
 async def lifespan(app: FastAPI):
     global predictor, db, compare_models
     logger.info("Loading models...")
-    predictor = ComplaintPredictor(use_muril=False)
+    predictor = ComplaintPredictor(use_muril=True)
     predictor.load_models()
     db = ComplaintDB()
 

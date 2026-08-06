@@ -96,6 +96,20 @@ async def lifespan(app: FastAPI):
         except Exception as e:
             logger.warning(f"Failed to load compare model {name}: {e}")
 
+    # Load MuRIL for compare if available
+    muril_cat_dir = MODEL_DIR / "muril_classifier" / "category"
+    muril_urg_dir = MODEL_DIR / "muril_classifier" / "urgency"
+    muril_trainer_instance = None
+    if muril_cat_dir.exists() and muril_urg_dir.exists():
+        try:
+            from src.muril_trainer import MurilTrainer
+            muril_cat = MurilTrainer.load(muril_cat_dir)
+            muril_urg = MurilTrainer.load(muril_urg_dir)
+            muril_trainer_instance = {'cat': muril_cat, 'urg': muril_urg, 'label': 'MuRIL (GPU)'}
+            logger.info("MuRIL models loaded for comparison")
+        except Exception as e:
+            logger.warning(f"Failed to load MuRIL for compare: {e}")
+
     logger.info("Models loaded! API ready.")
     yield
     logger.info("Shutting down...")
@@ -321,6 +335,23 @@ async def compare_predictions(request: Request, req: PredictionRequest):
             }
         except Exception as e:
             results[name] = {"label": model_info.get('label', name), "error": str(e)}
+
+    # Add MuRIL predictions if available
+    if muril_trainer_instance:
+        try:
+            cat_result = muril_trainer_instance['cat'].predict([req.text], "category")[0]
+            urg_result = muril_trainer_instance['urg'].predict([req.text], "urgency")[0]
+            results['muril'] = {
+                "label": "MuRIL (GPU)",
+                "category": cat_result['label'],
+                "category_confidence": cat_result['confidence'],
+                "category_probabilities": cat_result['probabilities'],
+                "urgency": urg_result['label'],
+                "urgency_confidence": urg_result['confidence'],
+                "urgency_probabilities": urg_result['probabilities'],
+            }
+        except Exception as e:
+            results['muril'] = {"label": "MuRIL (GPU)", "error": str(e)}
 
     cat_predictions = [r.get('category') for r in results.values() if r.get('category')]
     urg_predictions = [r.get('urgency') for r in results.values() if r.get('urgency')]
@@ -880,6 +911,8 @@ async def export_report():
 <tbody>
 <tr><td>TF-IDF + SVM</td><td>Category F1</td><td>99.69%</td></tr>
 <tr><td>Combined Ensemble</td><td>Urgency F1</td><td>99.96%</td></tr>
+<tr><td>MuRIL (GPU)</td><td>Category F1</td><td>99.87%</td></tr>
+<tr><td>MuRIL (GPU)</td><td>Urgency F1</td><td>100.00%</td></tr>
 </tbody></table>
 
 <h2>Recent Predictions (Last 20)</h2>
@@ -888,7 +921,7 @@ async def export_report():
 
 <div class="footer">
   <p>HinglishAI — Hinglish E-Commerce Complaint Classifier</p>
-  <p>Powered by scikit-learn TF-IDF + SVM | FastAPI Backend | React Frontend</p>
+  <p>Powered by MuRIL GPU + scikit-learn TF-IDF + SVM | FastAPI Backend | React Frontend</p>
 </div>
 </body>
 </html>"""

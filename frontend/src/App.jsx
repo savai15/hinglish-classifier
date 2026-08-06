@@ -1155,7 +1155,8 @@ function DashboardPage() {
             {[
               { label: 'TF-IDF + SVM — Category F1', score: 99.69, color: '#6366f1' },
               { label: 'Combined Ensemble — Urgency F1', score: 99.96, color: '#22d3ee' },
-              { label: 'MuRIL (GPU Fine-tuned)', score: 0, color: '#8b5cf6', note: 'Not trained yet' },
+              { label: 'MuRIL — Category F1', score: 99.87, color: '#8b5cf6' },
+              { label: 'MuRIL — Urgency F1', score: 100.00, color: '#a78bfa' },
             ].map((m, i) => (
               <div key={i}>
                 <div className="flex items-center justify-between text-xs mb-1">
@@ -1408,7 +1409,18 @@ function ClassifyPage() {
                 className="dark:bg-[#131825] bg-white border dark:border-white/5 border-gray-200 rounded-xl p-5 overflow-hidden"
               >
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-medium dark:text-gray-300 text-gray-600">Result</h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-medium dark:text-gray-300 text-gray-600">Result</h3>
+                    {result.source && (
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                        result.source === 'muril'
+                          ? 'bg-violet-500/10 text-violet-400 border border-violet-500/20'
+                          : 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'
+                      }`}>
+                        {result.source === 'muril' ? 'MuRIL' : 'Sklearn'}
+                      </span>
+                    )}
+                  </div>
                   {result.needs_review && (
                     <span className="flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
                       <AlertTriangle size={12} /> Needs Review
@@ -2653,6 +2665,7 @@ function ComparePage() {
     tfidf_svm: { label: 'TF-IDF + SVM', color: 'from-violet-500 to-purple-500' },
     tfidf_lr: { label: 'TF-IDF + LR', color: 'from-cyan-500 to-blue-500' },
     ensemble: { label: 'Combined Ensemble', color: 'from-emerald-500 to-teal-500' },
+    muril: { label: 'MuRIL (GPU)', color: 'from-purple-500 to-pink-500' },
   }
 
   return (
@@ -2663,7 +2676,7 @@ function ComparePage() {
         </div>
         <div>
           <h1 className="text-xl font-bold text-white">Model Comparison</h1>
-          <p className="text-sm text-gray-500">Compare predictions across all 3 models side-by-side</p>
+          <p className="text-sm text-gray-500">Compare predictions across all 4 models side-by-side</p>
         </div>
       </div>
 
@@ -2714,7 +2727,7 @@ function ComparePage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
             {Object.entries(result.models).map(([key, model]) => {
               const info = modelNames[key] || { label: key, color: 'from-gray-500 to-gray-600' }
               if (model.error) return (

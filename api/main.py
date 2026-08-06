@@ -991,8 +991,9 @@ def get_low_confidence(request: Request, limit: int = 20):
     df = db.get_low_confidence_predictions()
     if len(df) == 0:
         return {"predictions": [], "count": 0}
+    records = [{k: (None if pd.isna(v) else v) for k, v in row.items()} for row in df.to_dict(orient="records")]
     return {
-        "predictions": df.head(limit).to_dict(orient="records"),
+        "predictions": records[:limit],
         "count": len(df),
     }
 

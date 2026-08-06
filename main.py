@@ -90,10 +90,10 @@ def main():
     # ========================================================================
     # STEP 1: Load Data (Augmented)
     # ========================================================================
-    print("\n[1/9] Loading 50K Hinglish dataset...")
-    csv_path = os.path.join(PROJECT_ROOT, "data", "raw", "hinglish_dataset_50000.csv")
+    print("\n[1/9] Loading 30K Hinglish dataset from friend's codebase...")
+    csv_path = os.path.join(PROJECT_ROOT, "hinglish-classifier-0.8", "data", "raw", "hinglish_complaints_30k.csv")
     if not os.path.exists(csv_path):
-        raise FileNotFoundError(f"Missing required 50k dataset at: {csv_path}")
+        raise FileNotFoundError(f"Missing required 30k dataset at: {csv_path}")
     df = load_data(csv_path)
 
     stats = get_data_stats(df)

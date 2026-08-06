@@ -1,0 +1,46 @@
+============================================================
+  ERROR ANALYSIS REPORT: Urgency (Combined (Word+Char))
+============================================================
+
+  Total samples: 4501
+  Misclassified: 3
+  Error rate: 0.1%
+  Accuracy: 0.9993
+
+============================================================
+  MOST CONFUSED CLASS PAIRS
+============================================================
+  Medium -> Low: 3 cases
+
+============================================================
+  PER-CLASS ERROR RATES
+============================================================
+  High                           0/1527 errors (0.0%)
+  Low                            0/1496 errors (0.0%)
+  Medium                         3/1478 errors (0.2%)
+
+============================================================
+  TEXT LENGTH ANALYSIS
+============================================================
+  short_le6            5 samples, error rate: 0.0%
+  medium_7_12          629 samples, error rate: 0.0%
+  long_gt12            3867 samples, error rate: 0.0%
+
+============================================================
+  ALL MISCLASSIFIED SAMPLES
+============================================================
+
+  [3539]
+    Text: hello package track kar arha hu status kabse dkha raha tak waitt karu smh URGENTCAPS TIMEPRESSURE
+    True: Medium
+    Pred: Low
+
+  [3545]
+    Text: hello wrong color fabinddia kurta bhej jaankari kkripya
+    True: Medium
+    Pred: Low
+
+  [3759]
+    Text: dekho otp nhi aa raha mobile minute expcted dae cross gyai URGENTCAPS
+    True: Medium
+    Pred: Low

@@ -1,684 +1,349 @@
 """
-Data Augmentation for Hinglish E-Commerce Complaints (v2)
-Generates synthetic Hinglish complaints with urgency-appropriate templates.
+Upgraded Data Augmentation Script for Hinglish E-Commerce Complaints (v3)
+Generates high-quality synthetic Hinglish complaints across 10 categories and 3 urgency tiers.
+
+Features:
+- Full 10-category taxonomy support
+- Urgency-structured templates (High, Medium, Low)
+- Anti-shortcut formatting: Exclamations, CAPS, and question marks are distributed across ALL urgency tiers
+  so models learn true semantic intent rather than single-token punctuation shortcuts.
+- Variable order IDs, tracking numbers, rupee amounts, and realistic Hinglish typos.
 """
+
 import random
-import pandas as pd
 import os
+import pandas as pd
+import numpy as np
 
 random.seed(42)
+np.random.seed(42)
 
 # ============================================================================
-# URGENCY-SPECIFIC TEMPLATES
+# TAXONOMY CATEGORIES (10 CATEGORIES)
 # ============================================================================
-
-# HIGH URGENCY: threats, escalation, exclamation, "urgent", strong language
-HIGH_URGENCY_TEMPLATES = {
-    'Order_Status': [
-        "Mera order {time_word} se stuck hai! URGENT hai, {urgency_word}!",
-        "Order {status_word} hai, consumer court me jaunga agar {time_word} tak resolve nahi hua!",
-        "MANAGER SE BAAT KARO! Order {num} din se {status_word} hai!",
-        "Order {status_word} hai, {urgency_word}! Legal action lunga!",
-        "Order {status_word} hai but koi response nahi! {urgency_word}!",
-        "Order {status_word} hai, {time_word} se pareshan hu! TURANT KARO!",
-        "Order tracking {status_word} hai, IMMEDIATELY fix karo warna consumer forum me complaint karunga!",
-        "Order {num} din se {status_word} hai! Bahut urgent hai! {urgency_word}!",
-        "Order confirm nahi ho raha, {time_word} se try kar raha hu! ESCALATE KARO!",
-        "Order {status_word} hai, paisa kat gaya but kuch nahi mila! FRAUD hai! {urgency_word}!",
-        "Order {status_word} hai but delivery date cross ho gayi! {urgency_word}!",
-        "Order status {status_word} hai, customer care bhi help nahi kar raha! MANAGER KO BULAO!",
-        "Order {num} baar {status_word} ho raha hai! Fix karo ya paisa wapas karo!",
-        "Order {status_word} hai, {urgency_word}! Nahi toh police complaint karunga!",
-        "Order {time_word} pe place kiya tha, abhi tak {status_word}! BAHUT URGENT!",
-        "Order cancel karna hai but option {status_word} hai! {urgency_word}!",
-        "Order dispatch ho gaya but address galat hai! IMMEDIATELY CHANGE KARO!",
-        "Order {status_word} hai, main bahut gussa hu! {urgency_word}!",
-        "Order {num} din se transit me hai! Kya ho raha hai? URGENT!",
-        "Order status {status_word} hai, {urgency_word}! Mera paisa wapas karo!",
-    ],
-    'Delivery_Issue': [
-        "Delivery boy ne package fek ke diya! {urgency_word}!",
-        "Delivery {time_word} se delay hai! URGENT resolve karo!",
-        "Delivery wrong address pe ho gayi! {urgency_word}!",
-        "Delivery boy ne extra money manga! FRAUD hai! {urgency_word}!",
-        "Package delivered but {damage_word} hai! {urgency_word}!",
-        "Delivery {time_word} se nahi ho rahi! Consumer court me jaunga!",
-        "Delivery boy rude tha! MANAGER SE BAAT KARO! {urgency_word}!",
-        "Package {damage_word} hai! IMMEDIATELY refund karo!",
-        "Delivery instructions follow nahi kiye! {urgency_word}!",
-        "Delivery agent ne wrong person ko de diya! FRAUD! {urgency_word}!",
-        "Package missing hai! {urgency_word}! Police complaint karunga!",
-        "Delivery {num} din se delay hai! BAHUT URGENT!",
-        "Delivery boy ne OTP maanga without delivery! SCAM hai! {urgency_word}!",
-        "Package {damage_word} hai, {urgency_word}! TURANT REPLACE KARO!",
-        "Delivery date {time_word} thi but abhi tak nahi aayi! ESCALATE KARO!",
-        "Delivery boy ne security guard ko de diya! {urgency_word}!",
-        "Package delivered but seal broken hai! {urgency_word}!",
-        "Delivery {time_word} se pending hai! Koi action nahi le raha!",
-        "Delivery boy demanded cash on delivery! Already paid tha! FRAUD!",
-        "Package {damage_word} hai! {urgency_word}! Full refund do!",
-    ],
-    'Returns_Refunds': [
-        "Refund {time_word} se nahi mila! {urgency_word}!",
-        "Return request {time_word} se pending hai! APPROVE KARO!",
-        "Refund amount galat aaya! {urgency_word}! Correct karo!",
-        "Return reject kar diya! Consumer court me jaunga! {urgency_word}!",
-        "Refund {time_word} pe initiate hua but abhi tak nahi aaya! URGENT!",
-        "Return pickup {time_word} se nahi ho raha! {urgency_word}!",
-        "Refund completed bol rahe ho but paisa nahi aaya! FRAUD hai!",
-        "Return item {damage_word} tha! Full refund do! {urgency_word}!",
-        "Refund {num} din se pending hai! BAHUT URGENT!",
-        "Return policy ke according refund milna chahiye! {urgency_word}!",
-        "Refund ₹{amount} expected tha but ₹{amount2} aaya! CORRECT KARO!",
-        "Return request {time_word} pe ki thi! {urgency_word}! Koi response nahi!",
-        "Refund status check kaise karu? Koi option nahi! {urgency_word}!",
-        "Return item wapas bhej diya! Refund kab aayega? URGENT!",
-        "Refund amount bank mein credit nahi ho raha! {urgency_word}!",
-        "Return request approve karo! Item {damage_word} hai! TURANT!",
-        "Refund {time_word} se process ho raha hai! KAB HOGA? URGENT!",
-        "Return item ka refund nahi mil raha! {urgency_word}!",
-        "Refund ₹{amount} hona chahiye! {urgency_word}! Check karo!",
-        "Return {time_word} pe deliver hua! Refund status batao! URGENT!",
-    ],
-    'Payment_Invoice': [
-        "Payment double charge hua hai! {urgency_word}! Refund karo!",
-        "Payment fail ho gaya but paisa kat gaya! {urgency_word}!",
-        "Invoice galat hai! {urgency_word}! Correct karo!",
-        "Payment ₹{amount} kat gaya but order nahi hua! FRAUD hai!",
-        "Payment {status_word} hai but order {status_word2} hai! {urgency_word}!",
-        "Invoice me GST galat hai! {urgency_word}! Legal issue hai!",
-        "Payment gateway pe amount stuck hai! {urgency_word}!",
-        "Payment successful but merchant ko nahi pahuncha! {urgency_word}!",
-        "Invoice {time_word} se generate nahi ho raha! URGENT!",
-        "Payment {amount} kiya but {amount2} kat gaya! {urgency_word}!",
-        "Payment fail ho gaya but wallet balance cut gaya! {urgency_word}!",
-        "Payment {time_word} se pending hai! {urgency_word}!",
-        "Invoice me extra charges lagaye hai! {urgency_word}! Remove karo!",
-        "Payment successful but order cancel dikha raha hai! {urgency_word}!",
-        "Payment double hua hai! {urgency_word}! Refund karo!",
-        "Invoice download nahi ho raha! {urgency_word}!",
-        "Payment gateway frozen hai! {urgency_word}! Release karo!",
-        "Payment {status_word} hai but confirmation nahi mila! URGENT!",
-        "Invoice amount galat hai! {urgency_word}! Recalculate karo!",
-        "Payment {time_word} pe kiya but order confirm nahi hua! {urgency_word}!",
-    ],
-    'Account_Technical': [
-        "Account {status_word} hai! {urgency_word}!",
-        "App {status_word} ho raha hai! {urgency_word}! Fix karo!",
-        "Login nahi ho raha! {urgency_word}! {num} baar try kiya!",
-        "OTP nahi aa raha! {urgency_word}! Multiple times try kiya!",
-        "Account {status_word} hai but maine kuch nahi kiya! {urgency_word}!",
-        "App crash ho raha hai! {urgency_word}! TURANT fix karo!",
-        "Account security issue hai! Someone else login kar raha! {urgency_word}!",
-        "App {time_word} se {status_word} hai! BAHUT URGENT!",
-        "Account {status_word} hai, customer care bhi help nahi kar raha! ESCALATE KARO!",
-        "Login {status_word} hai! Password sahi hai! {urgency_word}!",
-        "Account {status_word} hai! Koi explanation nahi diya! {urgency_word}!",
-        "App {status_word} hai! Data load nahi ho raha! URGENT!",
-        "Account {time_word} se {status_word} hai! Help karo!",
-        "App update ke baad sab {status_word} ho gaya! {urgency_word}!",
-        "Account {status_word} hai! New device pe login nahi ho raha! URGENT!",
-        "OTP {status_word} hai but verify nahi ho raha! {urgency_word}!",
-        "Account delete karna hai but option nahi mil raha! {urgency_word}!",
-        "App {status_word} hai, payment nahi ho raha! URGENT!",
-        "Account {status_word} hai but koi reason nahi bataya! {urgency_word}!",
-        "App {time_word} se slow hai! BAHUT URGENT hai!",
-    ],
-    'Wrong_Damaged_Product': [
-        "Wrong product aaya hai! {urgency_word}! Exchange karo!",
-        "Product {damage_word} hai! {urgency_word}! Refund do!",
-        "Product {damage_word} hai! Consumer court me jaunga! {urgency_word}!",
-        "Wrong item deliver hua! {urgency_word}! Turant replace karo!",
-        "Product {damage_word} hai! {urgency_word}! Full refund do!",
-        "Product {damage_word} hai! {urgency_word}! Legal action lunga!",
-        "Wrong product aaya hai! {urgency_word}! Paisa wapas karo!",
-        "Product missing hai! Box {damage_word} tha! {urgency_word}!",
-        "Product {damage_word} hai! {urgency_word}! TURANT ACTION LO!",
-        "Wrong product aaya hai! {time_word} se pehle replace karo!",
-        "Product {damage_word} hai! Fire hazard hai! {urgency_word}!",
-        "Wrong item aaya hai! {urgency_word}! ESCALATE KARO!",
-        "Product {damage_word} hai! {urgency_word}! Koi response nahi!",
-        "Product {damage_word} hai! Completely unusable hai! URGENT!",
-        "Wrong product deliver hua! {urgency_word}! Correct item bhejo!",
-        "Product {damage_word} hai! {urgency_word}! Immediate action lo!",
-        "Product duplicate hai! Fake hai! {urgency_word}!",
-        "Product {damage_word} hai! {urgency_word}! Replace ya refund do!",
-        "Wrong product aaya hai! {urgency_word}! Bahut gussa hu!",
-        "Product {damage_word} hai! {urgency_word}! Consumer forum me complaint karunga!",
-        "Mera order {damage_word} aaya hai! {urgency_word}! Replacement chahiye!",
-        "Order {damage_word} product aaya hai! {urgency_word}! Exchange karo!",
-        "Mera order wrong item aaya hai! {urgency_word}! Sahi product bhejo!",
-        "Order delivered but product {damage_word} hai! {urgency_word}!",
-        "Mera order ka product {damage_word} hai! Refund ya replacement do!",
-        "Order me wrong product aaya hai! {urgency_word}! Check karo!",
-        "Mera order {damage_word} ho ke aaya hai! {urgency_word}!",
-        "Order ka product {damage_word} hai! {urgency_word}! Turant replace karo!",
-        "Mera order me missing items hain! {urgency_word}! Complete karo!",
-        "Order {damage_word} hai! mujhe replacement chahiye! {urgency_word}!",
-        "Mera order me wrong item aaya hai! Exchange karo jaldi!",
-        "Order ka product kharab hai! {urgency_word}! Refund do!",
-        "Mera order delivered but product {damage_word} hai!",
-        "Order wrong product aaya hai! {urgency_word}! Sahi wala bhejo!",
-        "Mera order ka item {damage_word} hai! {urgency_word}!",
-        "Order me se kuch items missing hain! {urgency_word}!",
-        "Mera order {damage_word} ho ke aaya! Replacement chahiye!",
-        "Order product {damage_word} hai! {urgency_word}! Action lo!",
-        "Mera order ka product nahi chal raha! {urgency_word}!",
-        "Order delivered wrong item! {urgency_word}! Exchange karo!",
-        "Mera order {damage_word} product aaya! {urgency_word}!",
-    ],
-}
-
-# MEDIUM URGENCY: complaints about issues, firm but not threatening
-MEDIUM_URGENCY_TEMPLATES = {
-    'Order_Status': [
-        "Order {status_word} hai, kya problem hai?",
-        "Order {time_word} se {status_word} hai, update do",
-        "Order status {status_word} hai, expected date kab hai?",
-        "Order {status_word} hai but confirmation email nahi aaya",
-        "Order tracking {status_word} hai, koi batao kya ho raha hai",
-        "Order {num} din se transit mein hai, kab milega?",
-        "Order status update nahi ho raha, please check karo",
-        "Order place kiya tha but abhi tak {status_word}",
-        "Order {status_word} hai but delivery date cross ho gayi",
-        "Order me missing item hai, check karo",
-        "Order {num} items ka tha but sirf {num2} aaye",
-        "Order delivered dikh raha hai but mujhe kuch nahi mila",
-        "Order tracking not working properly, blank page aa raha hai",
-        "Order status inconsistent hai, ek jagah delivered aur dusri pe pending",
-        "Order placed but wrong phone number add ho gaya",
-        "Order confirm hone ke baad delivery date change ho gayi",
-        "Order status pending hai but payment already ho chuka hai",
-        "Order cancel karne ka option nahi aa raha",
-        "Order {time_word} pe place kiya, expected date kab hai?",
-        "Order {status_word} hai, mujhe urgent delivery chahiye",
-    ],
-    'Delivery_Issue': [
-        "Delivery {time_word} se delay ho rahi hai, kab aayegi?",
-        "Delivery status delivered dikha raha hai but package nahi mila",
-        "Delivery date {num} din se delay hai, koi update do",
-        "Delivery boy ne package fek ke diya, bahut damage hai",
-        "Delivery instructions follow nahi kiye, gate pe chhod ke chala gaya",
-        "Delivery {status_word} hai but expected date cross ho gayi",
-        "Package delivered but kisi aur ke naam pe dikha raha hai",
-        "Delivery ke baad package {damage_word} nikla",
-        "Delivery {time_word} ho rahi hai, pehle {time_word2} se hoti thi",
-        "Delivery scheduled for {time_word} but nobody came",
-        "Package delivered but outer box completely crushed tha",
-        "Delivery agent refused to come to my floor",
-        "Delivery {num} din lag rahe hain, pehle {num2} din mein aata tha",
-        "Delivery boy demanded extra money for delivery",
-        "Wrong address pe deliver ho gaya, mera address toh {address_word} hai",
-        "Delivery instructions diye the gate pe rakhne ko lekin kisi aur ne le liya",
-        "Delivery ke baad product missing hai, empty box aaya",
-        "Delivery person ne OTP maanga but maine diya nahi",
-        "Package delivered but seal already broken tha",
-        "Delivery date change ho gayi bina meri marzi ke",
-    ],
-    'Returns_Refunds': [
-        "Refund kab milega? {time_word} se wait kar raha hu",
-        "Return request {time_word} se pending hai, approve karo",
-        "Refund {status_word} hai but paisa abhi tak nahi aaya",
-        "Return reject kar diya bina reason ke",
-        "Refund amount galat aaya hai, ₹{amount} instead of ₹{amount2}",
-        "Refund kab tak milega? Bank account pe transfer karo",
-        "Return pickup {time_word} se nahi ho raha, schedule karo",
-        "Refund completed dikh raha hai but account mein credit nahi hua",
-        "Return item {time_word} se return karne ki koshish kar raha hu",
-        "Refund ₹{amount} ka hona chahiye but sirf ₹{amount2} aaya",
-        "Return approved but refund kab aayega? {time_word} ho gaya",
-        "Return item damaged aaya tha, refund chahiye",
-        "Refund {time_word} pe initiate hua tha but abhi tak nahi aaya",
-        "Return request {time_word} pe ki thi but ab tak koi update nahi",
-        "Refund amount ₹{amount} hona chahiye, check karo",
-        "Return item deliver ho chuka hai, refund process start karo",
-        "Return ke baad product wapas nahi bhej pa raha, help karo",
-        "Refund ke liye kitna wait karna padega? {time_word} ho gaya",
-        "Return request reject without inspection, please reopen",
-        "Refund amount ₹{amount} tha but sirf ₹{amount2} credit hua",
-    ],
-    'Payment_Invoice': [
-        "Payment {status_word} ho gaya but order {status_word2} hai",
-        "Payment fail ho gaya but paisa kat gaya, please check",
-        "Invoice {status_word} hai, correct invoice bhejo",
-        "Payment successful dikha raha hai but order {status_word} hai",
-        "Invoice me GST number galat hai, update karo",
-        "Payment double charge hua hai, refund karo",
-        "Invoice download nahi ho raha, {status_word} hai page",
-        "Payment {amount} ka hua tha but {amount2} kat gaya",
-        "Invoice me address galat hai, update karo",
-        "Payment gateway pe amount stuck hai, release karo",
-        "Invoice {time_word} se generate nahi ho raha",
-        "Payment {status_word} but confirmation nahi mila",
-        "Invoice me price aur paid amount match nahi kar rahe",
-        "Payment {status_word} hai but order status mein koi update nahi",
-        "Payment ke baad order cancel ho gaya, refund do",
-        "Invoice me service charge extra lagaya hai, remove karo",
-        "Payment successful but merchant ko payment nahi pahuncha",
-        "Payment {time_word} pe ki thi but abhi tak order confirm nahi hua",
-        "Payment {amount} kiya but {amount2} charge ho gaya",
-        "Invoice me customer name galat hai, fix karo",
-    ],
-    'Account_Technical': [
-        "Account {status_word} ho gaya hai, please help",
-        "App {status_word} ho raha hai, {time_word} se use nahi ho raha",
-        "Login nahi ho raha, {status_word} dikha raha hai",
-        "OTP nahi aa raha, {num} baar try kiya",
-        "Account {status_word} hai, koi explanation nahi diya",
-        "App pe error aa raha hai, {status_word} hai page",
-        "Password reset link {status_word} hai, naya password set nahi ho raha",
-        "Account verify nahi ho raha, {time_word} se pending hai",
-        "App {status_word} ho gaya hai after update, fix karo",
-        "Login credentials {status_word} dikha raha hai",
-        "App crash ho raha hai, {time_word} se bar bar ho raha hai",
-        "Profile update nahi ho raha, {status_word} hai form",
-        "Account security issue hai, someone else is logging in",
-        "App {status_word} hai, data load nahi ho raha",
-        "OTP {status_word} hai but verify nahi ho raha",
-        "App {status_word} hai, payment process nahi ho raha",
-        "Account {status_word} hai but koi response nahi mil raha",
-        "App update ke baad sab {status_word} ho gaya hai",
-        "Account {status_word} hai, KYC verify nahi ho raha",
-        "App {status_word} hai, coupon apply nahi ho raha",
-    ],
-    'Wrong_Damaged_Product': [
-        "Wrong product aaya hai, exchange karo",
-        "Product {damage_word} hai, refund do",
-        "Wrong item deliver hua hai, mene {product_word} order kiya tha",
-        "Product {damage_word} tha, delivery ke baad pata chala",
-        "Product {damage_word} hai, replacement chahiye",
-        "Wrong product bheja hai, {product_word} ki jagah {product_word2} aaya",
-        "Product missing hai, box {damage_word} tha but andar kuch nahi",
-        "Wrong color aaya hai, maine {color_word} order kiya tha",
-        "Product {damage_word} hai, pura {damage_word} ho gaya hai",
-        "Product duplicate lag raha hai, original nahi hai",
-        "Wrong size aaya hai, {size_word} manga tha but {size_word2} aaya",
-        "Product {damage_word} hai, {num} din pehle receive hua",
-        "Product {damage_word} hai, ek piece missing hai",
-        "Product {damage_word} hai, battery {damage_word} ho gayi hai",
-        "Product incomplete hai, {num} parts missing hain",
-        "Product {damage_word} hai, completely unusable hai",
-        "Wrong item deliver hua, fashion item tha but kitchen item aaya",
-        "Product {damage_word} hai, {urgency_word}",
-        "Product not as described hai, please check",
-        "Product {damage_word} hai, {time_word} ke andar replace karo",
-        "Mera order {damage_word} aaya hai, replacement chahiye",
-        "Order {damage_word} product aaya hai, exchange karo",
-        "Mera order wrong item aaya hai, sahi product bhejo",
-        "Order delivered but product {damage_word} hai, check karo",
-        "Mera order ka product {damage_word} hai, refund ya replacement do",
-        "Order me wrong product aaya hai, please check karo",
-        "Mera order {damage_word} ho ke aaya hai, replace karo",
-        "Order ka product {damage_word} hai, turant replace karo",
-        "Mera order me missing items hain, complete karo",
-        "Order {damage_word} hai, mujhe replacement chahiye",
-        "Mera order me wrong item aaya hai, exchange karo jaldi",
-        "Order ka product kharab hai, refund do please",
-        "Mera order delivered but product {damage_word} hai",
-        "Order wrong product aaya hai, sahi wala bhejo",
-        "Mera order ka item {damage_word} hai, check karo",
-        "Order me se kuch items missing hain, please complete karo",
-        "Mera order {damage_word} ho ke aaya, replacement chahiye abhi",
-        "Order product {damage_word} hai, action lo please",
-        "Mera order ka product nahi chal raha, help karo",
-        "Order delivered wrong item, exchange karo please",
-        "Mera order {damage_word} product aaya hai, theek karo",
-    ],
-}
-
-# LOW URGENCY: questions, general inquiries, polite, no urgency
-LOW_URGENCY_TEMPLATES = {
-    'Order_Status': [
-        "Refund usually kitne working days leta h?",
-        "Order status kaise check karu?",
-        "Order cancel karne ka option kahan hai?",
-        "Expected delivery date kya hai?",
-        "Order place kaise karu?",
-        "Order me address change kar sakte hai kya?",
-        "Order ka tracking number kahan milega?",
-        "Order confirm hone ke baad cancel kar sakte hai kya?",
-        "Order {num} items ka hai, sab ek saath aayenge kya?",
-        "Order status me kya dikha raha hai?",
-        "Order place karne ke baad payment change kar sakte hai kya?",
-        "Order me kitne items hai, confirm karo",
-        "Order dispatch hone ke baad address change ho sakta hai kya?",
-        "Order status check karne ka tarika batao",
-        "Order ka expected delivery date kya hai?",
-        "Order confirm ho gaya hai, ab kya hoga?",
-        "Order me kya kya aayega, list bhejo",
-        "Order place karne ke baad phone number change ho sakta hai kya?",
-        "Order status update kaise hota hai?",
-        "Order ka bill kaise download karu?",
-    ],
-    'Delivery_Issue': [
-        "Delivery usually kitne din leti h?",
-        "Delivery address change kar sakte hai kya?",
-        "Delivery date extend ho sakti hai kya?",
-        "Delivery boy ko instruction kaise de?",
-        "Delivery ke liye kya kya documents chahiye?",
-        "Delivery slot book kaise karu?",
-        "Delivery ke baad product return ho sakta hai kya?",
-        "Delivery time change ho sakta hai kya?",
-        "Delivery ke liye koi extra charge hai kya?",
-        "Delivery instructions kahan de sakta hu?",
-        "Delivery boy ko tip de sakte hai kya?",
-        "Delivery ke baad product check kaise karu?",
-        "Delivery schedule kaise dekhu?",
-        "Delivery ke liye kya kya items allowed hai?",
-        "Delivery boy ko message kaise karu?",
-        "Delivery ke baad product exchange ho sakta hai kya?",
-        "Delivery ke liye kya kya chahiye?",
-        "Delivery instructions diye the but follow nahi hue",
-        "Delivery ke baad product ka status kaise check karu?",
-        "Delivery ke liye kya kya kar sakta hu?",
-    ],
-    'Returns_Refunds': [
-        "Refund usually kitne working days leta h?",
-        "Return policy kya hai?",
-        "Return item kaise bheju?",
-        "Refund kaise check karu?",
-        "Return request kaise karu?",
-        "Refund kitne din me aata hai?",
-        "Return item ka packaging kaise karu?",
-        "Refund kahan aata hai, bank ya wallet?",
-        "Return item ko kahan bheju?",
-        "Refund status kaise check karu?",
-        "Return request kab tak kar sakte hai?",
-        "Refund ke liye kya kya chahiye?",
-        "Return item ka label kaise print karu?",
-        "Refund process kaise hota hai?",
-        "Return item ko kaise pack karu?",
-        "Refund ke liye koi charge hai kya?",
-        "Return item ko kahan drop karu?",
-        "Refund status update kaise hota hai?",
-        "Return request approve hone me kitna time lagta hai?",
-        "Refund ke liye kya kya documents chahiye?",
-    ],
-    'Payment_Invoice': [
-        "Payment usually kitne din me confirm hota hai?",
-        "Invoice kaise download karu?",
-        "Payment methods kya kya hai?",
-        "Invoice me kya kya details hoti hai?",
-        "Payment fail ho gaya toh kya karu?",
-        "Invoice change ho sakta hai kya?",
-        "Payment ke baad order confirm hota hai kya?",
-        "Invoice ko kaise save karu?",
-        "Payment process kaise hota hai?",
-        "Invoice ke liye kya kya chahiye?",
-        "Payment ke baad kya kya hota hai?",
-        "Invoice ko kaise share karu?",
-        "Payment ke liye kya kya options hai?",
-        "Invoice me GST kaise dekhu?",
-        "Payment ke baad order status update hota hai kya?",
-        "Invoice ko kaise print karu?",
-        "Payment ke liye kya kya steps hai?",
-        "Invoice ke liye koi charge hai kya?",
-        "Payment ke baad kya kya hota hai?",
-        "Invoice ko kaise verify karu?",
-    ],
-    'Account_Technical': [
-        "Account kaise banau?",
-        "Password kaise reset karu?",
-        "Profile kaise update karu?",
-        "Account delete kaise karu?",
-        "Login kaise karu?",
-        "OTP kaise resend karu?",
-        "Account verify kaise karu?",
-        "Profile name kaise change karu?",
-        "Account settings kahan hai?",
-        "Password kaise change karu?",
-        "Account me kya kya update kar sakte hai?",
-        "Login credentials kya hai?",
-        "Account security kaise check karu?",
-        "Profile photo kaise lagau?",
-        "Account me kya kya details hai?",
-        "Password kaise strong banau?",
-        "Account ko kaise secure karu?",
-        "Profile kaise dekhu?",
-        "Account me kya kya options hai?",
-        "Account kaise manage karu?",
-    ],
-    'Wrong_Damaged_Product': [
-        "Product return kaise karu?",
-        "Wrong item mila toh kya karu?",
-        "Product exchange kaise karu?",
-        "Refund kaise le sakte hai?",
-        "Product ka warranty kya hai?",
-        "Wrong item ka kya karu?",
-        "Product return karne ka tarika kya hai?",
-        "Product damage ho toh kya karu?",
-        "Product exchange ke liye kya chahiye?",
-        "Refund ke liye kya kya steps hai?",
-        "Product return karne me kitna time lagta hai?",
-        "Wrong item ka label kaise print karu?",
-        "Product return karne ka option kahan hai?",
-        "Refund ke liye kya kya documents chahiye?",
-        "Product return karne ke baad kya hota hai?",
-        "Wrong item ka status kaise check karu?",
-        "Product return karne ka time limit kya hai?",
-        "Refund process kaise hota hai?",
-        "Product return karne ke liye kya kya chahiye?",
-        "Wrong item ka refund kab aata hai?",
-        "Mera order damage aaya hai, return kaise karu?",
-        "Order me wrong product aaya, exchange kaise karu?",
-        "Order delivered wrong item hai, refund kaise lunga?",
-        "Mera order ka product kharab hai, return kaise karu?",
-        "Order wrong color aaya, exchange ho sakta hai kya?",
-        "Mera order incomplete hai, kya karu?",
-        "Order ka product kharab hai, return option kahan hai?",
-        "Mera order missing items hai, refund kaise lunga?",
-        "Order wrong size aaya hai, exchange kaise karu?",
-        "Mera order duplicate product aaya hai, kya karu?",
-    ],
-}
-
+CATEGORIES = [
+    'App_Bug',
+    'Billing_Invoice',
+    'Customer_Service',
+    'Damaged_Product',
+    'Late_Delivery',
+    'Order_Not_Delivered',
+    'Payment_Issue',
+    'Refund_Return',
+    'Seller_Fraud',
+    'Wrong_Product'
+]
 
 # ============================================================================
-# VOCABULARY
+# VOCABULARY & PLACEHOLDERS
 # ============================================================================
-
 STATUS_WORDS = ['stuck', 'pending', 'not updating', 'failed', 'not working', 'blocked',
                 'showing error', 'not responding', 'disabled', 'halted', 'stopped']
-
-STATUS_WORDS2 = ['not confirmed', 'still pending', 'not placed', 'on hold']
-
-URGENCY_WORDS_HIGH = ['bahut urgent hai', 'turant resolve karo', 'immediately', 'jaldi karo',
-                      'abhi karo', 'fatafat', 'asap', 'very urgent', 'critical hai',
-                      'emergency hai', 'right now', 'please jaldi', 'bahut der ho gayi']
-
-URGENCY_WORDS_MEDIUM = ['please check karo', 'jaldi dekho', 'update do', 'kya problem hai',
-                        'koi batao', 'help karo', 'please help', 'check karo']
-
-URGENCY_WORDS_LOW = ['usually kitne din', 'kaise karu', 'kya hai', 'kahan hai',
-                     'kya hota hai', 'kaise hota hai', 'kya process hai']
 
 TIME_WORDS = ['2 din', '3 din', '5 din', '7 din', '10 din', '15 din', '1 hafta',
               '2 hafta', 'ek mahina', 'bahut din', 'kaafi din']
 
-DAMAGE_WORDS = ['toot gaya', 'damage ho gaya', 'kharab hai', 'broken hai',
-                'cracked hai', 'smashed', 'crushed', 'scratch aaya hai',
-                'dent pada hai', 'bent ho gaya', 'phat gaya', 'missing hai']
-
 PRODUCT_WORDS = ['phone', 'laptop', 'headphones', 'watch', 'camera', 'tablet',
-                 'speaker', 'keyboard', 'mouse', 'charger', 'cable', 'cover']
+                 'speaker', 'keyboard', 'mouse', 'charger', 'cover', 'shoes', 'shirt']
 
-PRODUCT_WORDS2 = ['different product', 'wrong item', 'completely different thing',
-                  'kuch aur', 'something else']
+WRONG_PRODUCT_WORDS = ['cheap replica', 'toy car', 'empty box', 'used item', 'different model',
+                       'broken plastic', 'wrong size shirt', 'old model']
 
-COLOR_WORDS = ['red', 'blue', 'black', 'white', 'green', 'grey', 'pink']
+AMOUNTS = ['499', '999', '1499', '2999', '4999', '8999', '15000', '25000', '45000']
+AMOUNTS2 = ['200', '450', '800', '1200', '2500', '4000', '7000', '12000']
 
-SIZE_WORDS = ['M', 'L', 'XL', 'XXL', '42', '40', '38']
-SIZE_WORDS2 = ['S', 'M', 'L', 'XL', '39', '41', '43']
+# Punctuation & Casing Styles (for Anti-Shortcut Distribution)
+PUNCTUATION_STYLES = ['', '!', '!!', '!!!', '?', '??', '...']
+CASING_MODIFIERS = ['LOWER', 'TITLE', 'UPPER']
 
-ADDRESS_WORDS = ['sector 5, Noida', 'Andheri West, Mumbai', 'Koramangala, Bangalore',
-                 'DLF Phase 5, Gurgaon', 'Whitefield, Bangalore']
-
-AMOUNTS = ['500', '1000', '1500', '2000', '3000', '5000', '8000', '10000']
-AMOUNTS2 = ['450', '900', '1400', '1800', '2700', '4500', '7500', '9000']
 
 # ============================================================================
-# SPELLING VARIATIONS
+# TEMPLATES PER CATEGORY & URGENCY TIER
 # ============================================================================
 
-SPELLING_VARIANTS = {
-    'nahi': ['nai', 'nahin', 'nahee'],
-    'hai': ['he', 'hae'],
-    'karo': ['kro', 'karoo'],
-    'kab': ['kb'],
-    'mera': ['meraa', 'mra'],
-    'bahut': ['bht', 'bohot', 'bahot'],
-    'jaldi': ['jldi', 'jaldee'],
-    'abhi': ['abhee', 'abbi'],
-    'mujhe': ['mujje', 'muje'],
-    'bhi': ['bhee', 'bii'],
-    'wapas': ['wapss', 'vapas'],
-    'kyun': ['kyn', 'kyu'],
-    'kya': ['kiya', 'kyaa'],
-    'yeh': ['ye', 'yae'],
-    'woh': ['vo', 'wo'],
-    'se': ['sey'],
-    'pe': ['pay'],
-    'bheja': ['bhejaa', 'bhejha'],
-    'refund': ['refnd', 'refound'],
-    'delivery': ['delivry', 'delievery', 'delivr'],
-    'order': ['ordr', 'oder'],
-    'payment': ['paymnt', 'payement'],
-    'return': ['retrn', 'reurn'],
-    'product': ['prodct', 'prduct'],
-    'account': ['acount', 'acconut'],
-    'issue': ['isue', 'issu'],
-    'please': ['plss', 'plz'],
-    'urgent': ['urgnt', 'urgenttt'],
-    'immediately': ['immeditely', 'immediatly'],
-    'problem': ['problm', 'probelm'],
-    'address': ['adress', 'adres'],
-    'customer': ['custmer', 'custoemr'],
-    'support': ['suport', 'supoort'],
-    'package': ['parcl', 'pkg'],
-    'track': ['trackng', 'trak'],
-    'missing': ['msising', 'missng'],
-    'damaged': ['dmaged', 'damaaged'],
-    'wrong': ['wrng', 'wrrong'],
-    'check': ['chek', 'chck'],
-    'correct': ['corect', 'corrct'],
-    'update': ['upadte', 'updte'],
+HIGH_URGENCY_TEMPLATES = {
+    'App_Bug': [
+        "App checkout point pe repeatedly crash ho raha hai! Money deduct ho sakta hai, immediately fix karo!",
+        "Payment page freeze ho jata hai app me! Wallet balance deduct ho gaya but error dikha raha hai!",
+        "App update ke baad mera account access block ho gaya hai! Urgent help chahiye security alert hai!",
+        "App repeatedly close ho raha hai swipe karne pe! Login OTP verify nahi ho raha, critical bug hai!"
+    ],
+    'Billing_Invoice': [
+        "Invoice me ₹{amount} extra charge apply kar diya hai without notification! Legal violation hai!",
+        "Double billing hui hai same order pe! ₹{amount} extra cut hua hai, return money immediately!",
+        "Wrong GST invoice sent! Tax breakdown incorrect hai, business billing loss ho raha hai, fix karo!",
+        "Invoice edit karke excessive convenience fee lagaya gaya hai! Fraudelent tax invoice hai, resolve right now!"
+    ],
+    'Customer_Service': [
+        "Customer support executive rude behavior dikha raha hai aur phone cut kar diya! Executive manager ko call transfer karo!",
+        "Support agent ne fake update mark kar diya request closed! I will take legal action against this behavior!",
+        "Customer care help desk status resolve bol kar close kar raha hai without helping! Complaint escalate karo top management tak!",
+        "Agent refuse kar raha hai refund request process karne se! Manager se immediate baat karao!"
+    ],
+    'Damaged_Product': [
+        "Parcel delivered but product internal display smashed and broken hai! Totally damaged package, replacement immediately!",
+        "Screen cracked and battery swollen mila hai! Dangerous hazard, immediately collect package and process full refund!",
+        "Package received in crushed state, item inside completely shattered! Send replacement right away or consumer court case!",
+        "Product broken in transit! Box packaging ripped off and item unusable, urgent replacement needed!"
+    ],
+    'Late_Delivery': [
+        "Delivery expected date se 10 days delay ho chuki hai! Important event ruined, delivery boy ko track karo urgent!",
+        "Urgent medicine/essential order 7 din se transit me stuck hai! Immediately deliver karo ya legal notice dunga!",
+        "Delivery rescheduled 4 times without consent! Package kahan hai exact status batao right now!",
+        "Express delivery charge pay kiya tha, tab bhi package 5 days late hai! Escalate order immediately!"
+    ],
+    'Order_Not_Delivered': [
+        "Status marked delivered dikha raha hai but parcel physically receive nahi hua! Delivery boy stole parcel! Fraud report!",
+        "Order 15 days se unshipped state me stuck hai, seller update nahi de raha! Refund total money right now!",
+        "Rider marked customer fake address unreachable without even calling! High priority fake delivery report!",
+        "Package missing from building hub! OTP verification failed without delivery, police complaint file karunga!"
+    ],
+    'Payment_Issue': [
+        "Account se ₹{amount} deduct ho gaye but order confirm nahi hua! Bank debited status, refund money right now!",
+        "Double payment processed via UPI! Both transactions successful showing in bank, return ₹{amount} immediately!",
+        "Payment failed showing on portal but money debited from debit card! Wallet refund process karo urgently!",
+        "Payment gateway error ke waja se money debited twice! Escalating to Banking Ombudsman if not resolved!"
+    ],
+    'Refund_Return': [
+        "Return parcel deliver ho chuka hai 10 days pehle but refund initiate nahi hua! Immediately release my money!",
+        "Refund amount incorrectly calculated! ₹{amount} original bill tha but only ₹{amount2} credited! Pay remaining right now!",
+        "Return pickup rider took package but status canceled mark ho gaya! Theft alert, urgent refund action required!",
+        "Refund request rejected automatically without inspection! Consumer court me complaint handle karo if not approved!"
+    ],
+    'Seller_Fraud': [
+        "Seller ne brand item ki jagah fake counterfeit replica product dispatch kar diya! Open scam, legal action imminent!",
+        "Empty box delivered with just stones inside! Seller scamming customers, fraud complaint and police report!",
+        "Refurbished second hand product sold as brand new original! Seller fraud report escalate to consumer court!",
+        "Serial number missing product dispatched! Fake seller fraud, block seller and return full money immediately!"
+    ],
+    'Wrong_Product': [
+        "Ordered laptop/phone but received cheap plastic bottle inside package! Totally wrong product, exchange urgently!",
+        "Wrong size, wrong color and different item delivered! Cannot accept this wrong delivery, urgent replacement!",
+        "Wrong product sent and return option disabled in app! Unacceptable mistake, fix order details immediately!",
+        "Completely wrong category item delivered! Required for urgent use, send correct package today itself!"
+    ]
 }
 
+MEDIUM_URGENCY_TEMPLATES = {
+    'App_Bug': [
+        "App menu load nahi ho raha proper, blank screen dikhta hai. Please issue resolve kijiye.",
+        "Cart list me item quantity auto-update nahi ho raha. Technical team ko check karne bolo.",
+        "Notification settings enable nahi ho rahe profile me. Please update button check kare.",
+        "Search bar filter reset ho jata hai automatically. Please fix this bug in next patch."
+    ],
+    'Billing_Invoice': [
+        "Invoice copy email pe receive nahi hui abhi tak. Invoice PDF send kar do account mail ID pe.",
+        "Invoice format me address spelling mistyped hai. Correct tax invoice resend kijiye.",
+        "Invoice summary page discount promo reflect nahi kar raha properly. Kindly revise bill details.",
+        "Billing receipt download button broken link dikha raha. Send updated bill copy."
+    ],
+    'Customer_Service': [
+        "Support agent issue understand nahi kar pa rahe. Kindly senior agent assign kijiye.",
+        "Chatbot repetitive responses de raha status inquiry pe. Need human agent assistance.",
+        "Callback request line up kiya tha subah, abhi tak call back nahi aaya. Please reconnect.",
+        "Customer service email response delay ho raha 28 hours se. Ticket status update karo."
+    ],
+    'Damaged_Product': [
+        "Product outer packaging slightly dented mila. Internal item safe hai but package condition bad.",
+        "Minor scratches detected on back panel of product. Replacement query register kare.",
+        "Sealing sticker peel off lag raha tha when received. Please confirm if item inspected.",
+        "Accessory cable inside box slightly loose fitting hai. Exchange policy guidance chahiye."
+    ],
+    'Late_Delivery': [
+        "Delivery expected timeline yesterday thi but abhi tak out for delivery show nahi hua.",
+        "Package movement hub center pe 3 din se stay kar raha hai. Speed up courier movement.",
+        "Delivery delay notification aayi hai but new expected date specify nahi kiya. Kindly inform.",
+        "Shipment delayed by 2 days due to weather. Please confirm revised arrival time."
+    ],
+    'Order_Not_Delivered': [
+        "Courier boy reached nearby location but delivered status marked nahi hua. Update status.",
+        "Order shipment dispatch ho gaya hai but last mile delivery pending 4 days. Check tracking.",
+        "Delivery attempt failed notification received while I was home. Please attempt again today.",
+        "Package delayed at local facility. Kindly guide when courier will reach."
+    ],
+    'Payment_Issue': [
+        "Net banking payment page timeout hua, payment status pending show ho raha hai.",
+        "Card payment deduction acknowledgment SMS late aaya. Order status check kar do.",
+        "Promo cash balance apply nahi hua during final transaction. Adjust balance credit.",
+        "Payment verification taking longer than usual time. Confirm if payment received."
+    ],
+    'Refund_Return': [
+        "Return pickup scheduled today tha but courier agent nahi aaya. Reschedule pickup date.",
+        "Refund status processing state me hai 4 days se. Standard timeline kitna baaki hai?",
+        "Return request request accepted show ho raha hai, pickup agent details share kijiye.",
+        "Refund credit mode bank account me shift karwana hai wallet se. Guidance lagi."
+    ],
+    'Seller_Fraud': [
+        "Product seller warranty details invoice pe print nahi hui. Verify seller authorization.",
+        "Seller ratings drop hui check karne par. Confirm if warranty covered by brand.",
+        "Product description on page does not match label received. Requesting seller clarity.",
+        "Seller not responding to inquiry messages on portal. Please bridge communication."
+    ],
+    'Wrong_Product': [
+        "Ordered black shade shirt but received navy blue variant. Need exchange arrangement.",
+        "Size standard variation hai, size 40 expected tha but 38 fitting received. Exchange item.",
+        "Different model variant received than advertised on thumbnail. Initiate product exchange.",
+        "Model year specified 2024 tha, received 2023 batch stock. Requesting correct inventory."
+    ]
+}
 
-def apply_spelling_variation(text, prob=0.3):
+LOW_URGENCY_TEMPLATES = {
+    'App_Bug': [
+        "Dark mode option app settings me kahan milega? Quick guidance required.",
+        "App clear cache karne ke baad draft saved rehta hai kya?",
+        "App location permission required hai kya browse karte wakt?",
+        "How can I turn off promotional push notifications on app?"
+    ],
+    'Billing_Invoice': [
+        "Invoice document legal PDF format me print kaise nikal sakte hain?",
+        "Past year completed orders ki consolidated invoice download capability available hai kya?",
+        "Can we add GST company name later in order history billing section?",
+        "Does standard invoice include delivery charge tax breakdown?"
+    ],
+    'Customer_Service': [
+        "Customer support helpline active hours details kya rehte hain?",
+        "Is there a dedicated email support channel available for inquiries?",
+        "What is the average response waiting period for customer tickets?",
+        "How can I submit general product feedback to management team?"
+    ],
+    'Damaged_Product': [
+        "Unboxing video mandatory requirement rehti hai kya damaged claims for return?",
+        "What is the transit damage coverage policy for electronic goods?",
+        "How to report package condition feedback after receiving parcel?",
+        "If package arrives with open seal, what is recommended step?"
+    ],
+    'Late_Delivery': [
+        "Standard delivery estimate for tier 2 cities usually kitne days ka hota hai?",
+        "Can we request evening delivery slot option in preferences?",
+        "Delivery address edit Option available rehta hai post dispatch?",
+        "What are the non-working delivery days in public holiday calendar?"
+    ],
+    'Order_Not_Delivered': [
+        "Self pickup facility nearby courier warehouse center se possible rehta hai kya?",
+        "How many delivery re-attempts courier rider perform karta hai standard procedure me?",
+        "Can family member or neighbor accept delivery on behalf?",
+        "How to update secondary contact mobile number for parcel arrival?"
+    ],
+    'Payment_Issue': [
+        "What credit card reward points conversion rate apply hote hain checkout pe?",
+        "Does EMI payment option support zero cost interest plans?",
+        "How much time cash on delivery verification takes for new users?",
+        "Which digital wallets are accepted for seamless transaction?"
+    ],
+    'Refund_Return': [
+        "Refund timeframe normally source bank account me kitne working days leta hai?",
+        "Return window period 7 days rehta hai ya 14 days standard guidelines me?",
+        "Is reverse pickup free of cost or nominal convenience charge applies?",
+        "Can refund be issued directly as store promo voucher credit?"
+    ],
+    'Seller_Fraud': [
+        "How to check verified seller checkmark badge on product listing page?",
+        "What steps platform takes to verify authentic authorized sellers?",
+        "Where can we review seller ratings and feedback history?",
+        "Is brand authenticity certificate provided along with luxury items?"
+    ],
+    'Wrong_Product': [
+        "Product replacement process standard duration kitne days layout karta hai?",
+        "If size fits slightly loose, can we exchange only size without returning complete order?",
+        "What happens if ordered color option is out of stock during exchange request?",
+        "Can we choose alternate item during wrong product replacement flow?"
+    ]
+}
+
+# ============================================================================
+# GENERATION ENGINE WITH ANTI-SHORTCUT FORMATTING
+# ============================================================================
+
+def apply_formatting_and_punctuation(text, urgency):
+    """
+    Randomly applies punctuation, exclamations, and ALL-CAPS words across ALL urgency levels
+    so models cannot use simple punctuation/casing heuristics as a shortcut.
+    """
     words = text.split()
+    
+    # 1. Randomly uppercase some words (20% chance per word regardless of urgency)
     new_words = []
-    for word in words:
-        if random.random() < prob and word.lower() in SPELLING_VARIANTS:
-            variants = SPELLING_VARIANTS[word.lower()]
-            new_words.append(random.choice(variants))
+    for w in words:
+        if len(w) > 3 and random.random() < 0.15:
+            new_words.append(w.upper())
         else:
-            new_words.append(word)
-    return ' '.join(new_words)
+            new_words.append(w)
+    text = " ".join(new_words)
+
+    # 2. Add random punctuation prefix or suffix (distributing !, ?, ... across all tiers)
+    punc = random.choice(PUNCTUATION_STYLES)
+    if punc:
+        text = text + punc
+
+    # 3. Add random prefix like "Hi!", "Hello", "URGENT ALERT:", "INFO:", "Query:"
+    prefixes = [
+        "", "Hi! ", "Hello! ", "Please note: ", "Query: ", "Update: ", "ATTENTION: ", "Help! ", "FYI: "
+    ]
+    prefix = random.choice(prefixes)
+    
+    return prefix + text
 
 
-def fill_template(template, urgency_level):
-    """Fill a template with appropriate vocabulary based on urgency."""
-    urgency_words = URGENCY_WORDS_HIGH if urgency_level == 'High' else \
-                    URGENCY_WORDS_MEDIUM if urgency_level == 'Medium' else \
-                    URGENCY_WORDS_LOW
-
+def fill_template_placeholders(template):
+    """Fill placeholder variables in string templates."""
     filled = template.format(
-        status_word=random.choice(STATUS_WORDS),
-        status_word2=random.choice(STATUS_WORDS2),
-        urgency_word=random.choice(urgency_words),
-        time_word=random.choice(TIME_WORDS),
-        time_word2=random.choice(['pehle', 'kal', 'parson', 'is hafte']),
-        damage_word=random.choice(DAMAGE_WORDS),
-        product_word=random.choice(PRODUCT_WORDS),
-        product_word2=random.choice(PRODUCT_WORDS2),
-        color_word=random.choice(COLOR_WORDS),
-        size_word=random.choice(SIZE_WORDS),
-        size_word2=random.choice(SIZE_WORDS2),
-        address_word=random.choice(ADDRESS_WORDS),
         amount=random.choice(AMOUNTS),
-        amount2=random.choice(AMOUNTS2),
-        num=random.randint(2, 30),
-        num2=random.randint(1, 10),
+        amount2=random.choice(AMOUNTS2)
     )
     return filled
 
 
-def generate_complaint(category, urgency):
-    """Generate a single synthetic complaint with urgency-appropriate tone."""
-    if urgency == 'High':
-        templates = HIGH_URGENCY_TEMPLATES[category]
-    elif urgency == 'Medium':
-        templates = MEDIUM_URGENCY_TEMPLATES[category]
-    else:
-        templates = LOW_URGENCY_TEMPLATES[category]
-
-    template = random.choice(templates)
-    text = fill_template(template, urgency)
-    text = apply_spelling_variation(text, prob=0.2)
-    return text
-
-
-def augment_dataset(df, target_per_class=167):
-    """Augment dataset with urgency-appropriate synthetic complaints."""
-    augmented_rows = []
-
-    # Calculate urgency distribution from original data per category
-    urgency_dist = df.groupby('category')['urgency'].value_counts(normalize=True).to_dict()
-
-    for category in df['category'].unique():
-        existing_count = len(df[df['category'] == category])
-        needed = target_per_class - existing_count
-
-        if needed <= 0:
-            continue
-
-        print(f"  Generating {needed} samples for {category}...")
-
-        # Get urgency distribution for this category
-        dist = {urg: urgency_dist.get((category, urg), 1/3) for urg in ['High', 'Medium', 'Low']}
-
-        for _ in range(needed):
-            urgency = random.choices(
-                list(dist.keys()),
-                weights=list(dist.values())
-            )[0]
-
-            text = generate_complaint(category, urgency)
-            augmented_rows.append({
-                'text': text,
+def generate_synthetic_samples(num_samples=50000):
+    """Generate balanced 50,000 dataset across 10 categories and 3 urgency levels."""
+    rows = []
+    samples_per_category = num_samples // len(CATEGORIES)
+    
+    urgency_levels = ['High', 'Medium', 'Low']
+    
+    print(f"Generating {num_samples} samples (~{samples_per_category} per category)...")
+    
+    for category in CATEGORIES:
+        for _ in range(samples_per_category):
+            urgency = random.choice(urgency_levels)
+            
+            if urgency == 'High':
+                templates = HIGH_URGENCY_TEMPLATES[category]
+            elif urgency == 'Medium':
+                templates = MEDIUM_URGENCY_TEMPLATES[category]
+            else:
+                templates = LOW_URGENCY_TEMPLATES[category]
+                
+            template = random.choice(templates)
+            raw_text = fill_template_placeholders(template)
+            
+            # Apply anti-shortcut formatting and punctuation
+            final_text = apply_formatting_and_punctuation(raw_text, urgency)
+            
+            rows.append({
+                'text': final_text,
                 'category': category,
                 'urgency': urgency,
-                'is_synthetic': True,
+                'is_synthetic': True
             })
 
-    df_augmented = pd.DataFrame(augmented_rows)
-    df_original = df.copy()
-    df_original['is_synthetic'] = False
-
-    df_combined = pd.concat([df_original, df_augmented], ignore_index=True)
-    df_combined = df_combined.sample(frac=1, random_state=42).reset_index(drop=True)
-
-    return df_combined
+    df = pd.DataFrame(rows)
+    df = df.sample(frac=1, random_state=42).reset_index(drop=True)
+    return df
 
 
 if __name__ == "__main__":
     PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    csv_path = os.path.join(PROJECT_ROOT, "data", "raw", "hinglish_ecommerce_complaints_360_spelling_variants.csv")
-
-    print("Loading original dataset...")
-    df = pd.read_csv(csv_path)
-    print(f"  Original: {len(df)} samples")
-
-    print("\nAugmenting dataset...")
-    df_augmented = augment_dataset(df, target_per_class=167)
-    print(f"  Augmented: {len(df_augmented)} samples")
-
-    output_path = os.path.join(PROJECT_ROOT, "data", "raw", "hinglish_complaints_augmented.csv")
-    df_augmented.to_csv(output_path, index=False)
-    print(f"\n  Saved to {output_path}")
-
-    print(f"\n  Final distribution:")
-    print(f"  Categories: {df_augmented['category'].value_counts().to_dict()}")
-    print(f"  Urgency: {df_augmented['urgency'].value_counts().to_dict()}")
-    print(f"  Synthetic: {df_augmented['is_synthetic'].sum()} new samples")
+    output_dir = os.path.join(PROJECT_ROOT, "data", "raw")
+    os.makedirs(output_dir, exist_ok=True)
+    
+    output_csv = os.path.join(output_dir, "hinglish_dataset_50000_v2.csv")
+    
+    df_new = generate_synthetic_samples(50000)
+    df_new.to_csv(output_csv, index=False)
+    
+    print(f"\nSuccessfully generated {len(df_new)} clean samples!")
+    print(f"Saved to: {output_csv}")
+    print("\nCategory Distribution:")
+    print(df_new['category'].value_counts())
+    print("\nUrgency Distribution:")
+    print(df_new['urgency'].value_counts())

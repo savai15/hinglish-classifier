@@ -1,0 +1,128 @@
+============================================================
+  ERROR ANALYSIS REPORT: Category (Combined (Word+Char))
+============================================================
+
+  Total samples: 4501
+  Misclassified: 17
+  Error rate: 0.4%
+  Accuracy: 0.9962
+
+============================================================
+  MOST CONFUSED CLASS PAIRS
+============================================================
+  Payment_Invoice -> Pricing_Discount: 7 cases
+  Pricing_Discount -> Payment_Invoice: 3 cases
+  Payment_Invoice -> Order_Status: 3 cases
+  Pricing_Discount -> Product_Quality: 1 cases
+  Order_Status -> Wrong_Damaged_Product: 1 cases
+  Delivery_Issue -> Order_Status: 1 cases
+  Payment_Invoice -> Returns_Refunds: 1 cases
+
+============================================================
+  PER-CLASS ERROR RATES
+============================================================
+  Account_Technical              0/517 errors (0.0%)
+  Customer_Service               0/501 errors (0.0%)
+  Delivery_Issue                 1/517 errors (0.2%)
+  Order_Status                   1/473 errors (0.2%)
+  Payment_Invoice                11/524 errors (2.1%)
+  Pricing_Discount               4/479 errors (0.8%)
+  Product_Quality                0/497 errors (0.0%)
+  Returns_Refunds                0/502 errors (0.0%)
+  Wrong_Damaged_Product          0/491 errors (0.0%)
+
+============================================================
+  TEXT LENGTH ANALYSIS
+============================================================
+  short_le6            5 samples, error rate: 0.0%
+  medium_7_12          629 samples, error rate: 0.1%
+  long_gt12            3867 samples, error rate: 0.3%
+
+============================================================
+  ALL MISCLASSIFIED SAMPLES
+============================================================
+
+  [3106]
+    Text: coupon welcome100 apply discount nahin mila packing bahut kharab kar sakte kripya batana zara MULTIPLEQUESTIONS
+    True: Payment_Invoice
+    Pred: Pricing_Discount
+
+  [3273]
+    Text: sir coupon festive30 apply discount nahin mila umeed jaldi resolve hoga URGENTKEYWORD
+    True: Payment_Invoice
+    Pred: Pricing_Discount
+
+  [3306]
+    Text: respected sir writing raise complaint regarding recent order coupon save20 apply discount nahin mila pehle aisa baar chuka order id od42668415803041731 amount agar jaldi resolve nahin national consumer helpline complaint karunga requesting escalate concerned department URGENTCAPS EXCLAMATION ESCALATION URGENTKEYWORD TIMEPRESSURE
+    True: Pricing_Discount
+    Pred: Payment_Invoice
+
+  [3453]
+    Text: namaste coupon festive30 apply discount nahin mila packing bahut kharab sunta nahin ajio EXCLAMATIONHIGH
+    True: Payment_Invoice
+    Pred: Pricing_Discount
+
+  [3494]
+    Text: chcekout extra charrge add gaya bina wajah mujhe liye chutti leni padi office thoda expedite karo please bar dekh lijiye
+    True: Payment_Invoice
+    Pred: Pricing_Discount
+
+  [3507]
+    Text: order vaue payment agya order confirmation nahin mila batao please tak jayega please batao
+    True: Payment_Invoice
+    Pred: Order_Status
+
+  [3564]
+    Text: bhaiya coupon festive30 apply discount nahin mila packing kharab process liye one bata sakta MULTIPLEQUESTIONS
+    True: Pricing_Discount
+    Pred: Payment_Invoice
+
+  [3738]
+    Text: dear concerned team writing raise complaint regarding recent order coupon welcome100 apply discount nahin mila order id amount worst experience ever awaiting prompt response resolution URGENTCAPS EXCLAMATION TIMEPRESSURE
+    True: Payment_Invoice
+    Pred: Pricing_Discount
+
+  [3782]
+    Text: order value paymnet gaa orderr confirmation nahin mila agar ghante solve nahin toh consumer court jaunga immediate action chahye fraud EXCLAMATIONHIGH THREAT
+    True: Payment_Invoice
+    Pred: Order_Status
+
+  [3828]
+    Text: hey coupon welcome100 apply discount nahin mila option kkahan milega
+    True: Payment_Invoice
+    Pred: Pricing_Discount
+
+  [3838]
+    Text: apytm mall levi jeans pice hceckout gaya packing bahut kahrab bas jaankari chahiye kripya batao
+    True: Pricing_Discount
+    Pred: Product_Quality
+
+  [3984]
+    Text: sunlo order dteails wrong dkiha raha mainne order maine screeshot bhej proof sath order id od70367362078243212 amount possible URGENTCAPS
+    True: Order_Status
+    Pred: Wrong_Damaged_Product
+
+  [4100]
+    Text: sunlo order cancel gaya dleivery time bina reason bataye please jaldi karo EXCLAMATION URGENTKEYWORD
+    True: Delivery_Issue
+    Pred: Order_Status
+
+  [4102]
+    Text: coupon newuser apply discount nahin mila delivery charges already pay kar chuka hu sunta nahin warna dekhna log karte URGENTCAPS EXCLAMATIONHIGH
+    True: Payment_Invoice
+    Pred: Pricing_Discount
+
+  [4157]
+    Text: sir refund intiiate tak accountt aa nhi please isko priiority le lo
+    True: Payment_Invoice
+    Pred: Returns_Refunds
+
+  [4299]
+    Text: bhaiya order value paymet gaya order confirmation nahin mila delivery charges already pay kar chuka hu baare email tak nahin mila kitna time lagta usually bata sakta MULTIPLEQUESTIONS
+    True: Payment_Invoice
+    Pred: Order_Status
+
+  [4482]
+    Text: dekho coupon festive30 apply discount anhi mila customer care bata chuka hu baare invoice attach kar raha hu reference liye order id od84674407237020402 amount please pakka karo tak hoga please madad karo URGENTCAPS MEDIUMAMOUNT
+    True: Pricing_Discount
+    Pred: Payment_Invoice

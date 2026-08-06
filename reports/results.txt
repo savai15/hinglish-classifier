@@ -2,11 +2,11 @@
   HINGLISH E-COMMERCE COMPLAINT CLASSIFIER - FINAL REPORT (Upgraded Stacking)
 ======================================================================
 
-  Dataset: 50000 samples from 50K Dataset
-  Categories: 10
+  Dataset: 30000 samples from 50K Dataset
+  Categories: 9
   Urgency levels: 3
 
-  Train: 42682 | Test: 7318
+  Train: 25499 | Test: 4501
   CV Folds: 3
   Enhancements: Stacking Ensemble + HPO Tuning + Dual-Task Classification
 
@@ -15,93 +15,78 @@
 ======================================================================
 
   TF-IDF + LR:
-    Accuracy:       1.0000
-    F1 (macro):     1.0000
-    F1 (weighted):  1.0000
+    Accuracy:       0.9931
+    F1 (macro):     0.9931
+    F1 (weighted):  0.9931
 
   Char N-gram + LR:
-    Accuracy:       1.0000
-    F1 (macro):     1.0000
-    F1 (weighted):  1.0000
+    Accuracy:       0.9944
+    F1 (macro):     0.9945
+    F1 (weighted):  0.9944
 
   Combined (Word+Char):
-    Accuracy:       1.0000
-    F1 (macro):     1.0000
-    F1 (weighted):  1.0000
+    Accuracy:       0.9962
+    F1 (macro):     0.9962
+    F1 (weighted):  0.9962
 
   TF-IDF + SVM:
-    Accuracy:       1.0000
-    F1 (macro):     1.0000
-    F1 (weighted):  1.0000
+    Accuracy:       0.9904
+    F1 (macro):     0.9904
+    F1 (weighted):  0.9904
 
   Ensemble:
-    Accuracy:       1.0000
-    F1 (macro):     1.0000
-    F1 (weighted):  1.0000
+    Accuracy:       0.9920
+    F1 (macro):     0.9920
+    F1 (weighted):  0.9920
 
 ======================================================================
   URGENCY CLASSIFICATION RESULTS
 ======================================================================
 
   TF-IDF + LR:
-    Accuracy:       0.3397
-    F1 (macro):     0.3214
-    F1 (weighted):  0.3517
+    Accuracy:       0.9973
+    F1 (macro):     0.9973
+    F1 (weighted):  0.9973
 
   Char N-gram + LR:
-    Accuracy:       0.3517
-    F1 (macro):     0.3251
-    F1 (weighted):  0.3597
+    Accuracy:       0.9976
+    F1 (macro):     0.9975
+    F1 (weighted):  0.9976
 
   Combined (Word+Char):
-    Accuracy:       0.3505
-    F1 (macro):     0.3240
-    F1 (weighted):  0.3590
+    Accuracy:       0.9993
+    F1 (macro):     0.9993
+    F1 (weighted):  0.9993
 
   TF-IDF + SVM:
-    Accuracy:       0.4232
-    F1 (macro):     0.2867
-    F1 (weighted):  0.3607
+    Accuracy:       0.9987
+    F1 (macro):     0.9987
+    F1 (weighted):  0.9987
 
   Ensemble:
-    Accuracy:       0.3274
-    F1 (macro):     0.3151
-    F1 (weighted):  0.3419
+    Accuracy:       0.9938
+    F1 (macro):     0.9937
+    F1 (weighted):  0.9938
 
 ======================================================================
   BEST MODELS
 ======================================================================
 
-  Best Category Model: TF-IDF + LR (F1=1.0000)
-  Best Urgency Model:  Char N-gram + LR (F1=0.3251)
+  Best Category Model: Combined (Word+Char) (F1=0.9962)
+  Best Urgency Model:  Combined (Word+Char) (F1=0.9993)
 
-  Ensemble Category F1: 1.0000
-  Ensemble Urgency F1:  0.3151
+  Ensemble Category F1: 0.9920
+  Ensemble Urgency F1:  0.9937
 
 ======================================================================
   V2 -> V3 IMPROVEMENT
 ======================================================================
   v2 Category Best F1: 0.7934 (TF-IDF + LR)
-  v3 Category Best F1: 1.0000 (TF-IDF + LR)
-  Improvement: 0.2066 (+26.0%)
+  v3 Category Best F1: 0.9962 (Combined (Word+Char))
+  Improvement: 0.2028 (+25.6%)
 
   v2 Urgency Best F1: 0.8023 (Char N-gram + LR)
-  v3 Urgency Best F1: 0.3251 (Char N-gram + LR)
-  Improvement: -0.4772 (-59.5%)
-
-======================================================================
-======================================================================
-  EVALUATION ON 5K HARD/AMBIGUOUS DATASET
-======================================================================
-
-  Category Classification:
-    Accuracy:       0.9464
-    F1 (macro):     0.9477
-    F1 (weighted):  0.9419
-
-  Urgency Classification:
-    Accuracy:       0.2972
-    F1 (macro):     0.2904
-    F1 (weighted):  0.3072
+  v3 Urgency Best F1: 0.9993 (Combined (Word+Char))
+  Improvement: 0.1970 (+24.6%)
 
 ======================================================================

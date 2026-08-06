@@ -40,8 +40,8 @@ def build_tfidf_pipeline(
             max_df=max_df,
             sublinear_tf=True,
             analyzer='word',
-            strip_accents=None,
-            token_pattern=r'(?u)\b\w+\b'
+            lowercase=False,
+            token_pattern=r'(?u)\b[A-Za-z0-9_]+\b'
         )),
         ('classifier', LogisticRegression(
             max_iter=1000,
@@ -154,8 +154,8 @@ def build_svm_pipeline(
             max_df=0.95,
             sublinear_tf=True,
             analyzer='word',
-            strip_accents=None,
-            token_pattern=r'(?u)\b\w+\b'
+            lowercase=False,
+            token_pattern=r'(?u)\b[A-Za-z0-9_]+\b'
         )),
         ('classifier', CalibratedClassifierCV(
             LinearSVC(

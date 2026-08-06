@@ -2,7 +2,7 @@
   ERROR ANALYSIS REPORT: Category (TF-IDF + LR)
 ============================================================
 
-  Total samples: 7318
+  Total samples: 7412
   Misclassified: 0
   Error rate: 0.0%
   Accuracy: 1.0000
@@ -14,23 +14,23 @@
 ============================================================
   PER-CLASS ERROR RATES
 ============================================================
-  App_Bug                        0/806 errors (0.0%)
-  Billing_Invoice                0/660 errors (0.0%)
-  Customer_Service               0/817 errors (0.0%)
-  Damaged_Product                0/740 errors (0.0%)
-  Late_Delivery                  0/643 errors (0.0%)
-  Order_Not_Delivered            0/675 errors (0.0%)
-  Payment_Issue                  0/849 errors (0.0%)
-  Refund_Return                  0/716 errors (0.0%)
-  Seller_Fraud                   0/718 errors (0.0%)
-  Wrong_Product                  0/694 errors (0.0%)
+  App_Bug                        0/834 errors (0.0%)
+  Billing_Invoice                0/681 errors (0.0%)
+  Customer_Service               0/680 errors (0.0%)
+  Damaged_Product                0/684 errors (0.0%)
+  Late_Delivery                  0/788 errors (0.0%)
+  Order_Not_Delivered            0/712 errors (0.0%)
+  Payment_Issue                  0/845 errors (0.0%)
+  Refund_Return                  0/794 errors (0.0%)
+  Seller_Fraud                   0/679 errors (0.0%)
+  Wrong_Product                  0/715 errors (0.0%)
 
 ============================================================
   TEXT LENGTH ANALYSIS
 ============================================================
-  short_le6            177 samples, error rate: 0.0%
-  medium_7_12          2849 samples, error rate: 0.0%
-  long_gt12            4292 samples, error rate: 0.0%
+  short_le6            22 samples, error rate: 0.0%
+  medium_7_12          3205 samples, error rate: 0.0%
+  long_gt12            4185 samples, error rate: 0.0%
 
 ============================================================
   ALL MISCLASSIFIED SAMPLES
